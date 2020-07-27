@@ -1,0 +1,28 @@
+# Name of workflow
+name: Build My Application
+# Event name, or action -> on push
+on: push
+
+jobs:
+  build:
+    name: Build our App
+    runs-on: ubuntu-latest
+    steps:
+      # Name of action
+      - name: Pull Repository
+        # Uses is custom github action that does something, in this case checkout of repo
+        uses: actions/checkout@v2
+      - name: Print Current Directory
+        # Run is actual keyword that does action that we specify
+        run: pwd
+      - name: List Files in Directory
+        run: ls
+        # Check if we have dotnet cli
+      - name: Check Donet Cli
+        # If we do, build solution
+        run: dotnet build
+      - name: List Files in Directory
+        # List directory of solution after build
+        run: ls JudoLibrary.Api -R
+      - name: Check NPM Cli
+        run: npm -v
