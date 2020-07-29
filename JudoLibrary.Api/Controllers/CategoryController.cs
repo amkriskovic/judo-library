@@ -23,20 +23,28 @@ namespace JudoLibrary.Api.Controllers
         [HttpGet]
         public IEnumerable<Category> GetAllCategories() => _context.Categories.ToList();
         
-        // GET -> /api/categories/{id}c
+        // GET -> /api/categories/{id}
         [HttpGet("{id}")]
         public Category GetCategory(string id) => _context.Categories
             .FirstOrDefault(c => c.Id.Equals(id, StringComparison.InvariantCultureIgnoreCase));
         
-        // GET -> /api/categories/{id}/{subcategories}
-        // Get all subcategories for particular category
+        // GET -> /api/categories/{id}/subcategories
+        // Get all subcategories for particular category | Passing category Id as param
         [HttpGet("{id}/subcategories")]
         public IEnumerable<SubCategory> GetAllSubCategoriesForCategory(string id) =>
             _context.SubCategories
                 .Where(sc => sc.CategoryId.Equals(id))
                 .ToList();
         
-        // POST -> /api/categories
+        // GET -> /api/categories/{id}/techniques
+        // Get all techniques for particular category | Passing category Id as param
+        [HttpGet("{id}/techniques")]
+        public IEnumerable<Technique> GetAllTechniquesForCategory(string id) =>
+            _context.Techniques
+                .Where(t => t.Category.Equals(id))
+                .ToList();
+        
+        // POST -> /api/category
         // Create category, sending json from the body of the request
         [HttpPost]
         public async Task<Category> CreateCategory([FromBody] Category category)

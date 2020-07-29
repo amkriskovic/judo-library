@@ -34,7 +34,7 @@ namespace JudoLibrary.Api.Controllers
             .FirstOrDefault();
 
         // GET -> /api/techniques/{id}/submissions
-        // Get all submissions for particular technique
+        // Get all submissions for particular technique | Passing technique Id as param
         [HttpGet("{id}/submissions")]
         public IEnumerable<Submission> GetAllSubmissionsForTechnique(string techniqueId) => _context.Submissions
             .Where(s => s.TechniqueId.Equals(techniqueId))
@@ -52,7 +52,8 @@ namespace JudoLibrary.Api.Controllers
                 Id = techniqueForm.Name.Replace(" ", "-").ToLowerInvariant(),
                 Name = techniqueForm.Name,
                 Description = techniqueForm.Description,
-                SubCategoryId = techniqueForm.SubCategoryId,
+                Category = techniqueForm.CategoryId,
+                SubCategory = techniqueForm.SubCategoryId,
             };
             
             // Save

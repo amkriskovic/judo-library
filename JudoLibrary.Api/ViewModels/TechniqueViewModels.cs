@@ -17,10 +17,11 @@ namespace JudoLibrary.Api.ViewModels
                 technique.Id,
                 technique.Name,
                 technique.Description,
-                technique.SubCategoryId, // Id
-                Counters = technique.Counters.Select(tc => tc.CounterId), // Selecting Counters for TechniqueForm
+                technique.Category, // Id
+                technique.SubCategory, // Id
                 SetUpAttacks = technique.SetUpAttacks.Select(tsa => tsa.SetUpAttackId), // Selecting Counters for TechniqueForm
-                FollowUpAttacks = technique.FollowUpAttacks.Select(tfa => tfa.FollowUpAttackId) // Selecting Counters for TechniqueForm
+                FollowUpAttacks = technique.FollowUpAttacks.Select(tfa => tfa.FollowUpAttackId), // Selecting Counters for TechniqueForm
+                Counters = technique.Counters.Select(tc => tc.CounterId), // Selecting Counters for TechniqueForm
             };
     }
 }

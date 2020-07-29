@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using Microsoft.AspNetCore.Hosting;
@@ -34,19 +35,70 @@ namespace JudoLibrary.Api
                     {
                         Id = "te-waza", Name = "Te Waza", Description = "Hand throwing techniques", CategoryId = "nage-waza"
                     });
+                    
                     context.Add(new SubCategory
                     {
                         Id = "koshi-waza", Name = "Koshi Waza", Description = "Hip throwing techniques", CategoryId = "nage-waza"
                     });
+                    
                     context.Add(new SubCategory
                     {
                         Id = "ashi-waza", Name = "Ashi Waza", Description = "Foot throwing techniques", CategoryId = "nage-waza"
                     });
                     
+                    context.Add(new SubCategory
+                    {
+                        Id = "sutemi-waza", Name = "Sutemi waza", Description = "Sacrifice techniques", CategoryId = "nage-waza"
+                    });
+                    
+                    context.Add(new SubCategory
+                    {
+                        Id = "osaekomi-waza", Name = "Osaekomi waza ", Description = "Pins or matholds", CategoryId = "katame-waza"
+                    });
+                    
                     // Seeding Techniques
                     context.Add(new Technique
                     {
-                        Id = "seoi-nage", Name = "Seoi Nage", Description = "Shoulder throw", SubCategoryId = "te-waza"
+                        Id = "kouchi-gari", Name = "Kouchi gari", Description = "Small inner reap", Category = "nage-waza", SubCategory = "ashi-waza"
+                    });
+                    
+                    context.Add(new Technique
+                    {
+                        Id = "osoto-gari", Name = "Osoto gari ", Description = "Major or large outer reap", Category = "nage-waza", SubCategory = "ashi-waza"
+                    });
+                    
+                    context.Add(new Technique
+                    {
+                        Id = "ushiro-goshi", Name = "Ushiro goshi", Description = "Rear hip throw", Category = "nage-waza", SubCategory = "koshi-waza"
+                    });
+                    
+                    context.Add(new Technique
+                    {
+                        Id = "tani-otoshi", Name = "Tani otoshi", Description = "Valley drop", Category = "nage-waza", SubCategory = "sutemi-waza"
+                    });
+                    
+                    context.Add(new Technique
+                    {
+                        Id = "Kesa-gatame", Name = "Kesa-gatame", Description = "Scarf hold", Category = "katame-waza", SubCategory = "osaekomi-waza"
+                    });
+                    
+                    // * Main Technique *
+                    context.Add(new Technique
+                    {
+                        Id = "seoi-nage", Name = "Seoi Nage", Description = "Shoulder throw", Category = "nage-waza", SubCategory = "ashi-waza",
+                        SetUpAttacks = new List<TechniqueSetupAttack>
+                        {
+                            new TechniqueSetupAttack{TechniqueId = "seoi-nage", SetUpAttackId = "kouchi-gari"}
+                        },
+                        FollowUpAttacks = new List<TechniqueFollowupAttack>
+                        {
+                            new TechniqueFollowupAttack{TechniqueId = "seoi-nage", FollowUpAttackId = "osoto-gari"}
+                        },
+                        Counters = new List<TechniqueCounter>
+                        {
+                            new TechniqueCounter{TechniqueId = "seoi-nage", CounterId = "ushiro-goshi"}, 
+                            new TechniqueCounter{TechniqueId = "seoi-nage", CounterId = "tani-otoshi"}
+                        }
                     });
 
                     // Saving changes to in-memory DB
