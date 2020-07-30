@@ -85,7 +85,7 @@ namespace JudoLibrary.Api
                     // * Main Technique *
                     context.Add(new Technique
                     {
-                        Id = "seoi-nage", Name = "Seoi Nage", Description = "Shoulder throw", Category = "nage-waza", SubCategory = "ashi-waza",
+                        Id = "seoi-nage", Name = "Seoi Nage", Description = "Shoulder throw", Category = "nage-waza", SubCategory = "te-waza",
                         SetUpAttacks = new List<TechniqueSetupAttack>
                         {
                             new TechniqueSetupAttack{TechniqueId = "seoi-nage", SetUpAttackId = "kouchi-gari"}

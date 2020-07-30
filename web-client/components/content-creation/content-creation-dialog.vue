@@ -70,7 +70,7 @@
           {component: TechniquesSteps, title: "Technique"},
           {component: SubmissionSteps, title: "Submission"},
           {component: CategoryForm, title: "Category"},
-          {component: SubcategoryForm, title: "Sub Category"},
+          {component: SubcategoryForm, title: "Sub-Category"},
         ]
       }
     },

@@ -44,7 +44,7 @@ namespace JudoLibrary.Api.Controllers
                 .Where(t => t.Category.Equals(id))
                 .ToList();
         
-        // POST -> /api/category
+        // POST -> /api/categories
         // Create category, sending json from the body of the request
         [HttpPost]
         public async Task<Category> CreateCategory([FromBody] Category category)

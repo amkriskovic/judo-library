@@ -15,7 +15,10 @@
           <!--? Step 1, Vuetify component that asks for technique name, description, stores it, on click goes to next step -->
           <v-text-field label="Name" v-model="form.name"></v-text-field>
           <v-text-field label="Description" v-model="form.description"></v-text-field>
+
+          <v-select :items="categoryItems" v-model="form.category" label="Category"></v-select>
           <v-select :items="subcategoryItems" v-model="form.subCategory" label="Sub Category"></v-select>
+
           <!-- Chips are nice way to display multiple items from dropdown -->
           <v-select :items="techniqueItems" v-model="form.setUpAttacks" label="Set Up Attacks" multiple small-chips chips
                     deletable-chips></v-select>
@@ -49,6 +52,7 @@
     form: {
       name: "",
       description: "",
+      category: "",
       subCategory: "",
       setUpAttacks: [],
       followUpAttacks: [],
@@ -71,7 +75,7 @@
 
     computed: {
       ...mapState("video-upload", ["active"]),
-      ...mapGetters("techniques", ["techniqueItems", "subcategoryItems"]),
+      ...mapGetters("techniques", ["techniqueItems", "categoryItems", "subcategoryItems"]),
     },
 
     // TODO EXPLORE WATCH

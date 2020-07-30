@@ -52,8 +52,19 @@ namespace JudoLibrary.Api.Controllers
                 Id = techniqueForm.Name.Replace(" ", "-").ToLowerInvariant(),
                 Name = techniqueForm.Name,
                 Description = techniqueForm.Description,
-                Category = techniqueForm.CategoryId,
-                SubCategory = techniqueForm.SubCategoryId,
+                Category = techniqueForm.Category,
+                SubCategory = techniqueForm.SubCategory,
+                SetUpAttacks = techniqueForm.SetUpAttacks
+                    // setUpAttackId is pulling values from TechniqueSetupAttack table -> SetUpAttackId prop, and we are
+                    // Selecting that and assigning to SetUpAttacks
+                    .Select(setUpAttackId => new TechniqueSetupAttack {SetUpAttackId = setUpAttackId})
+                    .ToList(),
+                FollowUpAttacks = techniqueForm.FollowUpAttacks
+                    .Select(followUpAttackId => new TechniqueFollowupAttack {FollowUpAttackId = followUpAttackId})
+                    .ToList(),
+                Counters = techniqueForm.Counters
+                    .Select(counterId => new TechniqueCounter {CounterId = counterId})
+                    .ToList()
             };
             
             // Save
