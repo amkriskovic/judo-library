@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JudoLibrary.Api.Controllers
 {
-    [ApiController]
     [Route("api/videos")]
     public class VideosController : ControllerBase
     {

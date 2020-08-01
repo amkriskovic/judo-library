@@ -4,7 +4,9 @@
 
     <!-- "Header" bar -->
     <v-app-bar app dense>
-      <v-toolbar-title>Judo Library</v-toolbar-title>
+
+      <!-- Enabling navigation via nuxt-link -> home page, vuetify class -->
+      <nuxt-link class="text-h5 text--primary" style="text-decoration: none;" to="/">Judo Library</nuxt-link>
 
       <v-spacer></v-spacer>
 

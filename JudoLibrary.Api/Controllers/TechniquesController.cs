@@ -33,9 +33,9 @@ namespace JudoLibrary.Api.Controllers
             .Select(TechniqueViewModels.Default)
             .FirstOrDefault();
 
-        // GET -> /api/techniques/{id}/submissions
+        // GET -> /api/techniques/{techniqueId}/submissions
         // Get all submissions for particular technique | Passing technique Id as param
-        [HttpGet("{id}/submissions")]
+        [HttpGet("{techniqueId}/submissions")]
         public IEnumerable<Submission> GetAllSubmissionsForTechnique(string techniqueId) => _context.Submissions
             .Where(s => s.TechniqueId.Equals(techniqueId))
             .ToList();
@@ -57,6 +57,8 @@ namespace JudoLibrary.Api.Controllers
                 SetUpAttacks = techniqueForm.SetUpAttacks
                     // setUpAttackId is pulling values from TechniqueSetupAttack table -> SetUpAttackId prop, and we are
                     // Selecting that and assigning to SetUpAttacks
+                    // * Assigning to SetUpAttackId value of setUpAttackId that came from [FromBody] when filling form.
+                    // * SetUpAttacks hold value/s then we are selecting them and as above described, mapping them to SetUpAttackId so EF knows what is what
                     .Select(setUpAttackId => new TechniqueSetupAttack {SetUpAttackId = setUpAttackId})
                     .ToList(),
                 FollowUpAttacks = techniqueForm.FollowUpAttacks

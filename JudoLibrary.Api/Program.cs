@@ -100,6 +100,21 @@ namespace JudoLibrary.Api
                             new TechniqueCounter{TechniqueId = "seoi-nage", CounterId = "tani-otoshi"}
                         }
                     });
+                    
+                    // Seeding submissions
+                    context.Add(new Submission
+                    {
+                        TechniqueId = "seoi-nage",
+                        Video = "seoi1.mp4",
+                        Description = "This Seoi nage was very hard to pull of..."
+                    });
+                    
+                    context.Add(new Submission
+                    {
+                        TechniqueId = "osoto-gari",
+                        Video = "osoto1.mp4",
+                        Description = "Demonstration of Osoto Gari"
+                    }); 
 
                     // Saving changes to in-memory DB
                     context.SaveChanges();

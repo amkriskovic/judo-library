@@ -1,21 +1,21 @@
 ﻿<template>
-  <div class="d-flex justify-center align-start">
+  <div class="d-flex mt-3 justify-center align-start">
 
     <div class="mx-2" v-if="submissions">
-      <div v-for="submission in 1">
-        <div v-for="submission in submissions">
-          {{ submission.id }} - {{ submission.description }} - {{ submission.techniqueId }}
-          <div>
-            <!-- :src is calling our /api/videos/{video} controller to open and read content from it -->
-            <video width="400" controls :src="`http://localhost:5000/api/videos/${ submission.video }`"></video>
-          </div>
-        </div>
+      <div v-for="submission in 2">
+        <v-card class="mb-3" v-for="submission in submissions" :key="`${submission}-${technique.id}-${submission.id}`">
+          <!-- Injecting video player component with dynamic binding of video where video is string -->
+          <!-- * Getting specific videos from submissions store |> state => fetchSubmissionsForTechnique filling state -->
+          <video-player :video="submission.video" :key="`v-${submission}-${technique.id}-${submission.id}`"/>
+
+          <v-card-text>{{submission.description}}</v-card-text>
+        </v-card>
       </div>
     </div>
 
     <!-- Component for http://localhost:3000/technique/{everything that comes after that (slug)} -->
     <!-- v-sheet represents "card" with information -->
-    <v-sheet class="pa-3 ma-2 sticky">
+    <v-sheet class="pa-3 sticky">
       <div class="text-h5">
         <span>{{ technique.name }}</span>
         <!-- :to= corresponds to page that we created | category == folder | category.id == page?  -->
@@ -45,8 +45,10 @@
 
 <script>
   import {mapState, mapGetters} from "vuex";
+  import VideoPlayer from "../../components/video-player";
 
   export default {
+    components: {VideoPlayer},
     // Page local state
     data: () => ({
       technique: null,
