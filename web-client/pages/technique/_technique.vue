@@ -1,26 +1,30 @@
 ﻿<template>
-  <div class="d-flex mt-3 justify-center align-start">
 
-    <div class="mx-2" v-if="submissions">
-      <div v-for="submission in 2">
-        <v-card class="mb-3" v-for="submission in submissions" :key="`${submission}-${technique.id}-${submission.id}`">
-          <!-- Injecting video player component with dynamic binding of video where video is string -->
-          <!-- * Getting specific videos from submissions store |> state => fetchSubmissionsForTechnique filling state -->
-          <video-player :video="submission.video" :key="`v-${submission}-${technique.id}-${submission.id}`"/>
+  <!-- Item-Content component injection -->
+  <item-content-layout>
+    <!-- Template for Content-->
+    <template v-slot:content>
+      <div class="mx-2" v-if="submissions">
+        <div v-for="submission in 4">
+          <v-card class="mb-3" v-for="submission in submissions"
+                  :key="`${submission}-${technique.id}-${submission.id}`">
+            <!-- Injecting video player component with dynamic binding of video where video is string -->
+            <!-- * Getting specific videos from submissions store |> state => fetchSubmissionsForTechnique filling state -->
+            <video-player :video="submission.video" :key="`v-${submission}-${technique.id}-${submission.id}`"/>
 
-          <v-card-text>{{submission.description}}</v-card-text>
-        </v-card>
+            <v-card-text>{{submission.description}}</v-card-text>
+          </v-card>
+        </div>
       </div>
-    </div>
+    </template>
 
-    <!-- Component for http://localhost:3000/technique/{everything that comes after that (slug)} -->
-    <!-- v-sheet represents "card" with information -->
-    <v-sheet class="pa-3 sticky">
+    <!-- Template for Item(card) -->
+    <template v-slot:item>
       <div class="text-h5">
         <span>{{ technique.name }}</span>
         <!-- :to= corresponds to page that we created | category == folder | category.id == page?  -->
-        <v-chip small label class="mb-1 ml-2" :to="`/category/${category.id}`">Category: {{ category.name }}</v-chip>
-        <v-chip small label class="mb-1 ml-2" :to="`/subcategory/${subcategory.id}`">Sub Category: {{ subcategory.name }}</v-chip>
+        <v-chip small label class="mb-1 ml-2" :to="`/category/${category.id}`">{{ category.name }}</v-chip>
+        <v-chip small label class="mb-1 ml-2" :to="`/subcategory/${subcategory.id}`">{{ subcategory.name }}</v-chip>
       </div>
 
       <v-divider class="my-1"></v-divider>
@@ -28,7 +32,8 @@
       <v-divider class="my-1"></v-divider>
 
       <!-- Auto-generated component based what relatedData func is returning -->
-      <div v-for="rd in relatedData" v-if="rd.data.length > 0"> <!-- * If there is data, only then display whole object inforation -->
+      <div v-for="rd in relatedData" v-if="rd.data.length > 0">
+        <!-- * If there is data, only then display whole object inforation -->
         <div class="text-subtitle-1">{{ rd.title }}</div>
 
         <v-chip-group>
@@ -38,17 +43,18 @@
           </v-chip>
         </v-chip-group>
       </div>
-    </v-sheet>
+    </template>
+  </item-content-layout>
 
-  </div>
 </template>
 
 <script>
   import {mapState, mapGetters} from "vuex";
   import VideoPlayer from "../../components/video-player";
+  import ItemContentLayout from "../../components/item-content-layout";
 
   export default {
-    components: {VideoPlayer},
+    components: {ItemContentLayout, VideoPlayer},
     // Page local state
     data: () => ({
       technique: null,
@@ -70,7 +76,7 @@
         return [
           {
             title: "Set Up Attacks",
-            data: this.techniques.filter(t => this.technique.followUpAttacks.indexOf(t.id) >= 0),
+            data: this.techniques.filter(t => this.technique.followUpAttacks.indexOf(t.id) >= 0), // filter() creates a new array
             idFactory: t => `technique-${t.id}`,
             routeFactory: t => `/technique/${t.id}`,
           },

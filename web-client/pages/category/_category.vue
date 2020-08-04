@@ -1,29 +1,37 @@
 ﻿<template>
-  <div class="d-flex mt-3 justify-center align-start">
 
-    <!-- Injecting technique list component in order to replace unnecessary HTML | Handles filtering too -->
-    <!-- :techniques is props defined in respective component, which marks details about how to bind tricks: [] -->
-    <technique-list :techniques="techniques" class="mx-2"/>
+  <!-- Item-Content component injection -->
+  <item-content-layout>
+    <!-- Template for Content-->
+    <template v-slot:content>
+      <!-- Injecting technique list component in order to replace unnecessary HTML | Handles filtering too -->
+      <!-- :techniques is props defined in respective component, which marks details about how to bind tricks: [] -->
+      <technique-list :techniques="techniques" class="mx-2"/>
+    </template>
 
-    <!-- Component for http://localhost:3000/category/{everything that comes after that (slug)} -->
-    <v-sheet class="pa-3 mx-2 sticky" v-if="category">
-      <div class="text-h6"> {{ category.name }}</div>
+    <!-- Template for Item(card) -->
+    <template v-slot:item>
+      <div class="pa-3 mx-2 sticky" v-if="category">
+        <div class="text-h6"> {{ category.name }}</div>
 
-      <v-divider class="my-1"></v-divider>
+        <v-divider class="my-1"></v-divider>
 
-      <div class="text-body-2"> {{ category.description }}</div>
-    </v-sheet>
+        <div class="text-body-2"> {{ category.description }}</div>
+      </div>
 
-  </div>
+    </template>
+  </item-content-layout>
+
 </template>
 
 <script>
   import {mapGetters} from "vuex";
   import TechniqueList from "../../components/technique-list";
+  import ItemContentLayout from "../../components/item-content-layout";
 
   export default {
     // Injected components
-    components: {TechniqueList},
+    components: {ItemContentLayout, TechniqueList},
 
     // Page local state | data
     data: () => ({

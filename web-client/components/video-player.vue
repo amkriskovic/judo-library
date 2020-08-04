@@ -51,7 +51,7 @@
   .video-container {
     display: flex;
     position: relative;
-    width: 480px;
+    width: 100%;
 
     /* Round top borders for video container */
     border-top-left-radius: inherit;

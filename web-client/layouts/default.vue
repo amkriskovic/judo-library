@@ -17,8 +17,10 @@
 
     <!-- Sizes your content based upon application components -->
     <v-main>
-      <!-- nuxt is where pages are displayed -->
-      <nuxt/>
+      <v-container>
+        <!-- nuxt is where pages are displayed -->
+        <nuxt/>
+      </v-container>
     </v-main>
   </v-app>
 </template>
