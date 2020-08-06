@@ -21,7 +21,7 @@ namespace JudoLibrary.Api
                 var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 var environment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
                 
-                // If Environment is Development seed test data
+                // If Environment is Development seed Combines data
                 if (environment.IsDevelopment())
                 {
                     // Seeding Categories
