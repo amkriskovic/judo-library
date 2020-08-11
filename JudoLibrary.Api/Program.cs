@@ -106,14 +106,16 @@ namespace JudoLibrary.Api
                     {
                         TechniqueId = "seoi-nage",
                         Video = "seoi1.mp4",
-                        Description = "This Seoi nage was very hard to pull of..."
+                        Description = "This Seoi nage was very hard to pull of...",
+                        VideoProcessed = true
                     });
                     
                     context.Add(new Submission
                     {
                         TechniqueId = "osoto-gari",
                         Video = "osoto1.mp4",
-                        Description = "Demonstration of Osoto Gari"
+                        Description = "Demonstration of Osoto Gari",
+                        VideoProcessed = true
                     }); 
 
                     // Saving changes to in-memory DB

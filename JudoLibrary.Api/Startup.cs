@@ -1,3 +1,5 @@
+using System.Threading.Channels;
+using JudoLibrary.Api.BackgroundServices;
 using JudoLibrary.Data;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -29,6 +31,12 @@ namespace JudoLibrary.Api
             
             // Adding service for using EF In-Memory database
             services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("Dev"));
+            
+            // Adding hosted service for VideoEditingBackgroundService which implements BackgroundService
+            services.AddHostedService<VideoEditingBackgroundService>();
+            
+            // Adding singleton service as Channel<EditVideoMessage>, _ without service provider
+            services.AddSingleton(_ => Channel.CreateUnbounded<EditVideoMessage>());
 
             // Service for CORS mechanism, with current policy, everything is accepted
             services.AddCors(options => options
