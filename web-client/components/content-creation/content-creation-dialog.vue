@@ -35,9 +35,9 @@
 
     <!-- Button -->
     <!-- Centered based on flex, margin top and bottom - 4  -->
-    <!-- Reset dialog component on click when we close component  -->
+    <!-- Cancel form on close -> cancel upload -> delete upload video if it was saved -->
     <div class="d-flex justify-center my-4">
-      <v-btn @click="reset">
+      <v-btn @click="cancelUpload">
         Close
       </v-btn>
     </div>
@@ -46,7 +46,7 @@
 </template>
 
 <script>
-  import {mapState, mapMutations} from "vuex";
+  import {mapState, mapMutations, mapActions} from "vuex";
   import TechniquesSteps from "./techniques-steps";
   import SubmissionSteps from "./submission-steps";
   import CategoryForm from "./category-form";
@@ -75,8 +75,11 @@
       }
     },
 
-    // Mapping mutations for video-upload | methods === functions ==> mutations/actions
-    methods: mapMutations("video-upload", ["reset", "activate"])
+    // Mapping mutations & actions for video-upload | methods === functions ==> mutations/actions
+    methods: {
+      ...mapMutations("video-upload", ["reset", "activate"]),
+      ...mapActions("video-upload", ["cancelUpload"])
+    }
 
   }
 </script>

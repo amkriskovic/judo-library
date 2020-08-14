@@ -11,24 +11,27 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace JudoLibrary.Api.BackgroundServices
+namespace JudoLibrary.Api.BackgroundServices.VideoEditing
 {
     public class VideoEditingBackgroundService : BackgroundService
     {
         private readonly IWebHostEnvironment _environment;
         private readonly ILogger<VideoEditingBackgroundService> _logger;
         private readonly IServiceProvider _serviceProvider;
+        private readonly VideoManager _videoManager;
         private readonly ChannelReader<EditVideoMessage> _channelReader;
 
         public VideoEditingBackgroundService(
             IWebHostEnvironment environment,
             ILogger<VideoEditingBackgroundService> logger,
             Channel<EditVideoMessage> channel,
-            IServiceProvider serviceProvider)
+            IServiceProvider serviceProvider,
+            VideoManager videoManager)
         {
             _environment = environment;
             _logger = logger;
             _serviceProvider = serviceProvider;
+            _videoManager = videoManager;
             _channelReader = channel.Reader;
         }
         
@@ -37,24 +40,25 @@ namespace JudoLibrary.Api.BackgroundServices
         // * Idea is for this Task to be looping
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            // Waiting until something is ready to be read from a channel
-            // If true, we enter while loop, if false, channel has been closed
+            // * Channel consumer
+            // aWaiting until something is ready to be read from a channel
+            // If true, we enter while loop , if false -> channel has been closed -> exiting while loop
             while (await _channelReader.WaitToReadAsync(stoppingToken))
             {
-                // Grab the message from a channel -> object that is constructed in SubmissionsController
+                // Grab the message from a channel -> item/msg that is constructed/has been written in SubmissionsController -> POST
                 var message = await _channelReader.ReadAsync(stoppingToken);
                 
                 // Try/Cath to now blow up program
                 try
                 {
-                    // Creating input path, wwwroot + message input that is video string <- original
-                    var inputPath = Path.Combine(_environment.WebRootPath, message.Input);
-                    
-                    // Creating output name for a video to be able to access it
-                    var outputName = $"converted_{DateTime.Now.Ticks}.mp4";
+                    // Creating input path, wwwroot + message that is video string <- original from channel
+                    var inputPath = _videoManager.TemporarySavePath(message.Input);
 
-                    // Creating output path, wwwroot + outputName that is custom "unique" converted string
-                    var outputPath = Path.Combine(_environment.WebRootPath, outputName);
+                    // Creating converted output name for a video to be able to access it
+                    var outputName = _videoManager.GenerateConvertedFileName();
+
+                    // Creating output path based on output video name
+                    var outputPath = _videoManager.TemporarySavePath(outputName);
 
                     // Object for starting process,
                     // Specifies a set of values that are used when you start a process.
@@ -72,7 +76,7 @@ namespace JudoLibrary.Api.BackgroundServices
 
                         // Gets or sets the working directory for the process to be started
                         // Specifying where things are happening
-                        WorkingDirectory = _environment.WebRootPath,
+                        WorkingDirectory = _videoManager.WorkingDirectory,
 
                         // Gets or sets a value indicating whether to start the process in a new window.
                         CreateNoWindow = true,
@@ -89,23 +93,30 @@ namespace JudoLibrary.Api.BackgroundServices
                         process.Start();
                         process.WaitForExit();
                     }
-                    
-                    // Create scope
+
+                    // If temporary converted video does NOT exist -> problem!!
+                    if (!_videoManager.TemporaryVideoExists(outputName))
+                    {
+                        // Throw an exception
+                        throw new Exception("FFMPEG failed to generate converted video!");
+                    }
+
+                    // Create scope, after using is finished, we get disposed of service that we injected
                     using (var scope = _serviceProvider.CreateScope())
                     {
                         // Get AppDbContext from scope
                         var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
-                        
+
                         // Get submission where submission Id is === to message from channel that -> SubmissionId
                         var submission = context.Submissions.FirstOrDefault(s => s.Id.Equals(message.SubmissionId));
-                        
+
                         // Assign outputName to submission.Video, assigning converted video to original one
                         submission.Video = outputName;
-                        
+
                         // Once video is updated -> mark video as Processed
                         // Until then it will be hidden
                         submission.VideoProcessed = true;
-                        
+
                         // Save changes to DB
                         await context.SaveChangesAsync(stoppingToken);
                     }
@@ -114,15 +125,16 @@ namespace JudoLibrary.Api.BackgroundServices
                 {
                     _logger.LogError(ex, $"Video processing has failed for {message.Input}");
                 }
+                finally
+                {
+                    // finally block run when control leaves a try statement.
+                    // * This is responsible for deleting temp video when everything went fine, when we pressed Save on the form
+                    // Finally -> no matter what happens =>> delete temporary video based on channel message input
+                    _videoManager.DeleteTemporaryVideoInPath(message.Input);
+                }
             }
 
         }
     }
     
-    // Class that is going to be passed between processes, with options of SubmissionId & Input
-    public class EditVideoMessage
-    {
-        public int SubmissionId { get; set; }
-        public string Input { get; set; }
-    }
 }

@@ -54,7 +54,7 @@
 </template>
 
 <script>
-  import {mapGetters, mapState, mapActions, mapMutations} from "vuex";
+  import {mapGetters, mapActions, mapMutations} from "vuex";
 
   // Initial local state of component
   const initState = () => ({
@@ -75,18 +75,6 @@
 
     computed: {
       ...mapGetters("techniques", ["techniqueItems"]),
-      ...mapState("video-upload", ["active"])
-    },
-
-    // Watcher for active state prop
-    watch: {
-      "active": function (newActiveValue) {
-        // If newActiveValue is false
-        if (!newActiveValue) {
-          // Resets component local state to initial state
-          Object.assign(this.$data, initState());
-        }
-      }
     },
 
     methods: {

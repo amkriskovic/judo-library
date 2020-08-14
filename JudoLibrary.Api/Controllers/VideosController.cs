@@ -1,9 +1,6 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
+﻿using System.IO;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
+using JudoLibrary.Api.BackgroundServices.VideoEditing;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,12 +9,11 @@ namespace JudoLibrary.Api.Controllers
     [Route("api/videos")]
     public class VideosController : ControllerBase
     {
-        // Provides information about the web hosting environment that application is running in
-        private readonly IWebHostEnvironment _environment;
+        private readonly VideoManager _videoManager;
 
-        public VideosController(IWebHostEnvironment environment)
+        public VideosController(VideoManager videoManager)
         {
-            _environment = environment;
+            _videoManager = videoManager;
         }
         
         // GET -> /api/videos/{video}
@@ -25,11 +21,15 @@ namespace JudoLibrary.Api.Controllers
         [HttpGet("{video}")]
         public IActionResult GetVideo(string video)
         {
-            // Grab the mime from video string (e.g. mp4, mpeg)
-            var mime = video.Split('.').Last();
+            // Create saving path for uploaded video
+            var savePath = _videoManager.TemporarySavePath(video);
             
-            // Save path for uploaded videos
-            var savePath = Path.Combine(_environment.WebRootPath, video);
+            // If savePath path is null or empty
+            if (string.IsNullOrEmpty(savePath))
+            {
+                // Return bad request -> 404
+                return BadRequest();
+            }
             
             // Use file stream where we provide save path, open file and read file (video)
             // Returns file stream result combining file stream and content type, which give us ability to play
@@ -39,31 +39,39 @@ namespace JudoLibrary.Api.Controllers
         // POST -> /api/videos
         // IFormFile must be of name video, because it's named in pages form name="video"
         // video binds to form where: name="video"
-        public async Task<IActionResult> UploadVideo(IFormFile video)
+        [HttpPost]
+        public Task<string> UploadVideo(IFormFile video)
         {
-            // Grab the type of video (extension e.g. mp4, mpeg)
-            var mime = video.FileName.Split('.').Last();
-            
-            // Creating <- constructing file name | . | appending mime
-            // original_{DateTime.Now.Ticks} generates random string for file name
-            var fileName = string.Concat($"original_{DateTime.Now.Ticks}", ".", mime);
-            
-            // Creating path for uploaded videos
-            // Combines path for saving video to wwwroot folder with random file name
-            var savePath = Path.Combine(_environment.WebRootPath, fileName);
-            
-            // Use File Stream where we provide save path <- where to save video, create, and write
-            // FileMode.Create specifies that the operating system should create a new file
-            // FileAccess.Write specifies that data can be written to the file
-
-            await using (var fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write))
+            // Saves temporary video based on video that is passed from form
+            return _videoManager.SaveTemporaryVideo(video);
+        }
+        
+        // DELETE -> /api/videos/{fileName}
+        // Action for deleting temporary video by passing fileName param which comes from frontend.
+        // It can be deleted after submission is created (save) or 
+        // when someone uploads video but cancels the form in the middle or right after uploading
+        [HttpDelete("{fileName}")]
+        public IActionResult DeleteTemporaryVideo(string fileName)
+        {
+            // If file name/video name, is not temporary based on file name
+            if (!_videoManager.IsTemporary(fileName))
             {
-                // Provide the stream that we want to put it in
-                // Asynchronously reads the bytes from the current stream and writes them to another stream
-                await video.CopyToAsync(fileStream);
+                // Return bad request, means it's not temporary, we dont wanna delete it -> 400
+                return BadRequest();
             }
             
-            return Ok(fileName);
+            // If temporary video does NOT exist based on file name
+            if (!_videoManager.TemporaryVideoExists(fileName))
+            {
+                // Return no content -> 404
+                return NoContent();
+            }
+            
+            // If it does exists, call DeleteTemporaryVideoInPath method which accepts file name and deletes based on that
+            _videoManager.DeleteTemporaryVideoInPath(fileName);
+
+            // Return Ok -> It has been deleted
+            return Ok();
         }
     }
 }

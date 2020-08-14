@@ -30,6 +30,7 @@
 
   export default {
     name: "Default",
+
     // Mapping components
     components: {
       ContentCreationDialog
