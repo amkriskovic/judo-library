@@ -1,81 +1,105 @@
 ﻿<template>
-  <!-- Stepper component -->
-  <v-stepper v-model="step">
-    <v-stepper-header>
-      <v-stepper-step :complete="step > 1" step="1">Upload Video</v-stepper-step>
+  <!-- Card -->
+  <v-card>
 
-      <v-divider></v-divider>
+    <!-- Title -->
+    <v-card-title>
+      Create Submission
+      <v-spacer></v-spacer>
 
-      <v-stepper-step :complete="step > 2" step="2">Select Technique</v-stepper-step>
+      <!-- Button - X -->
+      <!-- On click call close method which is mixin -->
+      <v-btn icon @click="close">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-card-title>
 
-      <v-divider></v-divider>
+    <!-- Stepper component -->
+    <v-stepper class="rounded-0" v-model="step">
+      <v-stepper-header class="elevation-0">
+        <v-stepper-step :complete="step > 1" step="1">Upload Video</v-stepper-step>
 
-      <v-stepper-step :complete="step > 3" step="3">Submission</v-stepper-step>
+        <v-divider></v-divider>
 
-      <v-divider></v-divider>
+        <v-stepper-step :complete="step > 2" step="2">Select Technique</v-stepper-step>
 
-      <v-stepper-step step="4">Review</v-stepper-step>
-    </v-stepper-header>
+        <v-divider></v-divider>
 
-    <v-stepper-items>
-      <v-stepper-content step="1">
-        <div>
-          <!-- Step 1, Vuetify component that accepts all types of videos, on change file upload process -->
-          <v-file-input accept="video/*" @change="handleFile"></v-file-input>
-        </div>
-      </v-stepper-content>
+        <v-stepper-step :complete="step > 3" step="3">Submission</v-stepper-step>
 
-      <v-stepper-content step="2">
-        <div>
-          <!-- # Dropdown for selecting technique -->
-          <!-- Step 2, Vuetify component for selecting technique from dropdown, on click goes to next step -->
-          <!-- Binds selected technique to techniqueId which lives in local form state -->
-          <v-select :items="techniqueItems" v-model="form.techniqueId" label="Select Technique"></v-select>
-          <v-btn @click="step++">Next</v-btn>
-        </div>
-      </v-stepper-content>
+        <v-divider></v-divider>
 
-      <v-stepper-content step="3">
-        <div>
-          <!-- Step 3, Vuetify component for saving submission, stores it, on click goes to next step -->
-          <v-text-field label="Description" v-model="form.description"></v-text-field>
-          <v-btn @click="step++">Next</v-btn>
-        </div>
-      </v-stepper-content>
+        <v-stepper-step step="4">Review</v-stepper-step>
+      </v-stepper-header>
 
-      <v-stepper-content step="4">
-        <!-- Button - Final step (4), Saving submission for particular technique -->
-        <div>
-          <v-btn @click="save">Save</v-btn>
-        </div>
-      </v-stepper-content>
-    </v-stepper-items>
-  </v-stepper>
+      <!-- Form input -->
+      <v-stepper-items>
+        <v-stepper-content class="pt-0" step="1">
+          <div>
+            <!-- Step 1, Vuetify component that accepts all types of videos, on change file upload process -->
+            <v-file-input accept="video/*" @change="handleFile"></v-file-input>
+          </div>
+        </v-stepper-content>
+
+        <v-stepper-content step="2">
+          <div>
+            <!-- # Dropdown for selecting technique -->
+            <!-- Step 2, Vuetify component for selecting technique from dropdown, on click goes to next step -->
+            <!-- Binds selected technique to techniqueId which lives in local form state -->
+            <v-select :items="techniqueItems" v-model="form.techniqueId" label="Select Technique"></v-select>
+
+            <!-- Button -->
+            <div class="d-flex justify-center">
+              <v-btn @click="step++">Next</v-btn>
+            </div>
+          </div>
+        </v-stepper-content>
+
+        <v-stepper-content step="3">
+          <div>
+            <!-- Step 3, Vuetify component for saving submission, stores it, on click goes to next step -->
+            <v-text-field label="Description" v-model="form.description"></v-text-field>
+
+            <!-- Button -->
+            <div class="d-flex justify-center">
+              <v-btn @click="step++">Next</v-btn>
+            </div>
+          </div>
+        </v-stepper-content>
+
+        <v-stepper-content step="4">
+          <!-- Button - Final step (4), Saving submission for particular technique -->
+          <div class="d-flex justify-center">
+            <v-btn @click="save">Save</v-btn>
+          </div>
+        </v-stepper-content>
+      </v-stepper-items>
+    </v-stepper>
+  </v-card>
+
 </template>
 
 <script>
   import {mapGetters, mapActions, mapMutations} from "vuex";
-
-  // Initial local state of component
-  const initState = () => ({
-    step: 1,
-    form: {
-      techniqueId: "",
-      video: "",
-      description: ""
-    }
-  });
+  import {close} from "./_shared";
 
   export default {
     // Component name
     name: "submission-steps",
 
     // Data is referencing initState function which holds local state of component -> this.$data
-    data: initState,
+    data: () => ({
+      step: 1,
+      form: {
+        techniqueId: "",
+        video: "",
+        description: ""
+      }
+    }),
 
-    computed: {
-      ...mapGetters("techniques", ["techniqueItems"]),
-    },
+    mixins: [close],
+
+    computed: mapGetters("techniques", ["techniqueItems"]),
 
     methods: {
       ...mapMutations("video-upload", ["hide"]),

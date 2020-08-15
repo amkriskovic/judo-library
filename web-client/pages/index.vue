@@ -1,11 +1,19 @@
 <template>
   <div>
 
-    <!-- Place where techniques are displayed -->
-    <div v-if="techniques">
-      <div v-for="technique in techniques">
-        <v-btn :to="`/technique/${technique.id}`">{{ technique.name }}</v-btn>
+    <div v-for="section in sections">
+      <!-- Index page data -->
+      <div class="d-flex flex-column align-center">
+        <p class="text-h5">{{section.title}}</p>
+
+        <div>
+          <!-- Loop over collections -->
+          <v-btn class="mx-1" v-for="item in section.collection" :to="section.routeFactory(item.id)">{{ item.name }}
+          </v-btn>
+        </div>
       </div>
+
+      <v-divider class="my-5"></v-divider>
     </div>
 
   </div>
@@ -15,7 +23,20 @@
   import {mapState} from "vuex"
 
   export default {
-    // * Techniques are getting fetched from index.js
-    computed: mapState("techniques", ["techniques"])
+    // * Techniques, categories, subcategories are getting fetched from index.js
+    computed: {
+      ...mapState("techniques", ["techniques", "category", "subcategory"]),
+
+      // Function that returns array of objects of data from techniques store state
+      sections() {
+        return [
+          // Collection is ARRAY of techniques || categories || subcategories and we can access their model props, like id
+          // /technique corresponds to folder _technique
+          {collection: this.techniques, title: "Tricks", routeFactory: id => `/technique/${id}`},
+          {collection: this.category, title: "Categories", routeFactory: id => `/category/${id}`},
+          {collection: this.subcategory, title: "Subcategories", routeFactory: id => `/subcategory/${id}`},
+        ]
+      }
+    }
   }
 </script>

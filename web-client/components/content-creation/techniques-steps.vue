@@ -1,69 +1,71 @@
 ﻿<template>
-  <!-- Stepper component - Steps -->
-  <v-stepper v-model="step">
-    <v-stepper-header>
-      <v-stepper-step :complete="step > 1" step="1">Technique Information</v-stepper-step>
+  <!-- Card -->
+  <v-card>
 
-      <v-divider></v-divider>
+    <!-- Title -->
+    <v-card-title>
+      Create Trick
+      <v-spacer></v-spacer>
 
-      <v-stepper-step step="2">Review</v-stepper-step>
-    </v-stepper-header>
+      <!-- Button - X -->
+      <!-- On click call close method which is mixin -->
+      <v-btn icon @click="close">
+        <v-icon>mdi-close</v-icon>
+      </v-btn>
+    </v-card-title>
 
-    <v-stepper-items>
-      <v-stepper-content step="1">
-        <div>
-          <!--? Step 1, Vuetify component that asks for technique name, description, stores it, on click goes to next step -->
-          <v-text-field label="Name" v-model="form.name"></v-text-field>
-          <v-text-field label="Description" v-model="form.description"></v-text-field>
+    <!-- Stepper component - Steps -->
+    <v-stepper class="rounded-0" v-model="step">
+      <v-stepper-header class="elevation-0">
+        <v-stepper-step :complete="step > 1" step="1">Technique Information</v-stepper-step>
 
-          <v-select :items="categoryItems" v-model="form.category" label="Category"></v-select>
-          <v-select :items="subcategoryItems" v-model="form.subCategory" label="Sub Category"></v-select>
+        <v-divider></v-divider>
 
-          <!-- Chips are nice way to display multiple items from dropdown -->
-          <v-select :items="techniqueItems" v-model="form.setUpAttacks" label="Set Up Attacks" multiple small-chips chips
-                    deletable-chips></v-select>
-          <v-select :items="techniqueItems" v-model="form.followUpAttacks" label="Follow Up Attacks" multiple small-chips chips
-                    deletable-chips></v-select>
-          <v-select :items="techniqueItems" v-model="form.counters" label="Counters" multiple small-chips chips
-                    deletable-chips></v-select>
+        <v-stepper-step step="2">Review</v-stepper-step>
+      </v-stepper-header>
+
+      <!-- Form inputs -->
+      <v-stepper-items>
+        <v-stepper-content class="pt-0" step="1">
+          <div>
+            <!--? Step 1, Vuetify component that asks for technique name, description, stores it, on click goes to next step -->
+            <v-text-field label="Name" v-model="form.name"></v-text-field>
+            <v-text-field label="Description" v-model="form.description"></v-text-field>
+
+            <v-select :items="categoryItems" v-model="form.category" label="Category"></v-select>
+            <v-select :items="subcategoryItems" v-model="form.subCategory" label="Sub Category"></v-select>
+
+            <!-- Chips are nice way to display multiple items from dropdown -->
+            <v-select :items="techniqueItems" v-model="form.setUpAttacks" label="Set Up Attacks" multiple small-chips chips
+                      deletable-chips></v-select>
+            <v-select :items="techniqueItems" v-model="form.followUpAttacks" label="Follow Up Attacks" multiple small-chips chips
+                      deletable-chips></v-select>
+            <v-select :items="techniqueItems" v-model="form.counters" label="Counters" multiple small-chips chips
+                      deletable-chips></v-select>
 
 
-          <v-btn @click="step++">Next</v-btn>
-        </div>
-      </v-stepper-content>
+            <div class="d-flex justify-center">
+              <v-btn @click="step++">Next</v-btn>
+            </div>
+          </div>
+        </v-stepper-content>
 
-      <v-stepper-content step="2">
-        <!-- Button - Final step (2), Saving trick -->
-        <div>
-          <v-btn @click="save">Save</v-btn>
-        </div>
-      </v-stepper-content>
-    </v-stepper-items>
+        <v-stepper-content step="2">
+          <!-- Button - Final step (2), Saving trick -->
+          <div class="d-flex justify-center">
+            <v-btn @click="save">Save</v-btn>
+          </div>
+        </v-stepper-content>
+      </v-stepper-items>
 
-  </v-stepper>
+    </v-stepper>
+  </v-card>
+
 </template>
 
 <script>
   import {mapGetters, mapActions, mapMutations} from "vuex";
-
-  // Initial local state of component
-  const initState = () => ({
-    step: 1,
-    form: {
-      name: "",
-      description: "",
-      category: "",
-      subCategory: "",
-      setUpAttacks: [],
-      followUpAttacks: [],
-      counters: [],
-    },
-    testData: [
-      {text: "Foo", value: 1},
-      {text: "Bar", value: 2},
-      {text: "Baz", value: 3},
-    ]
-  });
+  import {close} from "./_shared";
 
   // Component that is responsible for creating/saving technique
   export default {
@@ -71,7 +73,25 @@
     name: "techniques-steps",
 
     // Data is referencing initState function which holds local state of component -> this.$data
-    data: initState,
+    data: () => ({
+      step: 1,
+      form: {
+        name: "",
+        description: "",
+        category: "",
+        subCategory: "",
+        setUpAttacks: [],
+        followUpAttacks: [],
+        counters: [],
+      },
+      testData: [
+        {text: "Foo", value: 1},
+        {text: "Bar", value: 2},
+        {text: "Baz", value: 3},
+      ]
+    }),
+
+    mixins: [close],
 
     computed: {
       ...mapGetters("techniques", ["techniqueItems", "categoryItems", "subcategoryItems"]),
@@ -90,10 +110,8 @@
         // Local form is gonna get passed to store as payload
         await this.createTechnique({form: this.form});
 
-        // Resets video-upload store, after saving, closing dialog
-        // this refers to VueComponent, $data is VuesComponent local state, resetting component state
-        this.reset();
-        Object.assign(this.$data, initState());
+        // * this refers to VueComponent, close will set component to null and hide it, eventually -> pipeline
+        this.close();
       },
     },
   }

@@ -33,15 +33,6 @@
       <component :is="component"></component>
     </div>
 
-    <!-- Button -->
-    <!-- Centered based on flex, margin top and bottom - 4  -->
-    <!-- Cancel form on close -> cancel upload -> delete upload video if it was saved -->
-    <div class="d-flex justify-center my-4">
-      <v-btn @click="cancelUpload">
-        Close
-      </v-btn>
-    </div>
-
   </v-dialog>
 </template>
 
@@ -76,10 +67,7 @@
     },
 
     // Mapping mutations & actions for video-upload | methods === functions ==> mutations/actions
-    methods: {
-      ...mapMutations("video-upload", ["reset", "activate"]),
-      ...mapActions("video-upload", ["cancelUpload"])
-    }
+    methods: mapMutations("video-upload", ["activate"])
 
   }
 </script>
