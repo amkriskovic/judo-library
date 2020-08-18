@@ -5,16 +5,13 @@
     <!-- Template for Content-->
     <template v-slot:content>
       <div class="mx-2" v-if="submissions">
-        <div v-for="submission in 4">
-          <v-card class="mb-3" v-for="submission in submissions"
-                  :key="`${submission}-${technique.id}-${submission.id}`">
-            <!-- Injecting video player component with dynamic binding of video where video is string -->
-            <!-- * Getting specific videos from submissions store |> state => fetchSubmissionsForTechnique filling state -->
-            <video-player :video="submission.video" :key="`v-${submission}-${technique.id}-${submission.id}`"/>
+        <v-card class="mb-3" v-for="submission in submissions" :key="`${technique.id}-${submission.id}`">
+          <!-- Injecting video player component with dynamic binding of video where video is string -->
+          <!-- * Getting specific videos from submissions store |> state => fetchSubmissionsForTechnique filling state -->
+          <video-player :video="submission.video" :key="`v-${technique.id}-${submission.id}`"/>
 
-            <v-card-text>{{submission.description}}</v-card-text>
-          </v-card>
-        </div>
+          <v-card-text>{{submission.description}}</v-card-text>
+        </v-card>
       </div>
     </template>
 

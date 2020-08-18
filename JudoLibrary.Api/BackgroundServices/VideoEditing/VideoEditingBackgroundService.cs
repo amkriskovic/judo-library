@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using JudoLibrary.Data;
+using JudoLibrary.Models;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -55,10 +56,16 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                     var inputPath = _videoManager.TemporarySavePath(message.Input);
 
                     // Creating converted output name for a video to be able to access it
-                    var outputName = _videoManager.GenerateConvertedFileName();
+                    var outputConvertedName = _videoManager.GenerateConvertedFileName();
+                    
+                    // Creating thumbnail output name for a video
+                    var outputThumbnailName = _videoManager.GenerateThumbnailFileName();
 
-                    // Creating output path based on output video name
-                    var outputPath = _videoManager.TemporarySavePath(outputName);
+                    // Creating output converted path based on output video name
+                    var outputConvertedPath = _videoManager.TemporarySavePath(outputConvertedName);
+                    
+                    // Creating output thumbnail path based on output video name
+                    var outputThumbnailPath = _videoManager.TemporarySavePath(outputThumbnailName);
 
                     // Object for starting process,
                     // Specifies a set of values that are used when you start a process.
@@ -72,7 +79,8 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                         // Specifying arguments for manipulating video,
                         // inputPath -> video location with name {original}
                         // outputPath ->  video location with name {converted}
-                        Arguments = $"-y -i {inputPath} -an -vf scale=640x480 {outputPath}",
+                        // after second path we create thumbnail for video at 00:00:00 time and scale it to same size as video, with random name, save it to path with converted video
+                        Arguments = $"-y -i {inputPath} -an -vf scale=540x380 {outputConvertedPath} -ss 00:00:00 -vframes 1 -vf scale=540x380 {outputThumbnailPath}",
 
                         // Gets or sets the working directory for the process to be started
                         // Specifying where things are happening
@@ -95,7 +103,7 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                     }
 
                     // If temporary converted video does NOT exist -> problem!!
-                    if (!_videoManager.TemporaryVideoExists(outputName))
+                    if (!_videoManager.TemporaryVideoExists(outputConvertedName))
                     {
                         // Throw an exception
                         throw new Exception("FFMPEG failed to generate converted video!");
@@ -110,8 +118,13 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                         // Get submission where submission Id is === to message from channel that -> SubmissionId
                         var submission = context.Submissions.FirstOrDefault(s => s.Id.Equals(message.SubmissionId));
 
-                        // Assign outputName to submission.Video, assigning converted video to original one
-                        submission.Video = outputName;
+                        // Assign outputConvertedName & outputThumbnailName to VideoLink & ThumbLink to Submission
+                        // which contains Video prop inside itself
+                        submission.Video = new Video
+                        {
+                            ThumbLink = outputThumbnailName,
+                            VideoLink = outputConvertedName
+                        };
 
                         // Once video is updated -> mark video as Processed
                         // Until then it will be hidden

@@ -16,6 +16,7 @@ namespace JudoLibrary.Data
         public DbSet<TechniqueCounter> TechniqueCounters { get; set; }
         public DbSet<Technique> Techniques { get; set; }
         public DbSet<Submission> Submissions { get; set; }
+        public DbSet<Video> Videos { get; set; }
         
         // Fluent API configurations
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -8,7 +8,17 @@
 
     <!-- :src is calling our /api/videos/{video} controller to open and read content from it | video is prop -->
     <!-- ref => this element becomes javascript object -->
-    <video ref="video" width="400" muted loop :src="`http://localhost:5000/api/videos/${video}`"></video>
+    <!-- :poster is used for displaying thumbnails instead of preloading every video on the page -->
+    <!-- preload="none" prevents preloading when we go to tricks submissions page, when we click, only then is loaded -->
+    <video
+      ref="video"
+      width="400"
+      muted loop
+      :src="`http://localhost:5000/api/videos/${video.videoLink}`"
+      :poster="`http://localhost:5000/api/videos/${video.thumbLink}`"
+      preload="none"
+    >
+    </video>
   </div>
 </template>
 

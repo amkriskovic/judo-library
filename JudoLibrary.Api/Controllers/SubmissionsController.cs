@@ -4,6 +4,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using JudoLibrary.Api.BackgroundServices;
 using JudoLibrary.Api.BackgroundServices.VideoEditing;
+using JudoLibrary.Api.Form;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -35,22 +36,33 @@ namespace JudoLibrary.Api.Controllers
         // [FromServices] =>> Dependency Injection as method parameter
         [HttpPost]
         public async Task<IActionResult> CreateSubmission(
-            [FromBody] Submission submission,
+            [FromBody] SubmissionForm submissionForm,
             [FromServices] Channel<EditVideoMessage> channel,
             [FromServices] VideoManager videoManager)
         {
             // Validate video path
             // If temporary video does NOT exist based on provided video name
-            if (!videoManager.TemporaryVideoExists(submission.Video))
+            if (!videoManager.TemporaryVideoExists(submissionForm.Video))
             {
                 // Return bad request, we cant convert -> we dont have video -> hasn't been uploaded/stored successfully
                 return BadRequest();
             }
             
-            // Marking video as NOT processed
-            submission.VideoProcessed = false;
+            // Create new Submission
+            var submission = new Submission
+            {
+                // Grab the input fields from submission form / content creation
+                TechniqueId = submissionForm.TechniqueId,
+                Description = submissionForm.Description,
+                
+                // Marking video as NOT processed when we create new Submission
+                VideoProcessed = false
+            };
             
+            // Add created submission to DB
             _context.Add(submission);
+            
+            // Save changes to DB
             await _context.SaveChangesAsync();
             
             // * Channel producer
@@ -61,10 +73,11 @@ namespace JudoLibrary.Api.Controllers
                 // Save submissionId for particular upload
                 SubmissionId = submission.Id,
                 
-                // Input is original video -> string
-                Input = submission.Video
+                // Input is original video -> string that comes from input when selecting video from submission form
+                Input = submissionForm.Video
             });
 
+            // Return newly created submission
             return Ok(submission);
         }
         

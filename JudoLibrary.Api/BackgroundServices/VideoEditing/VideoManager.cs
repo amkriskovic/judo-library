@@ -13,6 +13,7 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
         private readonly IWebHostEnvironment _env;
         private const string TempPrefix = "temp_";
         private const string ConvertedPrefix = "conv_";
+        private const string ThumbnailPrefix = "thumb_";
 
         public VideoManager(IWebHostEnvironment env)
         {
@@ -64,9 +65,12 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
             return !_env.IsDevelopment() ? null : TemporarySavePath(fileName) ;
         }
 
-        // Returns string -> converted video file name
+        // Returns string -> converted video file name => e.g. .mp4
         public string GenerateConvertedFileName() => $"{ConvertedPrefix}{DateTime.Now.Ticks}.mp4";
         
+        // Returns string -> thumbnail for video file name => e.g. .png
+        public string GenerateThumbnailFileName() => $"{ThumbnailPrefix}{DateTime.Now.Ticks}.png";
+      
         // Returns string -> constructing name for saving temp video
         // IFormFile =>> Represents a file sent with the HttpRequest.
         public async Task<string> SaveTemporaryVideo(IFormFile video)

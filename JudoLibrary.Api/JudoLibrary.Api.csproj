@@ -10,18 +10,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="wwwroot\osoto1.mp4">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-      <Content Update="wwwroot\seoi1.mp4">
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-      </Content>
-    </ItemGroup>
-
-    <ItemGroup>
       <Folder Include="ffmpeg" />
+      <Folder Include="wwwroot" />
     </ItemGroup>
 
 </Project>

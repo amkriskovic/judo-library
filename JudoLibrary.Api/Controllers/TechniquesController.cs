@@ -7,6 +7,7 @@ using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace JudoLibrary.Api.Controllers
 {
@@ -34,9 +35,10 @@ namespace JudoLibrary.Api.Controllers
             .FirstOrDefault();
 
         // GET -> /api/techniques/{techniqueId}/submissions
-        // Get all submissions for particular technique | Passing technique Id as param
+        // Get all submissions for particular technique | Passing technique Id as param | Including videos for technique
         [HttpGet("{techniqueId}/submissions")]
         public IEnumerable<Submission> GetAllSubmissionsForTechnique(string techniqueId) => _context.Submissions
+            .Include(s => s.Video)
             .Where(s => s.TechniqueId.Equals(techniqueId))
             .ToList();
         
