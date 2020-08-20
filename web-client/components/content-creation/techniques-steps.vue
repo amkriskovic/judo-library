@@ -25,8 +25,8 @@
       </v-stepper-header>
 
       <!-- Form inputs -->
-      <v-stepper-items>
-        <v-stepper-content class="pt-0" step="1">
+      <v-stepper-items class="fpt-0">
+        <v-stepper-content step="1">
           <div>
             <!--? Step 1, Vuetify component that asks for technique name, description, stores it, on click goes to next step -->
             <v-text-field label="Name" v-model="form.name"></v-text-field>
@@ -36,10 +36,10 @@
             <v-select :items="subcategoryItems" v-model="form.subCategory" label="Sub Category"></v-select>
 
             <!-- Chips are nice way to display multiple items from dropdown -->
-            <v-select :items="techniqueItems" v-model="form.setUpAttacks" label="Set Up Attacks" multiple small-chips chips
-                      deletable-chips></v-select>
-            <v-select :items="techniqueItems" v-model="form.followUpAttacks" label="Follow Up Attacks" multiple small-chips chips
-                      deletable-chips></v-select>
+            <v-select :items="techniqueItems" v-model="form.setUpAttacks" label="Set Up Attacks" multiple small-chips
+                      chips deletable-chips></v-select>
+            <v-select :items="techniqueItems" v-model="form.followUpAttacks" label="Follow Up Attacks" multiple
+                      small-chips chips deletable-chips></v-select>
             <v-select :items="techniqueItems" v-model="form.counters" label="Counters" multiple small-chips chips
                       deletable-chips></v-select>
 

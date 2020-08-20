@@ -61,14 +61,14 @@ namespace JudoLibrary.Api.Controllers
             }
             
             // If temporary video does NOT exist based on file name
-            if (!_videoManager.TemporaryVideoExists(fileName))
+            if (!_videoManager.TemporaryFileExists(fileName))
             {
                 // Return no content -> 404
                 return NoContent();
             }
             
-            // If it does exists, call DeleteTemporaryVideoInPath method which accepts file name and deletes based on that
-            _videoManager.DeleteTemporaryVideoInPath(fileName);
+            // If it does exists, call DeleteTemporaryFileInPath method which accepts file name and deletes based on that
+            _videoManager.DeleteTemporaryFileInPath(fileName);
 
             // Return Ok -> It has been deleted
             return Ok();

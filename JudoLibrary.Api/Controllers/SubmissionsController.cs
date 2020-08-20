@@ -42,7 +42,7 @@ namespace JudoLibrary.Api.Controllers
         {
             // Validate video path
             // If temporary video does NOT exist based on provided video name
-            if (!videoManager.TemporaryVideoExists(submissionForm.Video))
+            if (!videoManager.TemporaryFileExists(submissionForm.Video))
             {
                 // Return bad request, we cant convert -> we dont have video -> hasn't been uploaded/stored successfully
                 return BadRequest();

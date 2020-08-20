@@ -101,22 +101,30 @@ namespace JudoLibrary.Api
                         }
                     });
                     
-                    // // Seeding submissions
-                    // context.Add(new Submission
-                    // {
-                    //     TechniqueId = "seoi-nage",
-                    //     Video = "seoi1.mp4",
-                    //     Description = "This Seoi nage was very hard to pull of...",
-                    //     VideoProcessed = true
-                    // });
-                    //
-                    // context.Add(new Submission
-                    // {
-                    //     TechniqueId = "osoto-gari",
-                    //     Video = "osoto1.mp4",
-                    //     Description = "Demonstration of Osoto Gari",
-                    //     VideoProcessed = true
-                    // }); 
+                    // Seeding submissions
+                    context.Add(new Submission
+                    {
+                        TechniqueId = "seoi-nage",
+                        Video = new Video
+                        {
+                            ThumbLink = "seoi.jpg",
+                            VideoLink = "seoi.mp4"
+                        },
+                        Description = "This Seoi nage was very hard to pull of...",
+                        VideoProcessed = true
+                    });
+                    
+                    context.Add(new Submission
+                    {
+                        TechniqueId = "osoto-gari",
+                        Video = new Video
+                        {
+                            ThumbLink = "osoto.jpg",
+                            VideoLink = "osoto.mp4"
+                        },
+                        Description = "Demonstration of Osoto Gari",
+                        VideoProcessed = true
+                    }); 
 
                     // Saving changes to in-memory DB
                     context.SaveChanges();

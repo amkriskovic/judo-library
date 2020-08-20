@@ -6,6 +6,11 @@ export default {
   ** See https://nuxtjs.org/api/configuration-mode
   */
   mode: 'universal',
+
+  publicRuntimeConfig: {
+    api: process.env.API_URL
+  },
+
   /*
   ** Nuxt target
   ** See https://nuxtjs.org/api/configuration-target
@@ -31,6 +36,7 @@ export default {
   ** Global CSS
   */
   css: [
+    '@/assets/css/main.scss'
   ],
   /*
   ** Plugins to load before mounting the App

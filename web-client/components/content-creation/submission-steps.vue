@@ -33,8 +33,8 @@
       </v-stepper-header>
 
       <!-- Form input -->
-      <v-stepper-items>
-        <v-stepper-content class="pt-0" step="1">
+      <v-stepper-items class="fpt-0">
+        <v-stepper-content step="1">
           <div>
             <!-- Step 1, Vuetify component that accepts all types of videos, on change file upload process -->
             <v-file-input accept="video/*" @change="handleFile"></v-file-input>
@@ -76,7 +76,6 @@
       </v-stepper-items>
     </v-stepper>
   </v-card>
-
 </template>
 
 <script>
