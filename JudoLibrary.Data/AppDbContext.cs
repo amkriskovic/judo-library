@@ -1,4 +1,5 @@
 ﻿using JudoLibrary.Models;
+using JudoLibrary.Models.Moderation;
 using Microsoft.EntityFrameworkCore;
 
 namespace JudoLibrary.Data
@@ -17,6 +18,7 @@ namespace JudoLibrary.Data
         public DbSet<Technique> Techniques { get; set; }
         public DbSet<Submission> Submissions { get; set; }
         public DbSet<Video> Videos { get; set; }
+        public DbSet<ModerationItem> ModerationItems { get; set; }
         
         // Fluent API configurations
         protected override void OnModelCreating(ModelBuilder modelBuilder)

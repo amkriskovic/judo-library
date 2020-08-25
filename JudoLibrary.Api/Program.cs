@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
+using JudoLibrary.Models.Moderation;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -62,10 +63,10 @@ namespace JudoLibrary.Api
                         Id = "kouchi-gari", Name = "Kouchi gari", Description = "Small inner reap", Category = "nage-waza", SubCategory = "ashi-waza"
                     });
                     
-                    context.Add(new Technique
-                    {
-                        Id = "osoto-gari", Name = "Osoto gari ", Description = "Major or large outer reap", Category = "nage-waza", SubCategory = "ashi-waza"
-                    });
+                    // context.Add(new Technique
+                    // {
+                    //     Id = "osoto-gari", Name = "Osoto gari ", Description = "Major or large outer reap", Category = "nage-waza", SubCategory = "ashi-waza"
+                    // });
                     
                     context.Add(new Technique
                     {
@@ -101,6 +102,23 @@ namespace JudoLibrary.Api
                         }
                     });
                     
+                    context.Add(new Technique
+                    {
+                        Id = "osoto-gari", Name = "Osoto gari", Description = "Major Outer Reaping", Category = "nage-waza", SubCategory = "ashi-waza",
+                        SetUpAttacks = new List<TechniqueSetupAttack>
+                        {
+                            new TechniqueSetupAttack{TechniqueId = "osoto-gari", SetUpAttackId = "seoi-nage"}
+                        },
+                        FollowUpAttacks = new List<TechniqueFollowupAttack>
+                        {
+                            new TechniqueFollowupAttack{TechniqueId = "osoto-gari", FollowUpAttackId = "kouchi-gari"}
+                        },
+                        Counters = new List<TechniqueCounter>
+                        {
+                            new TechniqueCounter{TechniqueId = "osoto-gari", CounterId = "ushiro-goshi"}
+                        }
+                    });
+                    
                     // Seeding submissions
                     context.Add(new Submission
                     {
@@ -125,6 +143,14 @@ namespace JudoLibrary.Api
                         Description = "Demonstration of Osoto Gari",
                         VideoProcessed = true
                     }); 
+                    
+                                    
+                    // Seeding moderation items
+                    context.Add(new ModerationItem
+                    {
+                        Target = "osoto-gari",
+                        Type = ModerationTypes.Technique
+                    });
 
                     // Saving changes to in-memory DB
                     context.SaveChanges();

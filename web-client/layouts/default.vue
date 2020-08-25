@@ -10,6 +10,9 @@
 
       <v-spacer></v-spacer>
 
+      <!-- Moderation button -->
+      <v-btn depressed to="/moderation">Moderation</v-btn>
+
       <!-- content-creation-dialog component - Popup -->
       <content-creation-dialog/>
 
