@@ -26,7 +26,7 @@
         </v-btn>
       </template>
 
-      <!-- Inject item(card) slot -->
+      <!-- Inject modItem(card) slot -->
       <!-- v-sheet represents "card" with information -->
       <v-sheet class="pa-3" rounded>
         <slot name="item"></slot>

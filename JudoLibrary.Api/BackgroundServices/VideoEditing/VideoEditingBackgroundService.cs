@@ -41,7 +41,7 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
             // If true, we enter while loop , if false -> channel has been closed -> exiting while loop
             while (await _channelReader.WaitToReadAsync(stoppingToken))
             {
-                // Grab the message from a channel -> item/msg that is constructed/has been written in SubmissionsController -> POST
+                // Grab the message from a channel -> modItem/msg that is constructed/has been written in SubmissionsController -> POST
                 var message = await _channelReader.ReadAsync(stoppingToken);
                 
                 // Creating input path, wwwroot + message that is video string <- original from channel

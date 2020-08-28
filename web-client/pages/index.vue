@@ -8,9 +8,9 @@
 
         <div>
           <!-- Loop over collections -->
-          <v-btn class="mx-1" v-for="item in section.collection"
+          <v-btn class="mx-1" v-for="modItem in section.collection"
                  :key="`${section.title}-${item.id}`"
-                 :to="section.routeFactory(item.id)">{{ item.name }}
+                 :to="section.routeFactory(item.id)">{{ modItem.name }}
           </v-btn>
         </div>
       </div>

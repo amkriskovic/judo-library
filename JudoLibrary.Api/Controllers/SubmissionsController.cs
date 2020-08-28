@@ -67,7 +67,7 @@ namespace JudoLibrary.Api.Controllers
             
             // * Channel producer
             // * We dont write to a channel if form wasn't successful submitted
-            // Grab the channel writer, and write an item/msg(EditVideoMessage) to a channel with SubmissionId & Input props
+            // Grab the channel writer, and write an modItem/msg(EditVideoMessage) to a channel with SubmissionId & Input props
             await channel.Writer.WriteAsync(new EditVideoMessage
             {
                 // Save submissionId for particular upload
