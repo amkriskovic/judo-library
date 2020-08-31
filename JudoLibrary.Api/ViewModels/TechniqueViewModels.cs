@@ -7,10 +7,13 @@ namespace JudoLibrary.Api.ViewModels
 {
     public static class TechniqueViewModels
     {
-        // Default ViewModel
+        // Assign to create delegate, projection expression that we compile, so we can use it in controller
+        public static readonly Func<Technique, object> Create = Projection.Compile();
+        
+        // Projection ViewModel
         // Expression holds information about function, returning a function that later can be traversed
         // EF will take Expression and translate it into Select statement
-        public static Expression<Func<Technique, object>> Default =>
+        public static Expression<Func<Technique, object>> Projection =>
             // Accept TechniqueForm and return object, this function becomes object, we are mapping stuff to TechniqueForm(technique) object
             technique => new
             {

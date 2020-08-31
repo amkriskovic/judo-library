@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using JudoLibrary.Models.Moderation;
@@ -30,18 +31,14 @@ namespace JudoLibrary.Api.Controllers
         public ModerationItem GetModerationItem(int id) => _ctx.ModerationItems.FirstOrDefault(mi => mi.Id.Equals(id));
         
         // GET -> /api/moderation-items/{id}/comments
+        // Listing comments for particular moderation item(id)
         [HttpGet("{id}/comments")]
-        public IEnumerable<Comment> GetCommentsForModerationItem(int id) =>
-            _ctx.ModerationItems
-                // TEntity => source =>> {ModerationItems}, Expression => navigationPropertyPath =>> {mi => mi.Comments}
-                // Include comments for moderation modItem
-                .Include(mi => mi.Comments)
-                // Where moderation modItem id is equal to id that is passed
-                .Where(mi => mi.Id.Equals(id))
-                // Select comments for single moderation modItem
-                .Select(mi => mi.Comments)
-                // Get list of comments for single moderation modItem
-                .FirstOrDefault();
+        public IEnumerable<object> GetCommentsForModerationItem(int id) =>
+            _ctx.Comments
+                // Where moderation item id for comment is equal to id that is passed
+                .Where(c => c.ModerationItemId.Equals(id))
+                .Select(CommentViewModel.Projection)
+                .ToList();
         
         // POST -> /api/moderation-items/{id}/comments
         // Create comment for particular moderation modItem
@@ -51,6 +48,13 @@ namespace JudoLibrary.Api.Controllers
         {
             // Get particular moderation modItem 
             var moderationItem = _ctx.ModerationItems.FirstOrDefault(mi => mi.Id.Equals(id));
+            
+            // If moderationItem doesnt exist -> we dont have anything to moderate
+            if (moderationItem == null)
+            {
+                // return no content
+                return NoContent();
+            }
             
             // First group starts with 2nd @ symbol, \B -> non word boundary => means as soon it tied to some word without space, it
             // will ignore it. Allowing lower & upper case characters, numbers, dash and underscore, + -> one or more from collection
@@ -81,7 +85,7 @@ namespace JudoLibrary.Api.Controllers
             await _ctx.SaveChangesAsync();
             
             // Return Ok response with created comment
-            return Ok(comment);
+            return Ok(CommentViewModel.Create(comment));
         }
     }
 }

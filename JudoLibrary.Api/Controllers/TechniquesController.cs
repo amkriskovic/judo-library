@@ -23,15 +23,15 @@ namespace JudoLibrary.Api.Controllers
         }
         
         // GET -> /api/techniques
-        // TechniqueViewModels.Default is responsible for giving us response
+        // TechniqueViewModels.Projection is responsible for giving us response
         [HttpGet]
-        public IEnumerable<object> GetAllTechniques() => _context.Techniques.Select(TechniqueViewModels.Default).ToList();
+        public IEnumerable<object> GetAllTechniques() => _context.Techniques.Select(TechniqueViewModels.Projection).ToList();
         
         // GET -> /api/techniques/{id}
         [HttpGet("{id}")]
         public object GetTechnique(string id) => _context.Techniques
             .Where(t => t.Id.Equals(id, StringComparison.InvariantCultureIgnoreCase))
-            .Select(TechniqueViewModels.Default)
+            .Select(TechniqueViewModels.Projection)
             .FirstOrDefault();
 
         // GET -> /api/techniques/{techniqueId}/submissions
@@ -75,8 +75,8 @@ namespace JudoLibrary.Api.Controllers
             _context.Add(technique);
             await _context.SaveChangesAsync();
 
-            // Compile and Invoke Expression which is our ViewModel then return ViewModel
-            return TechniqueViewModels.Default.Compile().Invoke(technique);
+            // Return created technique that we pass to TechniqueViewModels
+            return TechniqueViewModels.Create(technique);
         }
         
         // PUT -> /api/techniques
@@ -91,8 +91,8 @@ namespace JudoLibrary.Api.Controllers
             _context.Add(technique);
             await _context.SaveChangesAsync();
 
-            // Compile and Invoke Expression which is our ViewModel then return ViewModel
-            return TechniqueViewModels.Default.Compile().Invoke(technique);
+            // Return created technique that we pass to TechniqueViewModels
+            return TechniqueViewModels.Create(technique);
         }
         
         
