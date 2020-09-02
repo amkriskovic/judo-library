@@ -7,22 +7,13 @@
       {{modItem.description}}
     </div>
 
-    <!-- If we have parentCommentId -> means we have reply -->
-    <div v-if="parentCommentId > 0">
-      Replying to: {{parentCommentId}}
-      <!-- On click, clear -->
-      <v-btn @click="parentCommentId = 0">Clear</v-btn>
-    </div>
-
-    <!-- Comment body -->
-    <div>
-      <v-text-field label="Comment" v-model="comment"></v-text-field>
-      <v-btn @click="post">Post</v-btn>
-    </div>
+    <!-- Injecting comment section component, dyn binding comments so we can display them, hooking send event -->
+    <!-- * This is the place where moderator creates comment, this is creation of base comment -->
+    <!-- :comments is coming from comment-section prop -->
+    <comment-section :comments="comments" @send="send"/>
 
     <!-- Loop over comments, v-html will take care for rendering links/html tags etc -->
     <div class="my-1" v-for="comment in comments">
-      <span v-html="comment.htmlContent"></span>
       <!-- On click, set that base comment id to parentCommentId, so that we know which reply belong to what comment -->
       <v-btn small @click="parentCommentId = comment.id">Reply</v-btn>
 
@@ -42,6 +33,8 @@
 <script>
   // Separate from component, easier to re-use it
   // Resolves endpoint based on type it's passed
+  import CommentSection from "../../../../components/comments/comment-section";
+
   const endpointResolver = (type) => {
     // If type is technique, returns techniques string which we will use for resolving our API endpoint
     if (type === 'technique') return 'techniques'
@@ -58,6 +51,7 @@
   })
 
   export default {
+    components: {CommentSection},
     // Local state
     data: () => ({
       modItem: null,
@@ -91,40 +85,19 @@
     },
 
     methods: {
-      post() {
+      send(content) {
         // Extract moderation item id from URL param
         const {modItem} = this.$route.params;
 
-        // If we have parentCommentId means we can create reply for it
-        if (this.parentCommentId > 0) {
-
-          // Create reply for particular comment
-          this.$axios.$post(`/api/comments/${this.parentCommentId}/replies`)
-            .then(reply => this.comments
-              // Find the actual comment that we are replying to -> get particular comment => parent comment
-              .find(c => c.id === this.parentCommentId)
-              // Pipe replies, push to replies that reply from form body
-              .replies.push(reply))
-        } else {
-          // If it's not reply, it's regular comment
-          // Creating comment for particular moderation item, based on his Id that's passed via URL
-          // As data to save to our API, pass object with content prop, which is comment "" from local state, v-model, binding
-          this.$axios.$post(`/api/moderation-items/${modItem}/comments`, {content: this.comment})
-            // Push created comment to commentWithReplies func that will take comment and spread it into object
-            .then(comment => this.comments.push(commentWithReplies(comment)));
-        }
-
-      },
-
-      // Load replies for specified comment
-      loadReplies(comment) {
-        this.$axios.$get(`/api/comments/${comment.id}/replies`)
-          // Then set comment to replies from comments that are coming from API response
-          // $set => What do we wanna set, what prop we wanna set, what do we want to set it to
-          .then(comments => this.$set(comment, 'replies', comments))
+        // If it's not reply, it's regular comment
+        // Returning promise | Creating comment for particular moderation item, based on his Id that's passed via URL
+        // As data to save to our API, pass object with content prop, which is comment "" from local state, v-model, binding
+        return this.$axios.$post(`/api/moderation-items/${modItem}/comments`, {content: content})
+          // Then push comment to local state arr of comments
+          .then(comment => this.comments.push(comment));
       }
 
-    }
+    },
 
   }
 </script>

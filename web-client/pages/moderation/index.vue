@@ -2,8 +2,8 @@
   <div>
     <!-- Button for displaying modItem for moderation -->
     <!-- id |> moderation modItem id, type |> e.g. technique, target |> particular technique -->
-    <v-btn :to="`/moderation/${item.id}/${item.type}/${item.target}`" v-for="modItem in items" :key="item.id">
-      {{modItem.target}}
+    <v-btn :to="`/moderation/${modItem.id}/${modItem.type}/${modItem.target}`" v-for="modItem in modItems" :key="modItem.id">
+      {{modItem.target}} <- Target
     </v-btn>
   </div>
 </template>
@@ -12,13 +12,14 @@
   export default {
     // Local state
     data: () => ({
-      items: []
+      // Collection of items to moderate
+      modItems: []
     }),
 
     // Every time you need to get asynchronous data. fetch is called on server-side when rendering the route, and on client-side when navigating.
     async fetch() {
       // Grabbing everything from API controller and storing in local state, arr of items
-      this.items = await this.$axios.$get("/api/moderation-items")
+      this.modItems = await this.$axios.$get("/api/moderation-items")
     }
   }
 </script>
