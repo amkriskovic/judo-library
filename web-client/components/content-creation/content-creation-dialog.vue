@@ -17,7 +17,7 @@
         <v-list>
           <!-- # Iterating over components -->
           <!-- {component name}-menu-index, on click activate component that we chose -->
-          <!-- * deconstruct / send component as payload and ACTIVATES (Component) it -->
+          <!-- * deconstruct / sendComment component as payload and ACTIVATES (Component) it -->
           <v-list-item v-for="(modItem, index) in menuItems" :key="`ccd-menu-${index}`"
                        @click="activate({component: item.component})">
             <v-list-item-title>{{ modItem.title }}</v-list-item-title>

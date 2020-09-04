@@ -1,14 +1,14 @@
 ﻿<template>
   <div>
-    <!-- 1# Binding from comment-body component :comment prop to our comment prop, emitting send event -> both sending to same func -->
+    <!-- 1# Binding from comment-body component :comment prop to our comment prop, emitting sendComment event -> both sending to same func -->
     <!-- Replaying to top comment, @load-replies event => loads replies -->
     <comment-body :comment="comment" @send="send" @load-replies="loadReplies"/>
 
     <!-- 2# -->
     <div class="ml-5">
-      <!-- Replies part, pulling reply from replies, binding reply to comment prop, emitting send event -> both sending to same func -->
+      <!-- Replies part, pulling reply from replies, binding reply to comment prop, emitting sendComment event -> both sending to same func -->
       <!-- Replying to one of repays -->
-      <comment-body v-for="reply in replies" :comment="reply" @send="send"/>
+      <comment-body v-for="reply in replies" :comment="reply" @send="send" :key="`reply-${reply.id}`"/>
     </div>
   </div>
 </template>
@@ -40,7 +40,7 @@
 
     // Component methods
     methods: {
-      // Passing content from @send event -> creating reply for base comment
+      // Passing content from @sendComment event -> creating reply for base comment
       send(content) {
         // Create reply for particular comment
         return this.$axios.$post(`/api/comments/${this.comment.id}/replies`, {content: content})

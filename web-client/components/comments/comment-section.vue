@@ -3,8 +3,8 @@
   * it includes top to bottom, wrapper around all comments components -->
   <div>
     <!-- Injecting comment input component -->
-    <!-- * Hook to send event, but just passing comment content -> re-emitting again with content -->
-    <comment-input label="add comment" @send="(content) => $emit('send', content)" />
+    <!-- * Hook to sendComment event, but just passing comment content -> re-emitting again with content -->
+    <comment-input label="Add comment" @send="(content) => $emit('send', content)" />
 
     <v-divider class="my-5"/>
 

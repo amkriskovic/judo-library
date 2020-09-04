@@ -20,6 +20,7 @@ namespace JudoLibrary.Data
         public DbSet<Video> Videos { get; set; }
         public DbSet<ModerationItem> ModerationItems { get; set; }
         public DbSet<Comment> Comments { get; set; }
+        public DbSet<Review> Reviews { get; set; }
         
         // Fluent API configurations
         protected override void OnModelCreating(ModelBuilder modelBuilder)

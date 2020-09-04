@@ -86,5 +86,40 @@ namespace JudoLibrary.Api.Controllers
             // Return Ok response with created comment
             return Ok(CommentViewModel.Create(comment));
         }
+        
+        // GET -> /api/moderation-items/{id}/reviews
+        // Listing reviews for particular moderation item(id)
+        [HttpGet("{id}/reviews")]
+        public IEnumerable<Review> GetReviewsForModerationItem(int id) =>
+            _ctx.Reviews
+                // Where moderation item id for review is equal to id that is passed
+                .Where(r => r.ModerationItemId.Equals(id))
+                .ToList();
+        
+        // POST -> /api/moderation-items/{id}/reviews
+        // Create review for particular moderation modItem
+        // Passing id from url, and from body -> review 
+        [HttpPost("{id}/reviews")]
+        public async Task<IActionResult> CreateReviewForModerationItem(int id, [FromBody] Review review)
+        {
+            // Get particular moderation modItem 
+            var moderationItem = _ctx.ModerationItems.FirstOrDefault(mi => mi.Id.Equals(id));
+            
+            // If moderationItem doesnt exist -> we dont have anything to moderate
+            if (moderationItem == null)
+            {
+                // return no content
+                return NoContent();
+            }
+
+            // Add review to particular moderation modItem that we found by id, to list of reviews
+            moderationItem.Reviews.Add(review);
+            
+            // Save changes to DB
+            await _ctx.SaveChangesAsync();
+            
+            // Return Ok response with created review
+            return Ok(review);
+        }
     }
 }

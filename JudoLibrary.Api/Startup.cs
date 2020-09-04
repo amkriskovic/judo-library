@@ -39,6 +39,11 @@ namespace JudoLibrary.Api
             // Adding singleton service as Channel of type <EditVideoMessage>, _ without service provider
             services.AddSingleton(_ => Channel.CreateUnbounded<EditVideoMessage>());
             services.AddSingleton<VideoManager>();
+            
+            services.AddControllersWithViews()
+                .AddNewtonsoftJson(options =>
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+                );
 
             // Service for CORS mechanism, with current policy, everything is accepted
             services.AddCors(options => options

@@ -33,7 +33,7 @@ export const actions = {
 
   // Create submission with accessing state of store, and with payload <- form
   createSubmission({state, commit, dispatch}, {form}) {
-    // Make post request to url, send payload <- form, return Promise
+    // Make post request to url, sendComment payload <- form, return Promise
     return this.$axios.$post("/api/submissions", form);
   }
 

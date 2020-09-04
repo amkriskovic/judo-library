@@ -11,7 +11,10 @@ namespace JudoLibrary.Models.Moderation
         // Type represents -> what is the type of target that we are moderating => what it is
         public string Type { get; set; }
 
-        // List of comments for moderation, need to init in order to add to it?
+        // Comments for moderation => notes?, moderation item can have Many Comments
         public IList<Comment> Comments { get; set; } = new List<Comment>();
+
+        // Moderation item can have Many Reviews
+        public IList<Review> Reviews { get; set; } = new List<Review>();
     }
 }

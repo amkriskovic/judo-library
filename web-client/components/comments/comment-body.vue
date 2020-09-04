@@ -13,10 +13,10 @@
       <v-btn small text v-if="$listeners['load-replies']" @click="$emit('load-replies')">Show Replies</v-btn>
     </div>
 
-    <!-- Injecting comment-input component, emitting send event with content -> that reply holds -->
+    <!-- Injecting comment-input component, emitting sendComment event with content -> that reply holds -->
     <!-- @cancel event, we set replying to false => means we spawn cancel button in order to cancel reply if we want to -->
     <!-- if we are replying show the bar -->
-    <comment-input v-if="replying" @send="(content) => $emit('send', content)" @cancel="replying = false"/>
+    <comment-input label="Add reply" v-if="replying" @send="(content) => $emit('send', content)" @cancel="replying = false"/>
   </div>
 </template>
 
