@@ -45,15 +45,9 @@ namespace JudoLibrary.Api.Controllers
         [HttpPost("{id}/comments")]
         public async Task<IActionResult> CreateCommentForModerationItem(int id, [FromBody] Comment comment)
         {
-            // Get particular moderation modItem 
-            var moderationItem = _ctx.ModerationItems.FirstOrDefault(mi => mi.Id.Equals(id));
-            
             // If moderationItem doesnt exist -> we dont have anything to moderate
-            if (moderationItem == null)
-            {
-                // return no content
+            if (!_ctx.ModerationItems.Any(mi => mi.Id.Equals(id)))
                 return NoContent();
-            }
             
             // First group starts with 2nd @ symbol, \B -> non word boundary => means as soon it tied to some word without space, it
             // will ignore it. Allowing lower & upper case characters, numbers, dash and underscore, + -> one or more from collection
@@ -76,9 +70,13 @@ namespace JudoLibrary.Api.Controllers
                     // And return that as content, which becomes link
                     return content.Replace(tag, $"<a href=\"{tag}-user-link\">{tag}</a>");
                 });
+
+            
+            // Assign id from moderation item that we moderating to comment's moderation item id
+            comment.ModerationItemId = id;
             
             // Add comment to particular moderation modItem that we found by id, to list of comments
-            moderationItem.Comments.Add(comment);
+            _ctx.Add(comment);
             
             // Save changes to DB
             await _ctx.SaveChangesAsync();
@@ -102,18 +100,15 @@ namespace JudoLibrary.Api.Controllers
         [HttpPost("{id}/reviews")]
         public async Task<IActionResult> CreateReviewForModerationItem(int id, [FromBody] Review review)
         {
-            // Get particular moderation modItem 
-            var moderationItem = _ctx.ModerationItems.FirstOrDefault(mi => mi.Id.Equals(id));
-            
             // If moderationItem doesnt exist -> we dont have anything to moderate
-            if (moderationItem == null)
-            {
-                // return no content
+            if (!_ctx.ModerationItems.Any(mi => mi.Id.Equals(id)))
                 return NoContent();
-            }
 
+            // Assign id from moderation item that we moderating to review's moderation item id
+            review.ModerationItemId = id;
+            
             // Add review to particular moderation modItem that we found by id, to list of reviews
-            moderationItem.Reviews.Add(review);
+            _ctx.Add(review);
             
             // Save changes to DB
             await _ctx.SaveChangesAsync();
