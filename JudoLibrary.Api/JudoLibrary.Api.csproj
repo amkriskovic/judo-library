@@ -11,11 +11,26 @@
 
     <ItemGroup>
       <Folder Include="ffmpeg" />
+      <Folder Include="Pages\Shared" />
       <Folder Include="wwwroot" />
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="IdentityServer4" Version="4.0.4" />
+      <PackageReference Include="IdentityServer4.AspNetIdentity" Version="4.0.4" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="3.1.6" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="3.1.6" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Update="Pages\Account\Login.cshtml">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+      <Content Update="Pages\_ViewImports.cshtml">
+        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
     </ItemGroup>
 
 </Project>

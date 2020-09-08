@@ -3,6 +3,7 @@ using JudoLibrary.Data;
 using JudoLibrary.Models;
 using JudoLibrary.Models.Moderation;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -155,6 +156,14 @@ namespace JudoLibrary.Api
                     // Saving changes to in-memory DB
                     context.SaveChanges();
                 }
+                
+                // * Identity
+                // Get user manager service
+                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                
+                // Create a user
+                var user = new IdentityUser("test");
+                userManager.CreateAsync(user, "password").GetAwaiter().GetResult();
             }
             
             // Launch App
