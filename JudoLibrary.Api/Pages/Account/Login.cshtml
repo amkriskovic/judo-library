@@ -6,6 +6,13 @@
 }
 
 <form method="post">
+    <!-- Value of ReturnUrl get's populated by IS4 when we go to /Account/Login, it get's populated based on ConnectID Flow => callback? -->
+    <!-- because we specified this hidden field which OnGet takes that http://localhost:5000/Account/Login?ReturnUrl= everything after it -->
+    <!-- and assigns it's to value -->
+    <!-- #1 First thing where we redirect to is an endpoint within our IS4 (WHEN WE CLICK ON LOGIN) => "authorization_endpoint" => /connect/authorize
+    # well known info. about IS4 -->
+    
+    <!-- #2 If we are authorized we redirect back to our App with [code] that we can exchange for access token and ID token -->
     <input type="hidden" asp-for="Form.ReturnUrl" value="@Model.Form.ReturnUrl">
     <input asp-for="Form.Username">
     <span asp-validation-for="Form.Username"></span>

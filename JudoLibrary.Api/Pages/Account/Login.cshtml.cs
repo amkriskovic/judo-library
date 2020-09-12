@@ -13,7 +13,8 @@ namespace JudoLibrary.Api.Pages.Account
         [BindProperty]
         public LoginForm Form { get; set; }
         
-        // return Url gonna get populated by IS4 and authorization endpoint
+        // http://localhost:5000/Account/Login?ReturnUrl=...
+        // return Url gonna get populated by IS4 and authorization endpoint, needs to be named returnUrl otherwise wont work
         public void OnGet(string returnUrl)
         {
             // OnGet init LoginForm
@@ -39,7 +40,8 @@ namespace JudoLibrary.Api.Pages.Account
             
             if (signInResult.Succeeded)
             {
-                // If signInResult succeeded we want to pop user back on from where he came from
+                // If signInResult succeeded we want to pop user back on from where he came from, returnUrl contains all the info
+                // that server need to redirect us back
                 return Redirect(Form.ReturnUrl);
             }
 

@@ -1,6 +1,11 @@
 <template>
   <div>
 
+    <!-- Login section -->
+    <div>
+      <v-btn @click="login">Login</v-btn>
+    </div>
+
     <div v-for="section in sections">
       <!-- Index page data -->
       <div class="d-flex flex-column align-center">
@@ -8,8 +13,7 @@
 
         <div>
           <!-- Loop over collections -->
-          <v-btn class="mx-1" v-for="item in section.collection"
-                 :key="`${section.title}-${item.id}`"
+          <v-btn class="mx-1" v-for="item in section.collection" :key="`${section.title}-${item.id}`"
                  :to="section.routeFactory(item.id)">{{ item.name }}
           </v-btn>
         </div>
@@ -23,8 +27,15 @@
 
 <script>
   import {mapState} from "vuex"
+  import {UserManager, WebStorageStateStore} from "oidc-client"
 
   export default {
+    // Local data
+    data: () => ({
+      // Init user manager
+      userManager: null
+    }),
+
     // * Techniques, categories, subcategories are getting fetched from index.js
     computed: {
       ...mapState("techniques", ["techniques", "category", "subcategory"]),
@@ -39,6 +50,71 @@
           {collection: this.subcategory, title: "Subcategories", routeFactory: id => `/subcategory/${id}`},
         ]
       }
-    }
+    },
+
+    created() {
+      // If we are not on the server -> we are on the Client
+      if(!process.server) {
+        // Instantiate user manager and provide required setting, as well as some optional settings
+        this.userManager = new UserManager({
+          // The URL of the OIDC/OAuth2 provider.
+          authority: "http://localhost:5000",
+
+          // Your client application's identifier as registered with the OIDC/OAuth2 provider.
+          client_id: "web-client",
+
+          // The redirect URI of your client application to receive a response from the OIDC/OAuth2 provider.
+          redirect_uri: "http://localhost:3000",
+
+          // The type of response desired from the OIDC/OAuth2 provider.
+          response_type: "code",
+
+          // The scope being requested from the OIDC/OAuth2 provider.
+          scope: "openid profile",
+
+          // The OIDC/OAuth2 post-logout redirect URI.
+          post_logout_redirect_uri: "http://localhost:3000",
+
+          // The URL for the page containing the code handling the silent renew.
+          // silent_redirect_uri:
+
+          // Storage object used to persist User for currently authenticated user.
+          // Saving user to the local storage rather than session storage, so it persists after we close the browser
+          // * Session storage is temporary, after we close the browser it's deleted -> loosing authentication
+          // * Solution => store the tokens in the local storage
+          userStore: new WebStorageStateStore({ store: window.localStorage }),
+        })
+
+        // * Extract query parameters from route -> this is the part where we got the code from IS4 and got redirected back to the client
+        const {code, scope, session_state, state} = this.$route.query
+
+        // If we have all these parameters
+        if(code && scope && session_state && state){
+          // * Returns promise to process response from the authorization endpoint (IS4), The result of the promise is the authenticated User
+          this.userManager.signinRedirectCallback()
+            .then(user => {
+              // We get the user from the promise which contains: access_token, id_token, profile obj(user info)., scope and many more...
+
+              // Token has it's own endpoint => "token_endpoint": "http://localhost:5000/connect/token" which contains access_token, id_token...
+              // access_token === authorization, id_token === authentication
+
+              // UserInfo has it's own endpoint => "userinfo_endpoint": "http://localhost:5000/connect/userinfo", fetched separately
+              // userinfo === profile
+              console.log(user)
+
+              // Clear the URL which contains code after redirecting back to the client
+              this.$router.push('/')
+            })
+        }
+      }
+
+    },
+
+    methods: {
+      login() {
+        return this.userManager.signinRedirect()
+      }
+    },
+
   }
 </script>

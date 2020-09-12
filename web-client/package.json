@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.12.1",
-    "nuxt": "^2.14.3"
+    "nuxt": "^2.14.3",
+    "oidc-client": "^1.10.1"
   },
   "devDependencies": {
     "@nuxtjs/vuetify": "^1.11.2"
