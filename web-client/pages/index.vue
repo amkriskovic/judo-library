@@ -4,6 +4,8 @@
     <!-- Login section -->
     <div>
       <v-btn @click="login">Login</v-btn>
+      <v-btn @click="api('protected')">Api test auth</v-btn>
+      <v-btn @click="api('mod')">Api Mod auth</v-btn>
     </div>
 
     <div v-for="section in sections">
@@ -69,8 +71,9 @@
           // The type of response desired from the OIDC/OAuth2 provider.
           response_type: "code",
 
-          // The scope being requested from the OIDC/OAuth2 provider.
-          scope: "openid profile",
+          // The scope is being requested from the OIDC/OAuth2 provider.
+          // * All the resources hidden behind our API, scope is gonna be specifically for the policy that's protecting it
+          scope: "openid profile IdentityServerApi",
 
           // The OIDC/OAuth2 post-logout redirect URI.
           post_logout_redirect_uri: "http://localhost:3000",
@@ -85,14 +88,27 @@
           userStore: new WebStorageStateStore({ store: window.localStorage }),
         })
 
+        // Load the User object for the currently authenticated user
+        // * This is only get triggered if we are already authenticated and SIGNED IN
+        this.userManager.getUser()
+          .then(user => {
+            // If we have a user
+            if(user) {
+              console.log('User from local storage [already signed in] ', user)
+              // * Setting the token to user that's in local storage
+              // this.$axios.setToken(`Bearer ${user.access_token}`)
+            }
+          })
+
         // * Extract query parameters from route -> this is the part where we got the code from IS4 and got redirected back to the client
         const {code, scope, session_state, state} = this.$route.query
 
         // If we have all these parameters
         if(code && scope && session_state && state){
-          // * Returns promise to process response from the authorization endpoint (IS4), The result of the promise is the authenticated User
+          // * Returns promise to process response from the authorization endpoint (IS4)
           this.userManager.signinRedirectCallback()
             .then(user => {
+              // * The result of the promise is the AUTHENTICATED User
               // We get the user from the promise which contains: access_token, id_token, profile obj(user info)., scope and many more...
 
               // Token has it's own endpoint => "token_endpoint": "http://localhost:5000/connect/token" which contains access_token, id_token...
@@ -100,7 +116,10 @@
 
               // UserInfo has it's own endpoint => "userinfo_endpoint": "http://localhost:5000/connect/userinfo", fetched separately
               // userinfo === profile
-              console.log(user)
+              console.log('User after we authenticate ',user)
+
+              // * Setting the token after we are AUTHENTICATED
+              this.$axios.setToken(`Bearer ${user.access_token}`)
 
               // Clear the URL which contains code after redirecting back to the client
               this.$router.push('/')
@@ -111,8 +130,18 @@
     },
 
     methods: {
+      // Login method
       login() {
+        // Returns promise to trigger a redirect of the current window to the authorization endpoint.
+        // * "authorization_endpoint": "http://localhost:5000/connect/authorize", get's attached to /Account/Login?ReturnUrl=...
         return this.userManager.signinRedirect()
+      },
+
+      // Making API call
+      api(endpoint) {
+        // Making get request to our API with provided endpoint, we can call this resource if we are authenticated and authorized with specifidc
+        return this.$axios.$get(`/api/techniques/` + endpoint)
+          .then(msg => {console.log('msg from API call', msg)})
       }
     },
 

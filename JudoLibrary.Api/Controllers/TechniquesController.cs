@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using IdentityServer4;
 using JudoLibrary.Api.Form;
 using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +28,18 @@ namespace JudoLibrary.Api.Controllers
         // TechniqueViewModels.Projection is responsible for giving us response
         [HttpGet]
         public IEnumerable<object> GetAllTechniques() => _context.Techniques.Select(TechniqueViewModels.Projection).ToList();
+        
+        // GET -> /api/techniques/protected
+        [HttpGet("protected")]
+        // Providing Policy to authorize 
+        [Authorize(Policy = IdentityServerConstants.LocalApi.PolicyName)]
+        public string GetProtectedAuth() => "protected API Resource";
+        
+        // GET -> /api/techniques/mod
+        [HttpGet("mod")]
+        // Providing our custom Policy constant to authorize as Mod
+        [Authorize(Policy = JudoLibraryConstants.Policies.Mod)]
+        public string GetModeratorAuth() => "moderator API Resource";
         
         // GET -> /api/techniques/{id}
         [HttpGet("{id}")]

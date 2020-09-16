@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Security.Claims;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using JudoLibrary.Models.Moderation;
@@ -164,6 +165,14 @@ namespace JudoLibrary.Api
                 // Create a user
                 var user = new IdentityUser("test");
                 userManager.CreateAsync(user, "password").GetAwaiter().GetResult();
+                
+                // Create a mod
+                var mod = new IdentityUser("mod");
+                userManager.CreateAsync(mod, "password").GetAwaiter().GetResult();
+                // Adds the specified claim to the user(Mod) with providing claim type and value that we specified in our custom policy
+                userManager.AddClaimAsync(mod, new Claim(ClaimTypes.Role, JudoLibraryConstants.Roles.Mod))
+                    .GetAwaiter()
+                    .GetResult();
             }
             
             // Launch App

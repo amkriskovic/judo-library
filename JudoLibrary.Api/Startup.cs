@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using System.Threading.Channels;
 using IdentityServer4;
 using IdentityServer4.Models;
@@ -32,26 +33,26 @@ namespace JudoLibrary.Api
             // Opening Session with Postgres SQL
             // services.AddDbContext<AppDbContext>(options => 
             //     options.UseNpgsql(_configuration.GetConnectionString("JudoLibrary")));
-            
+
             // Adding service for using EF In-Memory database
             services.AddDbContext<AppDbContext>(options => options.UseInMemoryDatabase("Dev"));
-            
+
             // Calling our custom identity func for setting up Identity & IS4
             AddIdentity(services);
-            
+
             // Adds support for using controllers
             services.AddControllers();
-            
+
             // Adds support for using razor pages
             services.AddRazorPages();
-            
+
             // Adding hosted service for VideoEditingBackgroundService which implements BackgroundService <- IHostedService
             services.AddHostedService<VideoEditingBackgroundService>();
-            
+
             // Adding singleton service as Channel of type <EditVideoMessage>, _ without service provider
             services.AddSingleton(_ => Channel.CreateUnbounded<EditVideoMessage>());
             services.AddSingleton<VideoManager>();
-            
+
             services.AddControllersWithViews()
                 .AddNewtonsoftJson(options =>
                     options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
@@ -59,7 +60,7 @@ namespace JudoLibrary.Api
 
             // Service for CORS mechanism, with current policy, everything is accepted
             services.AddCors(options => options
-                .AddPolicy(AllCors,build => build
+                .AddPolicy(AllCors, build => build
                     .AllowAnyHeader()
                     .AllowAnyOrigin()
                     .AllowAnyMethod()));
@@ -74,20 +75,21 @@ namespace JudoLibrary.Api
 
             // Middleware func for CORS mechanism
             app.UseCors(AllCors);
-            
+
             // Support for routing
             app.UseRouting();
-            
-            // * Authentication part
+
+            // * Authentication part, Who are you?
             app.UseAuthentication();
             app.UseIdentityServer();
 
-            // * Authorization part
+            // * Authorization part, are you allowed?
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapDefaultControllerRoute();
-                
+
                 // Mapping razor pages endpoints
                 endpoints.MapRazorPages();
             });
@@ -104,7 +106,7 @@ namespace JudoLibrary.Api
                 // Place where we are going to store User records
                 config.UseInMemoryDatabase("DevIdentity");
             });
-            
+
             // Adding identity to services for managing User/role information
             services.AddIdentity<IdentityUser, IdentityRole>(options =>
                 {
@@ -125,7 +127,7 @@ namespace JudoLibrary.Api
                 // Wire up these services to DB (EF Store), connecting IdentityDbContext to DB
                 .AddEntityFrameworkStores<IdentityDbContext>()
                 // Adds the default token providers used to generate tokens for reset passwords, change email...
-                .AddDefaultTokenProviders(); 
+                .AddDefaultTokenProviders();
 
             services.ConfigureApplicationCookie(config =>
             {
@@ -137,11 +139,11 @@ namespace JudoLibrary.Api
                 config.LoginPath = "/Account/Login";
             });
             // * 
-            
+
             // * Identity Server layer (IS4)
             // Create identity server builder -> adding to services
             var identityServiceBuilder = services.AddIdentityServer();
-            
+
             // # We need to hook up IS4 with Identity(.NET Core), provide IdentityUser
             identityServiceBuilder.AddAspNetIdentity<IdentityUser>();
 
@@ -153,19 +155,31 @@ namespace JudoLibrary.Api
                 identityServiceBuilder.AddInMemoryIdentityResources(new IdentityResource[]
                 {
                     // These are Scopes =>> area/category of information's that we can extract -> we can give access to client to req. those scopes
-                    
+                    // Scopes for User information
+
                     // OpenId -> Informs the Authorization Server that the Client is making an OpenID Connect request. OpenID CR gives us ID Token
                     // and access Token, after exchanging for auth. code, and ID Token can be immediately consumed by application to understand who
                     // are you? And then the access token can be used to gather more information about the user e.g. (/connect/userinfo)
                     // ID Token === understand who the user is, | Access Token === is used for requesting API's
                     // OpenId contains well known openid configuration, which is called discovery document, which has all the information about IS4
                     new IdentityResources.OpenId(),
-                    
+
                     // Profile scope is used to gather info about the User
                     // This scope value requests access to the End-User's default profile Claims, there is many of them.
                     new IdentityResources.Profile(),
                 });
-                
+
+                // Adding in memory API scopes that client can request -> hidden information
+                identityServiceBuilder.AddInMemoryApiScopes(new ApiScope[]
+                {
+                    // Providing api scope with scope name -> "IdentityServerApi"
+                    // This allows us to request this scope (Client), for IS4 means it's gonna be some resource behind this scope
+                    
+                    // Adding ClaimType Role to our ApiScope -> after that it will be included in JWT access token -> putting that claim from
+                    // Identity4 side to access token, it will be something like -> role: "Mod" in User's access token
+                    new ApiScope(IdentityServerConstants.LocalApi.ScopeName, new string[]{ClaimTypes.Role})
+                });
+
                 // Client => thing that is receiving the tokens, tokens are gonna contain information, IS4 either gonna allow to client
                 // to access scopes above or not
 
@@ -175,7 +189,7 @@ namespace JudoLibrary.Api
                 // #3 The user is redirected back to the application with an authorization code (in the query string) [FC]
                 // #4 The application exchanges the authorization code by calling IS4 for an access token [BC] (Secret key)
                 // #5 Application now can talk to resource sever/API with access token [BC] ->> It's scoped to what we specify in scope
-                
+
                 // Adding in mem client to identity service builder
                 identityServiceBuilder.AddInMemoryClients(new Client[]
                 {
@@ -184,7 +198,7 @@ namespace JudoLibrary.Api
                     {
                         // FC == Front channel -> not that secure ->> browser => used to interact with a User
                         // BC == Back channel -> secure ->> server
-                        
+
                         // Client id, mimicking our Vue App client name
                         // ClientId is passed with initial request [FC] -> not sensitive -> identifies our Judo App,
                         // the client_id is a public identifier for App.
@@ -192,7 +206,7 @@ namespace JudoLibrary.Api
 
                         // Specifying authorization code flow, provides a way to retrieve tokens on a back-channel as opposed to the browser
                         // front-channel. It also support client authentication.
-                        
+
                         // Grant types are a way to specify how a client wants to interact with IdentityServer
                         // Grant type refers to the way an application gets an access token.
                         AllowedGrantTypes = GrantTypes.Code,
@@ -205,20 +219,22 @@ namespace JudoLibrary.Api
 
                         // CORS origins -> coz ppl are gonna come from different domains
                         AllowedCorsOrigins = new string[] {"http://localhost:3000"},
-                        
+
                         // We need to tell in client configuration that this Client is allowed to grab specified scopes that we defined in
                         // AddInMemoryIdentityResources on IS4 side
                         AllowedScopes = new string[]
                         {
                             // Passing allowed scopes that client can request from IS4
                             IdentityServerConstants.StandardScopes.OpenId,
-                            IdentityServerConstants.StandardScopes.Profile
+                            IdentityServerConstants.StandardScopes.Profile,
+                            
+                            IdentityServerConstants.LocalApi.ScopeName
                         },
 
                         // This is to allow code flow thorough the browser
                         // Adds code & code_verifier to http://localhost:5000/connect/token, in form data response
                         RequirePkce = true,
-                        
+
                         // Allowing transmitting access tokens via the browser channel
                         AllowAccessTokensViaBrowser = true,
 
@@ -230,7 +246,7 @@ namespace JudoLibrary.Api
                         RequireClientSecret = false
                     },
                 });
-                
+
                 // Adding sign in credentials to IS4 builder,
                 // Creates temporary key material at startup time. This is for dev scenarios.
                 // The generated key will be persisted in the local directory by default.
@@ -238,7 +254,43 @@ namespace JudoLibrary.Api
                 // Sets the temporary signing credential
                 identityServiceBuilder.AddDeveloperSigningCredential();
             }
+
+            // * Authentication & Authorization part of IS4 for accessing APIs, true for dev. and production
+            services.AddLocalApiAuthentication();
+            
+            // Custom authorization for MOD role
+            services.AddAuthorization(options =>
+            {
+                // Elevating default IS4 policy
+                options.AddPolicy(JudoLibraryConstants.Policies.Mod, policy =>
+                {
+                    // Getting default IS4 policy
+                    var IS4Policy = options.GetPolicy(IdentityServerConstants.LocalApi.PolicyName);
+                    
+                    // Our policy (Mod) + default policy
+                    // Combines the specified policy into the current instance, adding to our (Mod) policy, default one
+                    policy.Combine(IS4Policy);
+                    
+                    // Specifying required claims for this policy, Role claim type & allowed values for that role -> you need to be a Moderator
+                    policy.RequireClaim(ClaimTypes.Role, JudoLibraryConstants.Roles.Mod);
+                });
+            });
+
             // * 
+        }
+
+    }
+    
+    public struct JudoLibraryConstants
+    {
+        public struct Policies
+        {
+            public const string Mod = nameof(Mod);
+        }
+        
+        public struct Roles
+        {
+            public const string Mod = nameof(Mod);
         }
     }
 }
