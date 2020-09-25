@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Authenticating...</title>
+</head>
+<body>
+
+
+<script src="/oidc/oidc-client.min.js"></script>
+<script>
+  // The whole point of static page is to process the code and response url and redirect us back to the App
+
+  new Oidc.UserManager({
+    // Storage object used to persist User for currently authenticated user.
+    // Saving user to the local storage rather than session storage, so it persists after we close the browser
+    // * Session storage is temporary, after we close the browser it's deleted -> loosing authentication
+    // * Solution => store the tokens in the local storage
+    userStore: new Oidc.WebStorageStateStore({ store: window.localStorage }),
+
+    response_mode: "query",
+  }).signinRedirectCallback()
+    .then(user => {
+      // * The result of the promise is the AUTHENTICATED User
+      // We get the user from the promise which contains: access_token, id_token, profile obj(user info)., scope and many more...
+
+      // Token has it's own endpoint => "token_endpoint": "http://localhost:5000/connect/token" which contains access_token, id_token...
+      // access_token === authorization, id_token === authentication
+
+      // UserInfo has it's own endpoint => "userinfo_endpoint": "http://localhost:5000/connect/userinfo", fetched separately
+      // userinfo === profile
+      console.log('User after we authenticate ', user)
+
+      // Return from the static page to our App
+      window.location = '/'
+    })
+</script>
+</body>
+</html>
