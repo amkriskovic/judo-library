@@ -23,6 +23,11 @@ export const actions = {
   nuxtServerInit({dispatch}) {
     // Pre-load all available tricks, returning Promise...
     return dispatch("techniques/fetchTechniques");
+  },
+
+  // Client(User) initialization -> auth.js from store
+  clientInit({dispatch}) {
+    return dispatch("auth/initialize");
   }
 
 }

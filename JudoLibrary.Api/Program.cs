@@ -170,7 +170,8 @@ namespace JudoLibrary.Api
                 var mod = new IdentityUser("mod");
                 userManager.CreateAsync(mod, "password").GetAwaiter().GetResult();
                 // Adds the specified claim to the user(Mod) with providing claim type and value that we specified in our custom policy
-                userManager.AddClaimAsync(mod, new Claim(ClaimTypes.Role, JudoLibraryConstants.Roles.Mod))
+                userManager.AddClaimAsync(mod, 
+                        new Claim(JudoLibraryConstants.Claims.Role,JudoLibraryConstants.Roles.Mod))
                     .GetAwaiter()
                     .GetResult();
             }

@@ -10,11 +10,31 @@
 
       <v-spacer></v-spacer>
 
-      <!-- Moderation button -->
-      <v-btn depressed to="/moderation">Moderation</v-btn>
+      <!-- Moderation button, if he is Mod -> coming from auth.js getters -->
+      <v-btn class="mx-1" v-if="moderator" depressed to="/moderation">Moderation</v-btn>
 
-      <!-- content-creation-dialog component - Popup -->
-      <content-creation-dialog/>
+      <!-- Skeleton loader -> loading animation for content creation -->
+      <v-skeleton-loader class="mx-1" :loading="loading" transition="scale-transition" type="button">
+        <!-- content-creation-dialog component - Popup -->
+        <content-creation-dialog/>
+      </v-skeleton-loader>
+
+      <v-skeleton-loader :loading="loading" transition="scale-transition" type="button">
+        <!-- If we are authenticated => show Profile -->
+        <v-btn depressed outlined v-if="authenticated">
+          <v-icon outlined left>mdi-account-circle</v-icon>
+          Profile
+        </v-btn>
+
+        <!-- Else => not authenticated => Sign in => redirect to our client plugin -->
+        <v-btn depressed outlined v-else @click="$auth.signinRedirect()">
+          <v-icon outlined left>mdi-account-circle-outline</v-icon>
+          Sign in
+        </v-btn>
+      </v-skeleton-loader>
+
+      <!-- Logout, display only if we are authenticated => means we are logged in => redirect to our client plugin -->
+      <v-btn v-if="authenticated" depressed class="ml-1" @click="$auth.signoutRedirect()">Logout</v-btn>
 
     </v-app-bar>
 
@@ -29,14 +49,22 @@
 </template>
 
 <script>
-  import ContentCreationDialog from "../components/content-creation/content-creation-dialog";
+import ContentCreationDialog from "../components/content-creation/content-creation-dialog";
+import {mapGetters, mapState} from "vuex";
 
-  export default {
-    name: "Default",
+export default {
+  name: "Default",
 
-    // Mapping components
-    components: {
-      ContentCreationDialog
-    }
-  }
+  // Mapping components
+  components: {
+    ContentCreationDialog
+  },
+
+  // Mapping state & getters from auth.js store
+  computed: {
+    ...mapState('auth', ['loading']),
+    ...mapGetters('auth', ['authenticated', 'moderator']),
+  },
+
+}
 </script>

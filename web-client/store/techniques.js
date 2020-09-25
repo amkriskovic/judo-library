@@ -61,18 +61,23 @@ export const actions = {
   // # Base URL is set in nuxt.config.js
   // Fetching techniques, commit <- context of store, commit func is to invoke one of the mutation func's
   async fetchTechniques({commit}) {
-    // Await for response from GET request, getting data from response (url)
-    const techniques = await this.$axios.$get("/api/techniques");
+    try {
+      // Await for response from GET request, getting data from response (url)
+      const techniques = await this.$axios.$get("/api/techniques");
 
-    // Await for response from GET request, getting data for category and subcategory
-    const categories = await this.$axios.$get("/api/categories");
-    const subcategories = await this.$axios.$get("/api/subcategories");
+      // Await for response from GET request, getting data for category and subcategory
+      const categories = await this.$axios.$get("/api/categories");
+      const subcategories = await this.$axios.$get("/api/subcategories");
 
-    console.log('techniques::', techniques);
+      console.log('techniques::', techniques);
 
-    // Trigger a mutation func with commit func and provide payload <- techniques, category, subcategory
-    // Mutation function setTechniques renders UI
-    commit("setTechniques", {techniques, categories, subcategories});
+      // Trigger a mutation func with commit func and provide payload <- techniques, category, subcategory
+      // Mutation function setTechniques renders UI
+      commit("setTechniques", {techniques, categories, subcategories});
+    } catch (err) {
+      console.log(err)
+    }
+
   },
 
   // Create technique with accessing state of store, and with payload <- form

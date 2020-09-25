@@ -137,6 +137,9 @@ namespace JudoLibrary.Api
                 // redirect to /connect/authorize, this has the equivalent of the [Authorize] attribute
                 // redirect to /Account/Login because we are NOT authorized
                 config.LoginPath = "/Account/Login";
+                
+                // Set logout path
+                config.LogoutPath = "/api/auth/logout";
             });
             // * 
 
@@ -157,9 +160,12 @@ namespace JudoLibrary.Api
                     // These are Scopes =>> area/category of information's that we can extract -> we can give access to client to req. those scopes
                     // Scopes for User information
 
-                    // OpenId -> Informs the Authorization Server that the Client is making an OpenID Connect request. OpenID CR gives us ID Token
-                    // and access Token, after exchanging for auth. code, and ID Token can be immediately consumed by application to understand who
-                    // are you? And then the access token can be used to gather more information about the user e.g. (/connect/userinfo)
+                    // OpenId -> Informs the Authorization Server that the Client is making an OpenID Connect request.
+                    // OpenID CR gives us ID Token
+                    // and access Token, after exchanging for auth. code, and ID Token can be immediately consumed by application
+                    // to understand who
+                    // are you? And then the access token can be used to gather more information about the user
+                    // e.g. (/connect/userinfo)
                     // ID Token === understand who the user is, | Access Token === is used for requesting API's
                     // OpenId contains well known openid configuration, which is called discovery document, which has all the information about IS4
                     new IdentityResources.OpenId(),
@@ -167,6 +173,10 @@ namespace JudoLibrary.Api
                     // Profile scope is used to gather info about the User
                     // This scope value requests access to the End-User's default profile Claims, there is many of them.
                     new IdentityResources.Profile(),
+                    
+                    // Adding custom IdentityResource which we will include in ID Token -> Role
+                    new IdentityResource(JudoLibraryConstants.IdentityResources.RoleScope, 
+                        new string[] {JudoLibraryConstants.Claims.Role}), 
                 });
 
                 // Adding in memory API scopes that client can request -> hidden information
@@ -174,10 +184,15 @@ namespace JudoLibrary.Api
                 {
                     // Providing api scope with scope name -> "IdentityServerApi"
                     // This allows us to request this scope (Client), for IS4 means it's gonna be some resource behind this scope
+                    // IdentityServerApi will be included in "scopes_supported" in /.well-known/openid-configuration
                     
-                    // Adding ClaimType Role to our ApiScope -> after that it will be included in JWT access token -> putting that claim from
+                    // Adding ClaimType *Role* to our ApiScope ("claims_supported") -> after that it will be included in JWT access token
+                    // -> putting that claim from
                     // Identity4 side to access token, it will be something like -> role: "Mod" in User's access token
-                    new ApiScope(IdentityServerConstants.LocalApi.ScopeName, new string[]{ClaimTypes.Role})
+                    
+                    // The following scope definition tells the configuration system, that when a ScopeName -> IdentityServerApi scope gets granted,
+                    // the Role claim should be added to the access token:
+                    new ApiScope(IdentityServerConstants.LocalApi.ScopeName, new string[]{JudoLibraryConstants.Claims.Role})
                 });
 
                 // Client => thing that is receiving the tokens, tokens are gonna contain information, IS4 either gonna allow to client
@@ -211,14 +226,14 @@ namespace JudoLibrary.Api
                         // Grant type refers to the way an application gets an access token.
                         AllowedGrantTypes = GrantTypes.Code,
 
-                        // Where do we redirect after they logIn
-                        RedirectUris = new string[] {"http://localhost:3000"},
+                        // Where do we redirect after they log In
+                        RedirectUris = new string[] {"https://localhost:3000/oidc/sign-in-callback.html"},
 
-                        // Where do we redirect after they logOut
-                        PostLogoutRedirectUris = new string[] {"http://localhost:3000"},
+                        // Where do we redirect after they log Out
+                        PostLogoutRedirectUris = new string[] {"https://localhost:3000"},
 
                         // CORS origins -> coz ppl are gonna come from different domains
-                        AllowedCorsOrigins = new string[] {"http://localhost:3000"},
+                        AllowedCorsOrigins = new string[] {"https://localhost:3000"},
 
                         // We need to tell in client configuration that this Client is allowed to grab specified scopes that we defined in
                         // AddInMemoryIdentityResources on IS4 side
@@ -227,8 +242,11 @@ namespace JudoLibrary.Api
                             // Passing allowed scopes that client can request from IS4
                             IdentityServerConstants.StandardScopes.OpenId,
                             IdentityServerConstants.StandardScopes.Profile,
+
+                            // Adds IdentityServerApi to "scopes_supported"
+                            IdentityServerConstants.LocalApi.ScopeName,
                             
-                            IdentityServerConstants.LocalApi.ScopeName
+                            JudoLibraryConstants.IdentityResources.RoleScope, // Custom
                         },
 
                         // This is to allow code flow thorough the browser
@@ -256,6 +274,7 @@ namespace JudoLibrary.Api
             }
 
             // * Authentication & Authorization part of IS4 for accessing APIs, true for dev. and production
+            // To enable token validation for local APIs, add the following to your IdentityServer startup
             services.AddLocalApiAuthentication();
             
             // Custom authorization for MOD role
@@ -272,7 +291,7 @@ namespace JudoLibrary.Api
                     policy.Combine(IS4Policy);
                     
                     // Specifying required claims for this policy, Role claim type & allowed values for that role -> you need to be a Moderator
-                    policy.RequireClaim(ClaimTypes.Role, JudoLibraryConstants.Roles.Mod);
+                    policy.RequireClaim(JudoLibraryConstants.Claims.Role, JudoLibraryConstants.Roles.Mod);
                 });
             });
 
@@ -286,6 +305,16 @@ namespace JudoLibrary.Api
         public struct Policies
         {
             public const string Mod = nameof(Mod);
+        }
+        
+        public struct IdentityResources
+        {
+            public const string RoleScope = "role";
+        }
+        
+        public struct Claims
+        {
+            public const string Role = "role";
         }
         
         public struct Roles

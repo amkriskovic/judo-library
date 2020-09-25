@@ -1,4 +1,6 @@
 import colors from 'vuetify/es5/util/colors'
+import path from 'path'
+import fs from 'fs'
 
 export default {
   /*
@@ -7,8 +9,28 @@ export default {
   */
   mode: 'universal',
 
+  // Available on client & server side
   publicRuntimeConfig: {
-    api: process.env.API_URL
+    axios: {
+      baseURL: "https://localhost:5001",
+      https: true
+    },
+  },
+
+  // Available on server side, will override any publicRuntimeConfig
+  privateRuntimeConfig: {
+    axios: {
+      baseURL: "http://localhost:5000",
+      https: false
+    },
+  },
+
+  // Defining Server key-cert
+  server: {
+    https: {
+      key: fs.readFileSync(path.relative(__dirname, 'server.key')),
+      cert: fs.readFileSync(path.relative(__dirname, 'server.cert')),
+    }
   },
 
   /*
@@ -24,12 +46,12 @@ export default {
     titleTemplate: '%s - Judo Library',
     title: 'Welcome' || '',
     meta: [
-      { charset: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { hid: 'description', name: 'description', content: process.env.npm_package_description || '' }
+      {charset: 'utf-8'},
+      {name: 'viewport', content: 'width=device-width, initial-scale=1'},
+      {hid: 'description', name: 'description', content: process.env.npm_package_description || ''}
     ],
     link: [
-      { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }
+      {rel: 'icon', type: 'image/x-icon', href: '/favicon.ico'}
     ]
   },
   /*
@@ -43,6 +65,7 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
+    {src: '~/plugins/client-init.js', mode: 'client'},
   ],
   /*
   ** Auto import components
@@ -66,9 +89,7 @@ export default {
   ** Axios module configuration
   ** See https://axios.nuxtjs.org/options
   */
-  axios: {
-    baseURL: "http://localhost:5000"
-  },
+
   /*
   ** vuetify module configuration
   ** https://github.com/nuxt-community/vuetify-module
@@ -93,6 +114,5 @@ export default {
   ** Build configuration
   ** See https://nuxtjs.org/api/configuration-build/
   */
-  build: {
-  }
+  build: {}
 }
