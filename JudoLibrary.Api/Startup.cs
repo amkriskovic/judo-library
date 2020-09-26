@@ -174,7 +174,7 @@ namespace JudoLibrary.Api
                     // This scope value requests access to the End-User's default profile Claims, there is many of them.
                     new IdentityResources.Profile(),
                     
-                    // Adding custom IdentityResource which we will include in ID Token -> Role
+                    // Adding custom IdentityResource which we will include in Access Token -> Role
                     new IdentityResource(JudoLibraryConstants.IdentityResources.RoleScope, 
                         new string[] {JudoLibraryConstants.Claims.Role}), 
                 });
@@ -246,7 +246,7 @@ namespace JudoLibrary.Api
                             // Adds IdentityServerApi to "scopes_supported"
                             IdentityServerConstants.LocalApi.ScopeName,
                             
-                            JudoLibraryConstants.IdentityResources.RoleScope, // Custom
+                            JudoLibraryConstants.IdentityResources.RoleScope, // Custom -> role
                         },
 
                         // This is to allow code flow thorough the browser

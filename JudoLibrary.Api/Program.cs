@@ -163,11 +163,11 @@ namespace JudoLibrary.Api
                 var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
                 
                 // Create a user
-                var user = new IdentityUser("test");
+                var user = new IdentityUser("test@test.com");
                 userManager.CreateAsync(user, "password").GetAwaiter().GetResult();
                 
                 // Create a mod
-                var mod = new IdentityUser("mod");
+                var mod = new IdentityUser("mod@test.com");
                 userManager.CreateAsync(mod, "password").GetAwaiter().GetResult();
                 // Adds the specified claim to the user(Mod) with providing claim type and value that we specified in our custom policy
                 userManager.AddClaimAsync(mod, 

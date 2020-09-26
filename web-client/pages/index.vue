@@ -1,10 +1,7 @@
 <template>
   <div>
 
-    <!-- Login / Logout section -->
     <div>
-      <v-btn @click="login">Login</v-btn>
-      <v-btn @click="logout">Logout</v-btn>
       <v-btn @click="api('protected')">Api test auth</v-btn>
       <v-btn @click="api('mod')">Api Mod auth</v-btn>
     </div>
@@ -58,7 +55,6 @@
 
       // Logout method
       logout: function () {
-        // This should throw us back to the post_logout_redirect_uri specified above
       },
 
       // Making API call

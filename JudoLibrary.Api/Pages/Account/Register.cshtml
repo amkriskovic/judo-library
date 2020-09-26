@@ -1,8 +1,8 @@
 ﻿@page
-@model JudoLibrary.Api.Pages.Account.Login
+@model JudoLibrary.Api.Pages.Account.Register
 
 @{
-    ViewData["Title"] = "Login";
+    ViewData["Title"] = "Register";
     Layout = "Shared/_Layout";
 }
 
@@ -10,20 +10,20 @@
     <!-- Value of ReturnUrl get's populated by IS4 when we go to /Account/Login, it get's populated based on ConnectID Flow => callback? -->
     <!-- because we specified this hidden field which OnGet takes that http://localhost:5000/Account/Login?ReturnUrl= everything after it -->
     <!-- and assigns it's to value -->
-    
+
     <!-- #1 First thing where we redirect to is an endpoint within our IS4 (WHEN WE CLICK ON LOGIN) => "authorization_endpoint" 
     => /connect/authorizewell known info. about IS4 -->
 
     <!-- #2 If we are authorized we redirect back to our App with [code] that we can exchange for access token and ID token -->
     <input type="hidden" asp-for="Form.ReturnUrl" value="@Model.Form.ReturnUrl">
-    
-    <h3 class="title">Login</h3>
 
-    <!-- Username field -->
+    <h3 class="title">Register</h3>
+
+    <!-- Email field -->
     <div class="field">
-        <label>Username</label>
-        <input asp-for="Form.Username">
-        <span asp-validation-for="Form.Username"></span>
+        <label>Email</label>
+        <input asp-for="Form.Email">
+        <span asp-validation-for="Form.Email"></span>
     </div>
 
     <!-- Password field -->
@@ -33,10 +33,17 @@
         <span asp-validation-for="Form.Password"></span>
     </div>
 
+    <!-- Confirm Password field -->
+    <div class="field">
+        <label>Confirm Password</label>
+        <input asp-for="Form.ConfirmPassword">
+        <span asp-validation-for="Form.ConfirmPassword"></span>
+    </div>
+
     <!-- Button -->
     <div class="field flex-row">
-        <button type="submit">Sign In</button>
-        <!-- Populating -> passing returnUrl if we click Register link, which is generated on get -->
-        <a asp-page="/Account/Register" asp-route-returnUrl="@Model.Form.ReturnUrl">Register</a>
+        <button type="submit">Sign Up</button>
+        <!-- Populating -> passing returnUrl if we click "Back to Login" link, which is generated on get -->
+        <a asp-page="/Account/Login" asp-route-returnUrl="@Model.Form.ReturnUrl">Back to Login</a>
     </div>
 </form>

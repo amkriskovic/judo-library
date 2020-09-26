@@ -30,7 +30,7 @@ namespace JudoLibrary.Api.Pages.Account
         // SignInManager is a service -> come from Startup -> AddIdentity
         public async Task<IActionResult> OnPostAsync([FromServices] SignInManager<IdentityUser> signInManager)
         {
-            // If login form is invalid, return that page again
+            // If login form is invalid, return that page again => user did not provide valid username || password
             if (!ModelState.IsValid)
                 return Page();
             
@@ -41,7 +41,7 @@ namespace JudoLibrary.Api.Pages.Account
             if (signInResult.Succeeded)
             {
                 // If signInResult succeeded we want to pop user back on from where he came from, returnUrl contains all the info
-                // that server need to redirect us back
+                // that server need to redirect us back to the App
                 return Redirect(Form.ReturnUrl);
             }
 

@@ -1,0 +1,64 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>@ViewData["Title"]</title>
+
+    <!-- Login form styles -->
+    <style>
+        * {
+            font-family: "Roboto", sans-serif !important;
+        }
+    
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #1e2328;
+        }
+        
+        .title {
+           text-align: center; 
+        }
+        
+        form {
+            display: flex;
+            flex-direction: column;
+            background: #D7DCE8;
+            padding: 1.5rem;
+            border-radius: 2px;
+            box-shadow: 0 1px 8px 1px #c7d7eb;
+        }
+        
+        .field {
+             display: flex;
+             flex-direction: column;
+             align-items: flex-start;
+             margin-bottom: .5rem;
+        }
+        
+       .field > input {
+            margin-bottom: .25rem;
+            width: 100%;
+       }
+        
+        .field > span { 
+            font-size: 14px;
+            color: #db005f;
+        }
+        
+        .flex-row {
+            flex-direction: row;
+            justify-content: space-evenly;
+        }
+    </style>
+
+</head>
+<body>
+
+@RenderBody()
+
+</body>
+</html>

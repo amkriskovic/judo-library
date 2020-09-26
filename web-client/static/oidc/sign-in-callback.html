@@ -21,18 +21,25 @@
     response_mode: "query",
   }).signinRedirectCallback()
     .then(user => {
-      // * The result of the promise is the AUTHENTICATED User
-      // We get the user from the promise which contains: access_token, id_token, profile obj(user info)., scope and many more...
+      if (user) {
+        // * The result of the promise is the AUTHENTICATED User
+        // We get the user from the promise which contains: access_token, id_token, profile obj(user info)., scope and many more...
 
-      // Token has it's own endpoint => "token_endpoint": "http://localhost:5000/connect/token" which contains access_token, id_token...
-      // access_token === authorization, id_token === authentication
+        // Token has it's own endpoint => "token_endpoint": "http://localhost:5000/connect/token" which contains access_token, id_token...
+        // access_token === authorization, id_token === authentication
 
-      // UserInfo has it's own endpoint => "userinfo_endpoint": "http://localhost:5000/connect/userinfo", fetched separately
-      // userinfo === profile
-      console.log('User after we authenticate ', user)
+        // UserInfo has it's own endpoint => "userinfo_endpoint": "http://localhost:5000/connect/userinfo", fetched separately
+        // userinfo === profile
+        console.log('User after we authenticate ', user)
 
-      // Return from the static page to our App
-      window.location = '/'
+        // Return from the static page to our App
+        window.location = '/'
+      }
+    })
+    .catch(err => {
+      console.log(err.message)
+      if (err.message === 'login_required') {
+      }
     })
 </script>
 </body>

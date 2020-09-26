@@ -26,6 +26,7 @@
           Profile
         </v-btn>
 
+        <!-- Login / Logout section -->
         <!-- Else => not authenticated => Sign in => redirect to our client plugin -->
         <v-btn depressed outlined v-else @click="$auth.signinRedirect()">
           <v-icon outlined left>mdi-account-circle-outline</v-icon>
