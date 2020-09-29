@@ -17,7 +17,7 @@
     <!-- #2 If we are authorized we redirect back to our App with [code] that we can exchange for access token and ID token -->
     <input type="hidden" asp-for="Form.ReturnUrl" value="@Model.Form.ReturnUrl">
 
-    <h3 class="title">Register</h3>
+    @* <h3 class="title">Register</h3> *@
 
     <!-- Email field -->
     <div class="field">
@@ -40,9 +40,14 @@
         <span asp-validation-for="Form.ConfirmPassword"></span>
     </div>
 
-    <!-- Button -->
+    <!-- Button -> register as a action to creation of account -->
     <div class="field flex-row">
-        <button type="submit">Sign Up</button>
+        <button type="submit">Register</button>
+    </div>
+
+    <hr>
+
+    <div class="field flex-row">
         <!-- Populating -> passing returnUrl if we click "Back to Login" link, which is generated on get -->
         <a asp-page="/Account/Login" asp-route-returnUrl="@Model.Form.ReturnUrl">Back to Login</a>
     </div>

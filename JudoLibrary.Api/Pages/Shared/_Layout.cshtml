@@ -9,6 +9,7 @@
     <style>
         * {
             font-family: "Roboto", sans-serif !important;
+            box-sizing: border-box;
         }
     
         body {
@@ -17,19 +18,25 @@
             justify-content: center;
             align-items: center;
             background-color: #1e2328;
+            flex-direction: column;
         }
         
         .title {
-           text-align: center; 
+           text-align: center;
+           color: #ebedf0;
+           font-size: 30px;
         }
         
         form {
             display: flex;
             flex-direction: column;
-            background: #D7DCE8;
-            padding: 1.5rem;
-            border-radius: 2px;
-            box-shadow: 0 1px 8px 1px #c7d7eb;
+            background: #ebedf0;
+            padding: 1.7rem 2rem;
+            max-width: 300px;
+            width: 100%;
+            margin: 0 1rem;
+            border-radius: 4px;
+            box-shadow: 0 1px 8px 1px #d4dce7;
         }
         
         .field {
@@ -39,9 +46,29 @@
              margin-bottom: .5rem;
         }
         
+        .field > label {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
        .field > input {
             margin-bottom: .25rem;
             width: 100%;
+            
+            line-height: 20px;
+            padding: 8px 4px 8px;
+            max-width: 100%;
+            min-width: 0px;
+            border: 1px solid #1e2328;
+            font-size: 16px;
+            border-radius: 4px;
+            
+            background: #ecedee;
+       }
+       
+       .field > input:focus {
+           outline: none;
+           border: 1px solid #1976d2;
        }
         
         .field > span { 
@@ -53,10 +80,31 @@
             flex-direction: row;
             justify-content: space-evenly;
         }
+        
+        hr {
+            width: 100%
+        }
+        
+        .field > button {
+            height: 36px;
+            min-width: 64px;
+            padding: 0 16px;
+            background-color: transparent;
+            border-radius: 4px;
+           border: 1px solid #1976d2;
+           cursor: pointer;
+           font-size: 15px;
+        }
+        
+        .field > a {
+            text-decoration: none;
+        }
     </style>
 
 </head>
 <body>
+
+<h3 class="title">Judo Library</h3>
 
 @RenderBody()
 

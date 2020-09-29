@@ -29,7 +29,8 @@ export default async ({app, store}, inject) => {
     post_logout_redirect_uri: "https://localhost:3000",
 
     // The URL for the page containing the code handling the silent renew.
-    // silent_redirect_uri: "https://localhost:3000",
+    // * Page where <iframe> will land on, and have correct callback, it will rise correct events in this plugin
+    silent_redirect_uri: "https://localhost:3000/oidc/sign-in-silent-callback.html",
 
     // Storage object used to persist User for currently authenticated user.
     // Saving user to the local storage rather than session storage, so it persists after we close the browser

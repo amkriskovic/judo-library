@@ -226,8 +226,12 @@ namespace JudoLibrary.Api
                         // Grant type refers to the way an application gets an access token.
                         AllowedGrantTypes = GrantTypes.Code,
 
-                        // Where do we redirect after they log In
-                        RedirectUris = new string[] {"https://localhost:3000/oidc/sign-in-callback.html"},
+                        // Where do we redirect after they log In / silent refreshes for tokens
+                        RedirectUris = new string[]
+                        {
+                            "https://localhost:3000/oidc/sign-in-callback.html",
+                            "https://localhost:3000/oidc/sign-in-silent-callback.html",
+                        },
 
                         // Where do we redirect after they log Out
                         PostLogoutRedirectUris = new string[] {"https://localhost:3000"},

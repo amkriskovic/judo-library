@@ -38,7 +38,7 @@
         return [
           // Collection is ARRAY of techniques || categories || subcategories and we can access their model props, like id
           // /technique corresponds to folder _technique
-          {collection: this.techniques, title: "Tricks", routeFactory: id => `/technique/${id}`},
+          {collection: this.techniques, title: "Techniques", routeFactory: id => `/technique/${id}`},
           {collection: this.category, title: "Categories", routeFactory: id => `/category/${id}`},
           {collection: this.subcategory, title: "Subcategories", routeFactory: id => `/subcategory/${id}`},
         ]

@@ -1,4 +1,4 @@
-﻿﻿namespace JudoLibrary.Models
+﻿namespace JudoLibrary.Models
 {
     public abstract class BaseModel<TKey>
     {

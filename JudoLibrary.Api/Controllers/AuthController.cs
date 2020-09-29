@@ -9,6 +9,10 @@ namespace JudoLibrary.Api.Controllers
     [Route("api/auth")]
     public class AuthController : ControllerBase
     {
+        // #1 After we click logout -> /connect/endsession end point is called from oidc well known document, which passes id_token_hint
+        // and post_logout_redirect_uri
+
+        // #2 After that this endpoint is called (/api/auth/logout) with logout_id, which is id of this client
         [HttpGet("logout")]
         // Method for logging out User, logoutId for IS4 coz there can be multiple clients, OIDC will manage redirect & logout
         // SignInManager DI at method level => used for signing out User

@@ -38,21 +38,43 @@ export const actions = {
     // Load the User object for the currently authenticated user
     // * This is only get triggered if we are already authenticated and SIGNED IN
     // * $auth is nuxt plugin - client-init.js -> injecting UserManager
-    return this.$auth.getUser()
+
+    // Query OP for user's current signin status => promise -> it will give us session status
+    return this.$auth.querySessionStatus()
+      .then(sessionStatus => {
+        // Session status gives us infos in obj: {session_state, sid -> which is User profile id, sub -> which is subject => User}
+        console.log('sessionStatus: ', sessionStatus)
+
+        // If we have sessionStatus => get/reinitialize the User
+        if (sessionStatus) {
+          // Returns promise which will give us User obj
+          // Get the User again
+          return this.$auth.getUser()
+        }
+      })
+      // User
       .then(user => {
-        // If we have a user
+        // If we have the User
         if (user) {
-          console.log('User from local storage [already signed in] ', user)
+          console.log('User[GOT] from local storage [already signed in] ', user)
 
           // Commit user obj to saveUser mutation which will write to state => user is basically bih token
           commit('saveUser', {user})
 
-          // * Setting the token to user that's in local storage
+          // Set the access_token to local storage
           this.$axios.setToken(`Bearer ${user.access_token}`)
         }
       })
-      // Finally, doesn't matter what result is, commit finish -> stop loading
+      .catch(err => {
+        console.log('err: ', err.message)
+        if (err.message === 'login_required') {
+          // Remove from any storage the currently authenticated user
+          return this.$auth.removeUser()
+        }
+      })
+      // Finally, doesn't matter what result is, commit finish -> stop loading skeletons
       .finally(() => commit('finish'))
 
   }
+
 }

@@ -1,4 +1,4 @@
-﻿﻿<template>
+﻿<template>
   <!-- Dialog - Popup - based on state(value) of active prop in video-upload store state -->
   <v-dialog :value="active" persistent width="700">
 
@@ -19,7 +19,7 @@
           <!-- {component name}-menu-index, on click activate component that we chose -->
           <!-- * deconstruct / sendComment component as payload and ACTIVATES (Component) it -->
           <v-list-item v-for="(modItem, index) in menuItems" :key="`ccd-menu-${index}`"
-                       @click="activate({component: item.component})">
+                       @click="activate({component: modItem.component})">
             <v-list-item-title>{{ modItem.title }}</v-list-item-title>
           </v-list-item>
         </v-list>

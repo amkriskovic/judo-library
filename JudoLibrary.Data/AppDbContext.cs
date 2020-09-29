@@ -21,6 +21,7 @@ namespace JudoLibrary.Data
         public DbSet<ModerationItem> ModerationItems { get; set; }
         public DbSet<Comment> Comments { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<User> Users { get; set; }
         
         // Fluent API configurations
         protected override void OnModelCreating(ModelBuilder modelBuilder)
