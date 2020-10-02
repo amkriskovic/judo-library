@@ -25,7 +25,7 @@ namespace JudoLibrary.Api.Pages.Account
             };
         }
         
-        // Method for signing in -> when we submit the form
+        // Method for loging in -> when we submit the form => press the Log In button
         // DI at method level, injecting SignInManager for User
         // SignInManager is a service -> come from Startup -> AddIdentity
         public async Task<IActionResult> OnPostAsync([FromServices] SignInManager<IdentityUser> signInManager)
@@ -41,7 +41,7 @@ namespace JudoLibrary.Api.Pages.Account
             if (signInResult.Succeeded)
             {
                 // If signInResult succeeded we want to pop user back on from where he came from, returnUrl contains all the info
-                // that server need to redirect us back to the App
+                // that server need to redirect us back to the App -> ReturnUrl is callback
                 return Redirect(Form.ReturnUrl);
             }
 

@@ -1,5 +1,6 @@
 using System.Security.Claims;
 using System.Threading.Channels;
+using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Models;
 using JudoLibrary.Api.BackgroundServices;
@@ -110,6 +111,9 @@ namespace JudoLibrary.Api
             // Adding identity to services for managing User/role information
             services.AddIdentity<IdentityUser, IdentityRole>(options =>
                 {
+                    // Requiring User's email to be unique | for prod. and dev.
+                    options.User.RequireUniqueEmail = true;
+                    
                     if (_env.IsDevelopment())
                     {
                         // Specifying some password options
@@ -192,7 +196,12 @@ namespace JudoLibrary.Api
                     
                     // The following scope definition tells the configuration system, that when a ScopeName -> IdentityServerApi scope gets granted,
                     // the Role claim should be added to the access token:
-                    new ApiScope(IdentityServerConstants.LocalApi.ScopeName, new string[]{JudoLibraryConstants.Claims.Role})
+                    new ApiScope(IdentityServerConstants.LocalApi.ScopeName, new string[]
+                    {
+                        // Including PreferredUserName claim in access_token
+                        JwtClaimTypes.PreferredUserName,
+                        JudoLibraryConstants.Claims.Role
+                    })
                 });
 
                 // Client => thing that is receiving the tokens, tokens are gonna contain information, IS4 either gonna allow to client
@@ -308,6 +317,8 @@ namespace JudoLibrary.Api
     {
         public struct Policies
         {
+            // Pointing to "IdentityServerAccessToken" for User => you should be a User to access "this"
+            public const string User = IdentityServerConstants.LocalApi.PolicyName;
             public const string Mod = nameof(Mod);
         }
         

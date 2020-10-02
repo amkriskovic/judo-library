@@ -20,22 +20,42 @@
       </v-skeleton-loader>
 
       <v-skeleton-loader :loading="loading" transition="scale-transition" type="button">
-        <!-- If we are authenticated => show Profile -->
-        <v-btn depressed outlined v-if="authenticated">
-          <v-icon outlined left>mdi-account-circle</v-icon>
-          Profile
-        </v-btn>
+
+        <!-- If we are authenticated -->
+        <!-- Dropdown - Menu -->
+        <v-menu offset-y v-if="authenticated">
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn icon v-bind="attrs" v-on="on">
+              <v-icon>mdi-account-circle</v-icon>
+            </v-btn>
+          </template>
+          <v-list>
+            <!-- Profile -->
+            <v-list-item @click="$router.push('/profile')">
+              <v-list-item-title>
+                <v-icon outlined left>mdi-account-circle</v-icon>
+                Profile
+              </v-list-item-title>
+            </v-list-item>
+
+            <!-- Logout, means we are logged in => redirect to our client plugin -->
+            <v-list-item @click="$auth.signoutRedirect()">
+              <v-list-item-title>
+                <v-icon outlined left>mdi-logout</v-icon>
+                Logout
+              </v-list-item-title>
+            </v-list-item>
+
+          </v-list>
+        </v-menu>
 
         <!-- Login / Logout section -->
         <!-- Else => not authenticated => Sign in => redirect to our client plugin -->
         <v-btn depressed outlined v-else @click="$auth.signinRedirect()">
           <v-icon outlined left>mdi-account-circle-outline</v-icon>
-          Sign in
+          Log in
         </v-btn>
       </v-skeleton-loader>
-
-      <!-- Logout, display only if we are authenticated => means we are logged in => redirect to our client plugin -->
-      <v-btn v-if="authenticated" depressed class="ml-1" @click="$auth.signoutRedirect()">Logout</v-btn>
 
     </v-app-bar>
 

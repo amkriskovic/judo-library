@@ -15,6 +15,7 @@ export default async ({app, store}, inject) => {
     client_id: "web-client",
 
     // The redirect URI of your client application to receive a response from the OIDC/OAuth2 provider.
+    // Where do we end up after Log In button is pressed?
     redirect_uri: "https://localhost:3000/oidc/sign-in-callback.html",
 
     // The type of response desired from the OIDC/OAuth2 provider.

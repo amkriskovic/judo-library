@@ -3,6 +3,7 @@
 // Local state
 const initState = () => ({
   user: null,
+  profile: null,
   loading: true // At start it's loading => process of initializing Auth
 })
 
@@ -25,6 +26,11 @@ export const mutations = {
   saveUser(state, {user}) {
     // Save user, to initial state user
     state.user = user
+  },
+
+  saveProfile(state, {profile}) {
+    // Save profile, to initial state profile
+    state.profile = profile
   },
 
   // Authentication initialization has finished? => not loading anymore
@@ -53,16 +59,25 @@ export const actions = {
         }
       })
       // User
-      .then(user => {
+      .then(async user => {
         // If we have the User
         if (user) {
           console.log('User[GOT] from local storage [already signed in] ', user)
 
-          // Commit user obj to saveUser mutation which will write to state => user is basically bih token
+          // Commit user obj to saveUser mutation which will write to state => user is basically big token
           commit('saveUser', {user})
 
           // Set the access_token to local storage
           this.$axios.setToken(`Bearer ${user.access_token}`)
+
+          // Once we set access_token, make HTTP GET request to get our profile -> which will resole in profile obj containing:
+          // id, username, submissions(arr), deleted
+          const profile = await this.$axios.$get('/api/users/me')
+
+          console.log('store auth.js profile:: ', profile)
+
+          // Writing -> saving profile to state
+          commit('saveProfile', {profile})
         }
       })
       .catch(err => {
@@ -74,7 +89,50 @@ export const actions = {
       })
       // Finally, doesn't matter what result is, commit finish -> stop loading skeletons
       .finally(() => commit('finish'))
+  },
 
+  // Action corresponds to what we want to perform once user is initialized/loaded => executed only on client side
+  _watchUserLoaded({state, getters}, action) {
+    // Fuck off
+    if (process.server) return
+
+    // Return new promise for async purpose
+    return new Promise((resolve, reject) => {
+      // If we are Loading...
+      if (state.loading){
+
+        // Start watching
+        console.log('Start watching!')
+
+        const unwatch = this.watch(
+          // Inside the store, what do we wanna watch => loading
+          (store) => store.auth.loading,
+
+
+          // New and old value corresponds to value of loading
+          (newValue, oldValue) => {
+            // Get rid of watcher -> we no longer need it since loading is finished
+            console.log('UN-WATCHING')
+            unwatch()
+
+            // If we are not authenticated
+            if (!getters.authenticated){
+              // Pop back to the sign in form
+              this.$auth.signinRedirect()
+            } else if(!newValue) {
+              // If loading is false => loading is finished
+              console.log('User finished loading... => executing action!')
+              resolve(action())
+            }
+          }
+        )
+      } else {
+        // Else -> User is loaded.
+        // Pass action to resolve, whatever action returns it's gonna be resolved value of the Promise
+        console.log('User is already loaded => executing action!')
+        resolve(action())
+      }
+    })
   }
 
 }

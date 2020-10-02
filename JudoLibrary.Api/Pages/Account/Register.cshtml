@@ -12,13 +12,18 @@
     <!-- and assigns it's to value -->
 
     <!-- #1 First thing where we redirect to is an endpoint within our IS4 (WHEN WE CLICK ON LOGIN) => "authorization_endpoint" 
-    => /connect/authorizewell known info. about IS4 -->
+    => /connect/authorize - well known info. about IS4 -->
 
     <!-- #2 If we are authorized we redirect back to our App with [code] that we can exchange for access token and ID token -->
     <input type="hidden" asp-for="Form.ReturnUrl" value="@Model.Form.ReturnUrl">
-
-    @* <h3 class="title">Register</h3> *@
-
+    
+    <!-- Username field -->
+    <div class="field">
+        <label>Username</label>
+        <input asp-for="Form.Username">
+        <span asp-validation-for="Form.Username"></span>
+    </div>
+    
     <!-- Email field -->
     <div class="field">
         <label>Email</label>

@@ -27,6 +27,24 @@ namespace JudoLibrary.Api
                 // If Environment is Development seed Combines data
                 if (environment.IsDevelopment())
                 {
+                    // * Identity seeding part -> we need Users to exist before submission coz they relate to them
+                    // Get user manager service
+                    var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
+                
+                    // Create a test User
+                    var testUser = new IdentityUser("test"){Email = "test@test.com"};
+                    userManager.CreateAsync(testUser, "password").GetAwaiter().GetResult();
+                
+                    // Create a mod
+                    var mod = new IdentityUser("mod"){Email = "mod@test.com"};
+                    userManager.CreateAsync(mod, "password").GetAwaiter().GetResult();
+                    // Adds the specified claim to the user(Mod) with providing claim type and value that we specified in
+                    // our custom policy
+                    userManager.AddClaimAsync(mod, 
+                            new Claim(JudoLibraryConstants.Claims.Role,JudoLibraryConstants.Roles.Mod))
+                        .GetAwaiter()
+                        .GetResult();
+                    
                     // Seeding Categories
                     context.Add(new Category {Id = "nage-waza", Name = "Nage Waza", Description = "Throwing Techniques"});
                     context.Add(new Category {Id = "katame-waza", Name = "Katame Waza", Description = "Grappling Techniques"});
@@ -131,7 +149,8 @@ namespace JudoLibrary.Api
                             VideoLink = "seoi.mp4"
                         },
                         Description = "This Seoi nage was very hard to pull of...",
-                        VideoProcessed = true
+                        VideoProcessed = true,
+                        UserId = testUser.Id,
                     });
                     
                     context.Add(new Submission
@@ -143,9 +162,9 @@ namespace JudoLibrary.Api
                             VideoLink = "osoto.mp4"
                         },
                         Description = "Demonstration of Osoto Gari",
-                        VideoProcessed = true
+                        VideoProcessed = true,
+                        UserId = testUser.Id,
                     }); 
-                    
                                     
                     // Seeding moderation items
                     context.Add(new ModerationItem
@@ -157,23 +176,6 @@ namespace JudoLibrary.Api
                     // Saving changes to in-memory DB
                     context.SaveChanges();
                 }
-                
-                // * Identity
-                // Get user manager service
-                var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-                
-                // Create a user
-                var user = new IdentityUser("test@test.com");
-                userManager.CreateAsync(user, "password").GetAwaiter().GetResult();
-                
-                // Create a mod
-                var mod = new IdentityUser("mod@test.com");
-                userManager.CreateAsync(mod, "password").GetAwaiter().GetResult();
-                // Adds the specified claim to the user(Mod) with providing claim type and value that we specified in our custom policy
-                userManager.AddClaimAsync(mod, 
-                        new Claim(JudoLibraryConstants.Claims.Role,JudoLibraryConstants.Roles.Mod))
-                    .GetAwaiter()
-                    .GetResult();
             }
             
             // Launch App

@@ -2,18 +2,17 @@
 using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
-using JudoLibrary.Api.BackgroundServices;
 using JudoLibrary.Api.BackgroundServices.VideoEditing;
 using JudoLibrary.Api.Form;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JudoLibrary.Api.Controllers
 {
-    [ApiController]
     [Route("api/submissions")]
-    public class SubmissionsController : ControllerBase
+    public class SubmissionsController : ApiController
     {
         private readonly AppDbContext _context;
 
@@ -35,6 +34,7 @@ namespace JudoLibrary.Api.Controllers
         // POST -> /api/submissions
         // [FromServices] =>> Dependency Injection as method parameter
         [HttpPost]
+        [Authorize(JudoLibraryConstants.Policies.User)] // You should be a User to access "this"
         public async Task<IActionResult> CreateSubmission(
             [FromBody] SubmissionForm submissionForm,
             [FromServices] Channel<EditVideoMessage> channel,
@@ -56,7 +56,10 @@ namespace JudoLibrary.Api.Controllers
                 Description = submissionForm.Description,
                 
                 // Marking video as NOT processed when we create new Submission
-                VideoProcessed = false
+                VideoProcessed = false,
+                
+                // Grab the UserId from ApiController and assign it to UserId from Submission model
+                UserId = UserId
             };
             
             // Add created submission to DB

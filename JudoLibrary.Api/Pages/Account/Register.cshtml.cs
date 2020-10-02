@@ -37,8 +37,12 @@ namespace JudoLibrary.Api.Pages.Account
             if (!ModelState.IsValid)
                 return Page();
             
-            // Create a User, with username of {email} -> what he typed in the form
-            var user = new IdentityUser(Form.Email);
+            // Create a User, with Username -> what he typed in the form
+            var user = new IdentityUser(Form.Username)
+            {
+                // Adding email from form to user object as-well
+                Email = Form.Email
+            };
 
             // Creates user in store with user manager, based on identity (username included) user and password from form
             var createUserResult = await userManager.CreateAsync(user, Form.Password);
@@ -65,6 +69,9 @@ namespace JudoLibrary.Api.Pages.Account
 
             [Required]
             public string Email { get; set; }
+
+            [Required]
+            public string Username { get; set; }
 
             [Required]
             [DataType(DataType.Password)]
