@@ -14,6 +14,7 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
         private const string TempPrefix = "temp_";
         private const string ConvertedPrefix = "conv_";
         private const string ThumbnailPrefix = "thumb_";
+        private const string ProfilePrefix = "profile_";
 
         public VideoManager(IWebHostEnvironment env)
         {
@@ -65,7 +66,7 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
         }
 
         // Returns string -> path to video based on provided video name
-        public string DevVideoPath(string fileName)
+        public string GetSavePath(string fileName)
         {
             // If env is NOT dev, return null otherwise ...
             // Combines web root path (wwwroot) + fileName which is name of video
@@ -73,10 +74,13 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
         }
 
         // Returns string -> converted video file name => e.g. .mp4
-        public string GenerateConvertedFileName() => $"{ConvertedPrefix}{DateTime.Now.Ticks}.mp4";
+        public static string GenerateConvertedFileName() => $"{ConvertedPrefix}{DateTime.Now.Ticks}.mp4";
 
         // Returns string -> thumbnail for video file name => e.g. .png
-        public string GenerateThumbnailFileName() => $"{ThumbnailPrefix}{DateTime.Now.Ticks}.jpg";
+        public static string GenerateThumbnailFileName() => $"{ThumbnailPrefix}{DateTime.Now.Ticks}.jpg";
+        
+        // Returns string -> thumbnail for profile picture file name => e.g. .png
+        public static string GenerateProfileFileName() => $"{ProfilePrefix}{DateTime.Now.Ticks}.jpg";
 
         // Returns string -> constructing name for saving temp video
         // IFormFile =>> Represents a file sent with the HttpRequest.

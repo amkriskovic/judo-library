@@ -48,10 +48,10 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                 var inputPath = _videoManager.TemporarySavePath(message.Input);
 
                 // Creating converted output name for a video to be able to access it
-                var outputConvertedName = _videoManager.GenerateConvertedFileName();
+                var outputConvertedName = VideoManager.GenerateConvertedFileName();
                     
                 // Creating thumbnail output name for a video
-                var outputThumbnailName = _videoManager.GenerateThumbnailFileName();
+                var outputThumbnailName = VideoManager.GenerateThumbnailFileName();
 
                 // Creating output converted path based on output video name
                 var outputConvertedPath = _videoManager.TemporarySavePath(outputConvertedName);

@@ -26,14 +26,21 @@
         <v-menu offset-y v-if="authenticated">
           <template v-slot:activator="{ on, attrs }">
             <v-btn icon v-bind="attrs" v-on="on">
-              <v-icon>mdi-account-circle</v-icon>
+              <!-- Profile avatar image -->
+              <v-avatar size="38">
+                <!-- Make use of videos controller method for getting the profile image-->
+                <img v-if="profile.image" :src="`https://localhost:5001/api/videos/${profile.image}`"
+                     alt="profile image"/>
+
+                <v-icon v-else>mdi-account</v-icon>
+              </v-avatar>
             </v-btn>
           </template>
           <v-list>
             <!-- Profile -->
             <v-list-item @click="$router.push('/profile')">
               <v-list-item-title>
-                <v-icon outlined left>mdi-account-circle</v-icon>
+                <v-icon>mdi-account-circle</v-icon>
                 Profile
               </v-list-item-title>
             </v-list-item>
@@ -83,7 +90,7 @@ export default {
 
   // Mapping state & getters from auth.js store
   computed: {
-    ...mapState('auth', ['loading']),
+    ...mapState('auth', ['loading', 'profile']),
     ...mapGetters('auth', ['authenticated', 'moderator']),
   },
 

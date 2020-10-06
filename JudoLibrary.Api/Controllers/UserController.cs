@@ -1,11 +1,16 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JudoLibrary.Api.BackgroundServices.VideoEditing;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats.Jpeg;
+using SixLabors.ImageSharp.Processing;
 
 namespace JudoLibrary.Api.Controllers
 {
@@ -70,6 +75,49 @@ namespace JudoLibrary.Api.Controllers
                 .Include(s => s.Video)
                 .Where(s => s.UserId.Equals(id))
                 .ToListAsync();
+        }
+        
+        [HttpPut("me/image")]
+        // IFormFile represents a file sent with the HttpRequest.
+        public async Task<IActionResult> UpdateProfileImage(IFormFile image, [FromServices] VideoManager videoManager)
+        {
+            // If image is null -> 400
+            if (image == null) return BadRequest();
+            
+            // Grab UserId from ApiController
+            var userId = UserId;
+            
+            // Grab the User => compare User Id with userId that's coming from User Claim -> "sub"
+            var user = await _ctx.Users.FirstOrDefaultAsync(u => u.Id.Equals(userId));
+
+            // If no user -> 404
+            if (user == null) return NoContent();
+
+            // Generate profile picture file name
+            var fileName = VideoManager.GenerateProfileFileName();
+
+            // Create a IO File => provide temporary save path based on fileName
+            await using (var stream = System.IO.File.Create(videoManager.GetSavePath(fileName)))
+            {
+                // Input stream -> IFF -> image -> open the input stream -> write
+                using (var imageProcessor = await Image.LoadAsync(image.OpenReadStream()))
+                {
+                    // Resize the given image in place and return it for chaining.
+                    // 48x48
+                    imageProcessor.Mutate(x => x.Resize(48, 48));
+
+                    // Save based on stream that we created and image encoder
+                    await imageProcessor.SaveAsync(stream, new JpegEncoder());
+                } // Dispose - releasing memory into a memory pool ready for the next image you wish to process.
+            } // Dispose
+
+
+            // Assign fileName that we generated to Users Image fileName
+            user.Image = fileName;
+
+            await _ctx.SaveChangesAsync();
+
+            return Ok(user);
         }
     }
 }
