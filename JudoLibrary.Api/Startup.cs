@@ -20,12 +20,12 @@ namespace JudoLibrary.Api
     public class Startup
     {
         private const string AllCors = "All";
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration _config;
         private readonly IWebHostEnvironment _env;
 
-        public Startup(IConfiguration configuration, IWebHostEnvironment env)
+        public Startup(IConfiguration config, IWebHostEnvironment env)
         {
-            _configuration = configuration;
+            _config = config;
             _env = env;
         }
 
@@ -52,7 +52,9 @@ namespace JudoLibrary.Api
 
             // Adding singleton service as Channel of type <EditVideoMessage>, _ without service provider
             services.AddSingleton(_ => Channel.CreateUnbounded<EditVideoMessage>());
-            services.AddSingleton<VideoManager>();
+
+            // Adding FileManager which is extenstion method responsible for registering services => pass _config, for configuring options
+            services.AddFileManager(_config);
 
             services.AddControllersWithViews()
                 .AddNewtonsoftJson(options =>
@@ -311,30 +313,5 @@ namespace JudoLibrary.Api
             // * 
         }
 
-    }
-    
-    public struct JudoLibraryConstants
-    {
-        public struct Policies
-        {
-            // Pointing to "IdentityServerAccessToken" for User => you should be a User to access "this"
-            public const string User = IdentityServerConstants.LocalApi.PolicyName;
-            public const string Mod = nameof(Mod);
-        }
-        
-        public struct IdentityResources
-        {
-            public const string RoleScope = "role";
-        }
-        
-        public struct Claims
-        {
-            public const string Role = "role";
-        }
-        
-        public struct Roles
-        {
-            public const string Mod = nameof(Mod);
-        }
     }
 }

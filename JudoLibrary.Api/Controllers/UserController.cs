@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using JudoLibrary.Api.BackgroundServices.VideoEditing;
+using JudoLibrary.Api.Settings;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -79,7 +80,7 @@ namespace JudoLibrary.Api.Controllers
         
         [HttpPut("me/image")]
         // IFormFile represents a file sent with the HttpRequest.
-        public async Task<IActionResult> UpdateProfileImage(IFormFile image, [FromServices] VideoManager videoManager)
+        public async Task<IActionResult> UpdateProfileImage(IFormFile image, [FromServices] IFileManager fileManager)
         {
             // If image is null -> 400
             if (image == null) return BadRequest();
@@ -94,10 +95,10 @@ namespace JudoLibrary.Api.Controllers
             if (user == null) return NoContent();
 
             // Generate profile picture file name
-            var fileName = VideoManager.GenerateProfileFileName();
+            var fileName = JudoLibraryConstants.Files.GenerateProfileFileName();
 
             // Create a IO File => provide temporary save path based on fileName
-            await using (var stream = System.IO.File.Create(videoManager.GetSavePath(fileName)))
+            await using (var stream = System.IO.File.Create(fileManager.GetSavePath(fileName)))
             {
                 // Input stream -> IFF -> image -> open the input stream -> write
                 using (var imageProcessor = await Image.LoadAsync(image.OpenReadStream()))
@@ -113,7 +114,7 @@ namespace JudoLibrary.Api.Controllers
 
 
             // Assign fileName that we generated to Users Image fileName
-            user.Image = fileName;
+            user.Image = fileManager.GetFileUrl(fileName, FileType.Image);
 
             await _ctx.SaveChangesAsync();
 

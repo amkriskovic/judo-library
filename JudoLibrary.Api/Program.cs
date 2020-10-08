@@ -145,8 +145,8 @@ namespace JudoLibrary.Api
                         TechniqueId = "seoi-nage",
                         Video = new Video
                         {
-                            ThumbLink = "seoi.jpg",
-                            VideoLink = "seoi.mp4"
+                            ThumbLink = "https://localhost:5001/api/files/image/seoi.jpg",
+                            VideoLink = "https://localhost:5001/api/files/video/seoi.mp4"
                         },
                         Description = "This Seoi nage was very hard to pull of...",
                         VideoProcessed = true,
@@ -158,8 +158,8 @@ namespace JudoLibrary.Api
                         TechniqueId = "osoto-gari",
                         Video = new Video
                         {
-                            ThumbLink = "osoto.jpg",
-                            VideoLink = "osoto.mp4"
+                            ThumbLink = "https://localhost:5001/api/files/image/osoto.jpg",
+                            VideoLink = "https://localhost:5001/api/files/video/osoto.mp4"
                         },
                         Description = "Demonstration of Osoto Gari",
                         VideoProcessed = true,

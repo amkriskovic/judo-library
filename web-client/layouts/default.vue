@@ -29,7 +29,7 @@
               <!-- Profile avatar image -->
               <v-avatar size="38">
                 <!-- Make use of videos controller method for getting the profile image-->
-                <img v-if="profile.image" :src="`https://localhost:5001/api/videos/${profile.image}`"
+                <img v-if="profile.image" :src="profile.image"
                      alt="profile image"/>
 
                 <v-icon v-else>mdi-account</v-icon>

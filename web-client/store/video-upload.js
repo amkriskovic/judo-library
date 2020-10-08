@@ -62,7 +62,7 @@ export const actions = {
     // We are getting promise with some state, * for data we need to await it
     // Extract the data from response
     // Generate cancelToken from the source
-    const uploadPromise = this.$axios.post("/api/videos", form, {
+    const uploadPromise = this.$axios.post("/api/files", form, {
 
       // Supply an option/s -> progress -> false -> removes loading bar (spinning)
       progress: false,
@@ -104,7 +104,7 @@ export const actions = {
 
 
         // Call API controller in order to delete particular video
-        await this.$axios.delete("/api/videos/" + video);
+        await this.$axios.delete("/api/files/" + video);
       } else {
         // If upload wasn't completed (cancelled while pending), cancel the source
         console.log('uploadCancelSource.cancel() CLOSE');

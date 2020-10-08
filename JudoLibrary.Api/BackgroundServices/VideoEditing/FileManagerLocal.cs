@@ -1,31 +1,58 @@
 ﻿using System;
 using System.IO;
 using System.Threading.Tasks;
+using JudoLibrary.Api.Settings;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Options;
 
 namespace JudoLibrary.Api.BackgroundServices.VideoEditing
 {
-    public class VideoManager
+    public class FileManagerLocal : IFileManager
     {
         // Provides information about the web hosting environment that application is running in.
         private readonly IWebHostEnvironment _env;
-        private const string TempPrefix = "temp_";
-        private const string ConvertedPrefix = "conv_";
-        private const string ThumbnailPrefix = "thumb_";
-        private const string ProfilePrefix = "profile_";
+        private readonly IOptionsMonitor<FileSettings> _fileSettingsMonitor;
 
-        public VideoManager(IWebHostEnvironment env)
+
+        // Injecting FileSettings with IOptionsMonitor => DI, when service get updated/resolved we get new value 
+        // Depends/Pulls on appsettings.dev.json FileSettings
+        public FileManagerLocal(IWebHostEnvironment env, IOptionsMonitor<FileSettings> fileSettingsMonitor)
         {
             _env = env;
+            _fileSettingsMonitor = fileSettingsMonitor;
         }
 
+        // Proxy for TempPrefix
+        private static string TempPrefix => JudoLibraryConstants.Files.TempPrefix;
+        
         // Points to working directory
         private string WorkingDirectory => _env.WebRootPath;
 
         // Points to FFMPEG executable
-        public string FFMPEGPath => Path.Combine(_env.ContentRootPath, "ffmpeg", "ffmpeg.exe");
+        public string GetFFMPEGPath() => Path.Combine(_env.ContentRootPath, "ffmpeg", "ffmpeg.exe");
+        
+        // Method for resolving file URL
+        public string GetFileUrl(string fileName, FileType fileType)
+        {
+            // Getting current value out of _fileSettingsMonitor -> re-reading the file settings
+            var settings = _fileSettingsMonitor.CurrentValue;
+            
+            // Switch file type
+            return fileType switch
+            {
+                // If it's image
+                FileType.Image =>
+                    // Return image url (path) / filename
+                    $"{settings.ImageUrl}/{fileName}",
+                
+                // If it's video ...
+                FileType.Video => $"{settings.VideoUrl}/{fileName}",
+                
+                // Default -> invalid file type
+                _ => throw new ArgumentOutOfRangeException(nameof(fileType), fileType, null)
+            };
+        }
 
         // Returns string -> temp save path for video
         public string TemporarySavePath(string fileName)
@@ -68,23 +95,13 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
         // Returns string -> path to video based on provided video name
         public string GetSavePath(string fileName)
         {
-            // If env is NOT dev, return null otherwise ...
             // Combines web root path (wwwroot) + fileName which is name of video
-            return !_env.IsDevelopment() ? null : TemporarySavePath(fileName);
+            return TemporarySavePath(fileName);
         }
-
-        // Returns string -> converted video file name => e.g. .mp4
-        public static string GenerateConvertedFileName() => $"{ConvertedPrefix}{DateTime.Now.Ticks}.mp4";
-
-        // Returns string -> thumbnail for video file name => e.g. .png
-        public static string GenerateThumbnailFileName() => $"{ThumbnailPrefix}{DateTime.Now.Ticks}.jpg";
-        
-        // Returns string -> thumbnail for profile picture file name => e.g. .png
-        public static string GenerateProfileFileName() => $"{ProfilePrefix}{DateTime.Now.Ticks}.jpg";
 
         // Returns string -> constructing name for saving temp video
         // IFormFile =>> Represents a file sent with the HttpRequest.
-        public async Task<string> SaveTemporaryVideo(IFormFile video)
+        public async Task<string> SaveTemporaryFile(IFormFile video)
         {
             // Returns string which we combine with temp prefix, unique ticks which are based on time and
             // getting extension from video file name, example: .mp4, .mpeg
