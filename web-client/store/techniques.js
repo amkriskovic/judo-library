@@ -12,25 +12,25 @@ export const state = initState;
 // Getters for techniques,category,subcategory mapping data from initial state
 export const getters = {
   // * Lambda that is returning Lambda, returning technique by id
-  techniqueById: state => id => state.techniques.find(t => t.id === id),
+  techniqueById: state => id => state.techniques.find(t => t.slug === id),
 
-  categoryById: state => id => state.category.find(c => c.id === id),
+  categoryById: state => id => state.category.find(c => c.slug === id),
 
-  subcategoryById: state => id => state.subcategory.find(sc => sc.id === id),
+  subcategoryById: state => id => state.subcategory.find(sc => sc.slug === id),
 
   techniqueItems: state => state.techniques.map(t => ({
     text: t.name,
-    value: t.id
+    value: t.id // slug ??
   })),
 
   categoryItems: state => state.category.map(c => ({
     text: c.name,
-    value: c.id
+    value: c.slug
   })),
 
   subcategoryItems: state => state.subcategory.map(sc => ({
     text: sc.name,
-    value: sc.id
+    value: sc.slug
   })),
 }
 

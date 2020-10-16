@@ -26,7 +26,7 @@ namespace JudoLibrary.Api.Controllers
         // GET -> /api/subcategories/{id}
         [HttpGet("{id}")]
         public SubCategory GetSubCategory(string id) => _context.SubCategories
-            .FirstOrDefault(c => c.Id.Equals(id, StringComparison.InvariantCultureIgnoreCase));
+            .FirstOrDefault(c => c.Slug.Equals(id, StringComparison.InvariantCultureIgnoreCase));
         
         // GET -> /api/subcategories/{id}/techniques
         // Get all techniques for particular sub-category | Passing sub-category Id as param
@@ -40,8 +40,8 @@ namespace JudoLibrary.Api.Controllers
         [HttpPost]
         public async Task<SubCategory> CreateSubCategory([FromBody] SubCategory subCategory)
         {
-            // Create SubCategory -> Id | based on SubCategory -> Name | ' ' -> '-' ==> slug
-            subCategory.Id = subCategory.Name.Replace(" ", "-").ToLowerInvariant();
+            // Create SubCategory -> Slug | based on SubCategory -> Name | ' ' -> '-' ==> slug
+            subCategory.Slug = subCategory.Name.Replace(" ", "-").ToLowerInvariant();
             
             // Add SubCategory to DB
             _context.Add(subCategory);
@@ -57,7 +57,7 @@ namespace JudoLibrary.Api.Controllers
         public async Task<SubCategory> UpdateSubCategory([FromBody] SubCategory subCategory)
         {
             // Check if SubCategory exists
-            if (string.IsNullOrEmpty(subCategory.Id))
+            if (string.IsNullOrEmpty(subCategory.Slug))
                 return null;
             
             // Update

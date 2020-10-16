@@ -58,11 +58,11 @@ namespace JudoLibrary.Data
                 .WithMany(t => t.Counters) // One Technique can have Many TechniqueCounters
                 .HasForeignKey(tc => tc.TechniqueId);
 
-            // Defining TechniqueId in Submission table as ForeignKey
-            modelBuilder.Entity<Submission>()
-                .HasOne<Technique>()
-                .WithMany()
-                .HasForeignKey(s => s.TechniqueId);
+            // // Defining TechniqueId in Submission table as ForeignKey
+            // modelBuilder.Entity<Submission>()
+            //     .HasOne<Technique>()
+            //     .WithMany()
+            //     .HasForeignKey(s => s.TechniqueId);
             
             // // Defining CategoryId in SubCategory table as ForeignKey
             // modelBuilder.Entity<SubCategory>()

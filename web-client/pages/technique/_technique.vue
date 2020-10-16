@@ -5,10 +5,10 @@
     <!-- Template for Content-->
     <template v-slot:content>
       <div class="mx-2" v-if="submissions">
-        <v-card class="mb-3" v-for="submission in submissions" :key="`${technique.id}-${submission.id}`">
+        <v-card class="mb-3" v-for="submission in submissions" :key="`${technique.slug}-${submission.id}`">
           <!-- Injecting video player component with dynamic binding of video where video is string -->
           <!-- * Getting specific videos from submissions store |> state => fetchSubmissionsForTechnique filling state -->
-          <video-player :video="submission.video" :key="`v-${technique.id}-${submission.id}`"/>
+          <video-player :video="submission.video" :key="`v-${technique.slug}-${submission.id}`"/>
 
           <v-card-text>{{submission.description}}</v-card-text>
         </v-card>
@@ -20,8 +20,8 @@
       <div class="text-h5">
         <span>{{ technique.name }}</span>
         <!-- :to= corresponds to page that we created | category == folder | category.id == page?  -->
-        <v-chip small label class="mb-1 ml-2" :to="`/category/${category.id}`">{{ category.name }}</v-chip>
-        <v-chip small label class="mb-1 ml-2" :to="`/subcategory/${subcategory.id}`">{{ subcategory.name }}</v-chip>
+        <v-chip small label class="mb-1 ml-2" :to="`/category/${category.slug}`">{{ category.name }}</v-chip>
+        <v-chip small label class="mb-1 ml-2" :to="`/subcategory/${subcategory.slug}`">{{ subcategory.name }}</v-chip>
       </div>
 
       <v-divider class="my-1"></v-divider>
@@ -73,21 +73,21 @@
         return [
           {
             title: "Set Up Attacks",
-            data: this.techniques.filter(t => this.technique.followUpAttacks.indexOf(t.id) >= 0), // filter() creates a new array
-            idFactory: t => `technique-${t.id}`,
-            routeFactory: t => `/technique/${t.id}`,
+            data: this.techniques.filter(t => this.technique.followUpAttacks.indexOf(t.slug) >= 0), // filter() creates a new array
+            idFactory: t => `technique-${t.slug}`,
+            routeFactory: t => `/technique/${t.slug}`,
           },
           {
             title: "Follow Up Attacks",
-            data: this.techniques.filter(t => this.technique.setUpAttacks.indexOf(t.id) >= 0),
-            idFactory: t => `technique-${t.id}`,
-            routeFactory: t => `/technique/${t.id}`,
+            data: this.techniques.filter(t => this.technique.setUpAttacks.indexOf(t.slug) >= 0),
+            idFactory: t => `technique-${t.slug}`,
+            routeFactory: t => `/technique/${t.slug}`,
           },
           {
             title: "Counters",
-            data: this.techniques.filter(t => this.technique.counters.indexOf(t.id) >= 0),
-            idFactory: t => `technique-${t.id}`,
-            routeFactory: t => `/technique/${t.id}`
+            data: this.techniques.filter(t => this.technique.counters.indexOf(t.slug) >= 0),
+            idFactory: t => `technique-${t.slug}`,
+            routeFactory: t => `/technique/${t.slug}`
           }
         ]
       },

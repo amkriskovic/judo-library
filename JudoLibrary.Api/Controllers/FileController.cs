@@ -19,9 +19,9 @@ namespace JudoLibrary.Api.Controllers
         }
         
         // GET -> /api/files/{type}/{file}
-        // Action for getting file type based on his name
+        // Action for getting file based on his type & file-name
         [HttpGet("{type}/{file}")]
-        public IActionResult GetVideo(string type, string file)
+        public IActionResult GetFile(string type, string file)
         {
             // Switch the "type" to extract mime from it based on FileType
             // If it's image -> image/jpg | If it's video -> video/mp4
@@ -34,15 +34,13 @@ namespace JudoLibrary.Api.Controllers
             // If mime is null -> 400 you are requesting invalid type
             if (mime == null) return BadRequest();
                 
-            // Create saving path for uploaded file
+            // Get save path for uploaded file
             var savePath = _fileManagerLocal.TemporarySavePath(file);
             
             // If savePath path is null or empty
             if (string.IsNullOrEmpty(savePath))
-            {
                 // Return bad request -> 404
                 return BadRequest();
-            }
             
             // Use file stream where we provide save path, open file and read file (file)
             // Returns file stream result combining file stream and content type, which will be resolved in image or video format

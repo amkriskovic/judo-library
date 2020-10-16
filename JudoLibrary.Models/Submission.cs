@@ -1,6 +1,8 @@
-﻿namespace JudoLibrary.Models
+﻿using JudoLibrary.Models.Abstractions;
+
+namespace JudoLibrary.Models
 {
-    public class Submission : BaseModel<int>
+    public class Submission : TemporalModel
     {
         public int VideoId { get; set; } // Submission can have One Video 
         public Video Video { get; set; } // Navigation prop

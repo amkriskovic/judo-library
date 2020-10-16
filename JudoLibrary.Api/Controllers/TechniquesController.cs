@@ -7,6 +7,7 @@ using JudoLibrary.Api.Form;
 using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
+using JudoLibrary.Models.Moderation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -28,23 +29,11 @@ namespace JudoLibrary.Api.Controllers
         // TechniqueViewModels.Projection is responsible for giving us response
         [HttpGet]
         public IEnumerable<object> GetAllTechniques() => _context.Techniques.Select(TechniqueViewModels.Projection).ToList();
-        
-        // GET -> /api/techniques/protected
-        [HttpGet("protected")]
-        // Providing Policy to authorize 
-        [Authorize(Policy = IdentityServerConstants.LocalApi.PolicyName)]
-        public string GetProtectedAuth() => "protected API Resource";
-        
-        // GET -> /api/techniques/mod
-        [HttpGet("mod")]
-        // Providing our custom Policy constant to authorize as Mod
-        [Authorize(Policy = JudoLibraryConstants.Policies.Mod)]
-        public string GetModeratorAuth() => "moderator API Resource";
-        
+
         // GET -> /api/techniques/{id}
         [HttpGet("{id}")]
         public object GetTechnique(string id) => _context.Techniques
-            .Where(t => t.Id.Equals(id, StringComparison.InvariantCultureIgnoreCase))
+            .Where(t => t.Slug.Equals(id, StringComparison.InvariantCultureIgnoreCase))
             .Select(TechniqueViewModels.Projection)
             .FirstOrDefault();
 
@@ -64,8 +53,9 @@ namespace JudoLibrary.Api.Controllers
             // Create Technique, mapping props from trickForm to Technique
             var technique = new Technique
             {
-                // Create TechniqueForm -> Id | based on TechniqueForm -> Name | ' ' -> '-' ==> slug
-                Id = techniqueForm.Name.Replace(" ", "-").ToLowerInvariant(),
+                // Create TechniqueForm -> Slug | based on TechniqueForm -> Name | ' ' -> '-' ==> slug
+                Slug = techniqueForm.Name.Replace(" ", "-").ToLowerInvariant(),
+                Version = 1,
                 Name = techniqueForm.Name,
                 Description = techniqueForm.Description,
                 Category = techniqueForm.Category,
@@ -85,11 +75,24 @@ namespace JudoLibrary.Api.Controllers
                     .ToList()
             };
             
-            // Save
+            // Add technique to DB
             _context.Add(technique);
+            
+            // Save Technique to DB
             await _context.SaveChangesAsync();
 
-            // Return created technique that we pass to TechniqueViewModels
+            // We need to add particular Technique to ModerationItem first to be approved/rejected/pending -> after that it can be visible at index page
+            // Specifying Target which is technique's Id and Type which is Technique => that we created above
+            _context.Add(new ModerationItem
+            {
+                Target = technique.Id, // This is where Id is going to be generated
+                Type = ModerationTypes.Technique
+            });
+            
+            // Save ModerationItem to DB
+            await _context.SaveChangesAsync();
+
+            // Invoke delegate Create which is our ViewModel then return ViewModel
             return TechniqueViewModels.Create(technique);
         }
         
@@ -98,7 +101,7 @@ namespace JudoLibrary.Api.Controllers
         public async Task<object> UpdateTechnique([FromBody] Technique technique)
         {
             // Check if TechniqueForm exists
-            if (string.IsNullOrEmpty(technique.Id))
+            if (string.IsNullOrEmpty(technique.Slug))
                 return null;
             
             // Update

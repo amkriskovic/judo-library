@@ -16,129 +16,152 @@ namespace JudoLibrary.Api
         {
             // Bundle
             var host = CreateHostBuilder(args).Build();
-            
+
             // Extract the services before running server
             using (var scope = host.Services.CreateScope())
             {
                 // Extracting context for AppDbContext and Hosting Environment
                 var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
                 var environment = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
-                
+
                 // If Environment is Development seed Combines data
                 if (environment.IsDevelopment())
                 {
                     // * Identity seeding part -> we need Users to exist before submission coz they relate to them
                     // Get user manager service
                     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
-                
+
                     // Create a test User
-                    var testUser = new IdentityUser("test"){Email = "test@test.com"};
+                    var testUser = new IdentityUser("test") {Email = "test@test.com"};
                     userManager.CreateAsync(testUser, "password").GetAwaiter().GetResult();
-                
+
                     // Create a mod
-                    var mod = new IdentityUser("mod"){Email = "mod@test.com"};
+                    var mod = new IdentityUser("mod") {Email = "mod@test.com"};
                     userManager.CreateAsync(mod, "password").GetAwaiter().GetResult();
                     // Adds the specified claim to the user(Mod) with providing claim type and value that we specified in
                     // our custom policy
-                    userManager.AddClaimAsync(mod, 
-                            new Claim(JudoLibraryConstants.Claims.Role,JudoLibraryConstants.Roles.Mod))
+                    userManager.AddClaimAsync(mod,
+                            new Claim(JudoLibraryConstants.Claims.Role, JudoLibraryConstants.Roles.Mod))
                         .GetAwaiter()
                         .GetResult();
-                    
+
                     // Seeding Categories
-                    context.Add(new Category {Id = "nage-waza", Name = "Nage Waza", Description = "Throwing Techniques"});
-                    context.Add(new Category {Id = "katame-waza", Name = "Katame Waza", Description = "Grappling Techniques"});
-                    context.Add(new Category {Id = "atemi-waza", Name = "Atemi Waza", Description = "Body Striking Techniques"});
-                    context.Add(new Category {Id = "uke-waza", Name = "Uke Waza", Description = "Blocks And Parries"});
-                    
+                    context.Add(new Category
+                    {
+                        Id = 1, Version = 1, Active = true, Slug = "nage-waza", Name = "Nage Waza",
+                        Description = "Throwing Techniques"
+                    });
+                    context.Add(new Category
+                    {
+                        Id = 2, Version = 1, Active = true, Slug = "katame-waza", Name = "Katame Waza",
+                        Description = "Grappling Techniques"
+                    });
+                    context.Add(new Category
+                    {
+                        Id = 3, Version = 1, Active = true, Slug = "atemi-waza", Name = "Atemi Waza",
+                        Description = "Body Striking Techniques"
+                    });
+                    context.Add(new Category
+                    {
+                        Id = 4, Version = 1, Active = true, Slug = "uke-waza", Name = "Uke Waza",
+                        Description = "Blocks And Parries"
+                    });
+
                     // Seeding SubCategories
                     context.Add(new SubCategory
                     {
-                        Id = "te-waza", Name = "Te Waza", Description = "Hand throwing techniques", CategoryId = "nage-waza"
+                        Id = 1, Version = 1, Active = true, Slug = "te-waza", Name = "Te Waza",
+                        Description = "Hand throwing techniques", CategoryId = "nage-waza"
                     });
-                    
+
                     context.Add(new SubCategory
                     {
-                        Id = "koshi-waza", Name = "Koshi Waza", Description = "Hip throwing techniques", CategoryId = "nage-waza"
+                        Id = 2, Version = 1, Active = true, Slug = "koshi-waza", Name = "Koshi Waza",
+                        Description = "Hip throwing techniques", CategoryId = "nage-waza"
                     });
-                    
+
                     context.Add(new SubCategory
                     {
-                        Id = "ashi-waza", Name = "Ashi Waza", Description = "Foot throwing techniques", CategoryId = "nage-waza"
+                        Id = 3, Version = 1, Active = true, Slug = "ashi-waza", Name = "Ashi Waza",
+                        Description = "Foot throwing techniques", CategoryId = "nage-waza"
                     });
-                    
+
                     context.Add(new SubCategory
                     {
-                        Id = "sutemi-waza", Name = "Sutemi waza", Description = "Sacrifice techniques", CategoryId = "nage-waza"
+                        Id = 4, Version = 1, Active = true, Slug = "sutemi-waza", Name = "Sutemi waza",
+                        Description = "Sacrifice techniques", CategoryId = "nage-waza"
                     });
-                    
+
                     context.Add(new SubCategory
                     {
-                        Id = "osaekomi-waza", Name = "Osaekomi waza ", Description = "Pins or matholds", CategoryId = "katame-waza"
+                        Id = 5, Version = 1, Active = true, Slug = "osaekomi-waza", Name = "Osaekomi waza ",
+                        Description = "Pins or matholds", CategoryId = "katame-waza"
                     });
-                    
+
                     // Seeding Techniques
                     context.Add(new Technique
                     {
-                        Id = "kouchi-gari", Name = "Kouchi gari", Description = "Small inner reap", Category = "nage-waza", SubCategory = "ashi-waza"
+                        Id = 1, Version = 1, Active = true, Slug = "kouchi-gari", Name = "Kouchi gari",
+                        Description = "Small inner reap", Category = "nage-waza", SubCategory = "ashi-waza"
                     });
-                    
-                    // context.Add(new Technique
-                    // {
-                    //     Id = "osoto-gari", Name = "Osoto gari ", Description = "Major or large outer reap", Category = "nage-waza", SubCategory = "ashi-waza"
-                    // });
-                    
+
                     context.Add(new Technique
                     {
-                        Id = "ushiro-goshi", Name = "Ushiro goshi", Description = "Rear hip throw", Category = "nage-waza", SubCategory = "koshi-waza"
+                        Id = 2, Version = 1, Active = true, Slug = "ushiro-goshi", Name = "Ushiro goshi",
+                        Description = "Rear hip throw", Category = "nage-waza", SubCategory = "koshi-waza"
                     });
-                    
+
                     context.Add(new Technique
                     {
-                        Id = "tani-otoshi", Name = "Tani otoshi", Description = "Valley drop", Category = "nage-waza", SubCategory = "sutemi-waza"
+                        Id = 3, Version = 1, Active = true, Slug = "tani-otoshi", Name = "Tani otoshi",
+                        Description = "Valley drop", Category = "nage-waza", SubCategory = "sutemi-waza"
                     });
-                    
+
                     context.Add(new Technique
                     {
-                        Id = "Kesa-gatame", Name = "Kesa-gatame", Description = "Scarf hold", Category = "katame-waza", SubCategory = "osaekomi-waza"
+                        Id = 4, Version = 1, Active = true, Slug = "Kesa-gatame", Name = "Kesa-gatame",
+                        Description = "Scarf hold", Category = "katame-waza", SubCategory = "osaekomi-waza"
                     });
-                    
+
                     // * Main Technique *
                     context.Add(new Technique
                     {
-                        Id = "seoi-nage", Name = "Seoi Nage", Description = "Shoulder throw", Category = "nage-waza", SubCategory = "te-waza",
+                        Id = 5, Version = 1, Active = true, Slug = "seoi-nage", Name = "Seoi Nage",
+                        Description = "Shoulder throw", Category = "nage-waza", SubCategory = "te-waza",
                         SetUpAttacks = new List<TechniqueSetupAttack>
                         {
-                            new TechniqueSetupAttack{TechniqueId = "seoi-nage", SetUpAttackId = "kouchi-gari"}
+                            new TechniqueSetupAttack {TechniqueId = 5, SetUpAttackId = 1}
                         },
                         FollowUpAttacks = new List<TechniqueFollowupAttack>
                         {
-                            new TechniqueFollowupAttack{TechniqueId = "seoi-nage", FollowUpAttackId = "osoto-gari"}
+                            new TechniqueFollowupAttack {TechniqueId = 5, FollowUpAttackId = 6}
                         },
                         Counters = new List<TechniqueCounter>
                         {
-                            new TechniqueCounter{TechniqueId = "seoi-nage", CounterId = "ushiro-goshi"}, 
-                            new TechniqueCounter{TechniqueId = "seoi-nage", CounterId = "tani-otoshi"}
+                            new TechniqueCounter {TechniqueId = 5, CounterId = 2},
+                            new TechniqueCounter {TechniqueId = 5, CounterId = 3}
                         }
                     });
-                    
+
                     context.Add(new Technique
                     {
-                        Id = "osoto-gari", Name = "Osoto gari", Description = "Major Outer Reaping", Category = "nage-waza", SubCategory = "ashi-waza",
+                        Id = 6, Version = 1, Active = true, Slug = "osoto-gari", Name = "Osoto gari",
+                        Description = "Major Outer Reaping",
+                        Category = "nage-waza", SubCategory = "ashi-waza",
                         SetUpAttacks = new List<TechniqueSetupAttack>
                         {
-                            new TechniqueSetupAttack{TechniqueId = "osoto-gari", SetUpAttackId = "seoi-nage"}
+                            new TechniqueSetupAttack {TechniqueId = 6, SetUpAttackId = 5}
                         },
                         FollowUpAttacks = new List<TechniqueFollowupAttack>
                         {
-                            new TechniqueFollowupAttack{TechniqueId = "osoto-gari", FollowUpAttackId = "kouchi-gari"}
+                            new TechniqueFollowupAttack {TechniqueId = 6, FollowUpAttackId = 1}
                         },
                         Counters = new List<TechniqueCounter>
                         {
-                            new TechniqueCounter{TechniqueId = "osoto-gari", CounterId = "ushiro-goshi"}
+                            new TechniqueCounter {TechniqueId = 6, CounterId = 2}
                         }
                     });
-                    
+
                     // Seeding submissions
                     context.Add(new Submission
                     {
@@ -152,7 +175,7 @@ namespace JudoLibrary.Api
                         VideoProcessed = true,
                         UserId = testUser.Id,
                     });
-                    
+
                     context.Add(new Submission
                     {
                         TechniqueId = "osoto-gari",
@@ -164,12 +187,12 @@ namespace JudoLibrary.Api
                         Description = "Demonstration of Osoto Gari",
                         VideoProcessed = true,
                         UserId = testUser.Id,
-                    }); 
-                                    
+                    });
+
                     // Seeding moderation items
                     context.Add(new ModerationItem
                     {
-                        Target = "osoto-gari",
+                        Target = 6,
                         Type = ModerationTypes.Technique
                     });
 
@@ -177,7 +200,7 @@ namespace JudoLibrary.Api
                     context.SaveChanges();
                 }
             }
-            
+
             // Launch App
             host.Run();
         }

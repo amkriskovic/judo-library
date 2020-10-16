@@ -1,9 +1,11 @@
-﻿namespace JudoLibrary.Models.Moderation
+﻿using JudoLibrary.Models.Abstractions;
+
+namespace JudoLibrary.Models.Moderation
 {
-    public class Review : BaseModel<int>
+    public class Review : TemporalModel
     {
         // Review can have One Moderation Item => belongs to
-        public int? ModerationItemId { get; set; }
+        public int ModerationItemId { get; set; }
         public ModerationItem ModerationItem { get; set; }
         
         // This is explanation for your decision of the review when we approve/reject/put on wait,

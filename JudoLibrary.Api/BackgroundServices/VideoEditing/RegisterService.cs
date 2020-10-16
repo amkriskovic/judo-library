@@ -9,13 +9,14 @@ namespace Microsoft.Extensions.DependencyInjection
 {
     public static class RegisterService
     {
-        // Extension Method -> Goal is to be injectable in other services
+        // Extension Method -> Goal is to be injectable in other services -> Adding File manager depending on 
+        // environment(provider)
         public static IServiceCollection AddFileManager(this IServiceCollection services, IConfiguration config)
         {
             // Specifying settings section -> resembles FileSetting in appsettings.dev.json which is proxied via class FileSettings 
             var settingsSection = config.GetSection(nameof(FileSettings));
 
-            // Casting json object to FileSettings type
+            // Casting json object to FileSettings type, resolves in props in FileSettings
             var settings = settingsSection.Get<FileSettings>();
 
             // Registers a configuration instance which T Options will bind against.

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
+using JudoLibrary.Models.Abstractions;
 using JudoLibrary.Models.Moderation;
 
 namespace JudoLibrary.Models
 {
     // Self referencing table
-    public class Comment : BaseModel<int>
+    public class Comment : TemporalModel
     {
         public string Content { get; set; }
         public string HtmlContent { get; set; }

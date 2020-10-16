@@ -18,6 +18,7 @@ namespace JudoLibrary.Api.ViewModels
             technique => new
             {
                 technique.Id,
+                technique.Slug,
                 technique.Name,
                 technique.Description,
                 technique.Category, // Id
