@@ -2,13 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using IdentityServer4;
 using JudoLibrary.Api.Form;
 using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using JudoLibrary.Models.Moderation;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,14 +24,17 @@ namespace JudoLibrary.Api.Controllers
         }
         
         // GET -> /api/techniques
-        // TechniqueViewModels.Projection is responsible for giving us response
+        // TechniqueViewModels.Projection is responsible for giving us response => grab all active Techniques
         [HttpGet]
-        public IEnumerable<object> GetAllTechniques() => _context.Techniques.Select(TechniqueViewModels.Projection).ToList();
+        public IEnumerable<object> GetAllTechniques() => _context.Techniques
+            .Where(t => t.Active)
+            .Select(TechniqueViewModels.Projection)
+            .ToList();
 
         // GET -> /api/techniques/{id}
         [HttpGet("{id}")]
         public object GetTechnique(string id) => _context.Techniques
-            .Where(t => t.Slug.Equals(id, StringComparison.InvariantCultureIgnoreCase))
+            .Where(t => t.Slug.Equals(id, StringComparison.InvariantCultureIgnoreCase) && t.Active)
             .Select(TechniqueViewModels.Projection)
             .FirstOrDefault();
 
@@ -98,18 +99,68 @@ namespace JudoLibrary.Api.Controllers
         
         // PUT -> /api/techniques
         [HttpPut]
-        public async Task<object> UpdateTechnique([FromBody] Technique technique)
+        public async Task<IActionResult> UpdateTechnique([FromBody] TechniqueForm techniqueForm)
         {
-            // Check if TechniqueForm exists
-            if (string.IsNullOrEmpty(technique.Slug))
-                return null;
+            // Extract existing technique from DB by comparing Id(int)
+            var technique = _context.Techniques.FirstOrDefault(t => t.Id == techniqueForm.Id);
             
-            // Update
-            _context.Add(technique);
+            // If technique is null -> NoContent 204
+            if (technique == null) return NoContent();
+            
+            // When we are updating the technique we are NOT modifying existing one, we are creating New one
+            var newTechnique = new Technique
+            {
+                // Those 3 will come from original Technique -> NOT modifying -> Slug depends on the Name
+                Id = technique.Id,
+                Slug = technique.Slug,
+                // Bump the new Technique Version to + 1 from original Technique that we trying to edit
+                Version = technique.Version + 1,
+                
+                Name = techniqueForm.Name,
+                Description = techniqueForm.Description,
+                Category = techniqueForm.Category,
+                SubCategory = techniqueForm.SubCategory,
+                
+                // Collections
+                SetUpAttacks = techniqueForm.SetUpAttacks
+                    // saId is collection of int's that's coming from form SetUpAttacks(IE<int>), then we are selecting that int which
+                    // represents SetUpAttack and assigning it to SetUpAttackId 
+                    .Select(saId => new TechniqueSetupAttack{SetUpAttackId = saId})
+                    .ToList(),
+                
+                FollowUpAttacks = techniqueForm.FollowUpAttacks
+                    .Select(faId => new TechniqueFollowupAttack{FollowUpAttackId = faId})
+                    .ToList(),
+                
+                Counters = techniqueForm.Counters
+                    .Select(cId => new TechniqueCounter{CounterId = cId})
+                    .ToList()
+            };
+            
+            // Add newTechnique to DB
+            _context.Add(newTechnique);
+            
+            // Save newTechnique to DB
+            await _context.SaveChangesAsync();
+            
+            // Adding this newTechnique to MI -> First need to approve it to be visible
+            _context.Add(new ModerationItem
+            {
+                // Using Id's for versioning
+                // Grab technique Id and assign it to Current (version)
+                Current = technique.Id,
+
+                // Assign Id from newly added/created technique to Target(version)
+                Target = newTechnique.Id,
+
+                Type = ModerationTypes.Technique
+            });
+            
+            // Save MI to DB
             await _context.SaveChangesAsync();
 
             // Return created technique that we pass to TechniqueViewModels
-            return TechniqueViewModels.Create(technique);
+            return Ok(TechniqueViewModels.Create(newTechnique));
         }
         
         
@@ -117,8 +168,8 @@ namespace JudoLibrary.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTechnique(string id)
         {
-            // Grab technique from DB
-            var technique = _context.Techniques.FirstOrDefault(t => t.Id.Equals(id));
+            // Grab technique from DB by comparing Slugs
+            var technique = _context.Techniques.FirstOrDefault(t => t.Slug == id);
             
             // If technique not exists
             if (technique == null)

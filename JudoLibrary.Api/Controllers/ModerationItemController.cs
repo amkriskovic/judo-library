@@ -2,11 +2,13 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using JudoLibrary.Api.Form;
 using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using JudoLibrary.Models.Moderation;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace JudoLibrary.Api.Controllers
 {
@@ -98,23 +100,41 @@ namespace JudoLibrary.Api.Controllers
         // Create review for particular moderation modItem
         // Passing id from url, and from body -> review 
         [HttpPost("{id}/reviews")]
-        public async Task<IActionResult> CreateReviewForModerationItem(int id, [FromBody] Review review)
+        public async Task<IActionResult> CreateReviewForModerationItem(int id, [FromBody] ReviewForm reviewForm)
         {
-            // If moderationItem doesnt exist -> we dont have anything to moderate
-            if (!_ctx.ModerationItems.Any(mi => mi.Id.Equals(id)))
+            // Get the moderation item by comparing Id's -> include Reviews with it
+            var modItem = _ctx.ModerationItems
+                .Include(mi => mi.Reviews)
+                .FirstOrDefault(mi => mi.Id == id);
+                
+            // If moderationItem doesnt exist -> we dont have anything to moderate -> 204
+            if (modItem == null)
                 return NoContent();
+            
+            // If moderation item is deleted -> 400
+            if (modItem.Deleted)
+                return BadRequest("Moderation item no longer exists!");
+            
+            // Create new Review for this particular MI
+            var review = new Review
+            {
+                // Assign moderation-item - {id} (That's passed in) to Review's ModerationItemId
+                ModerationItemId = id,
+                Status = reviewForm.Status,
+                Comment = reviewForm.Comment
+            };
 
-            // Assign id from moderation item that we moderating to review's moderation item id
-            review.ModerationItemId = id;
-            
-            // Add review to particular moderation modItem that we found by id, to list of reviews
+            // Add review to moderation item list of reviews
             _ctx.Add(review);
-            
-            // Save changes to DB
-            await _ctx.SaveChangesAsync();
-            
+
+            // If moderation item Reviews count is greater or equal to 3 -> approved/rejected/pending
+            if (modItem.Reviews.Count >= 3)
+            {
+                // todo: Implement Versioning
+            }
+
             // Return Ok response with created review
-            return Ok(review);
+            return Ok(ReviewViewModel.Create(review));
         }
     }
 }
