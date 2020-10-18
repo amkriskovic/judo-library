@@ -11,12 +11,13 @@
       <v-col class="d-none d-sm-block" sm="5" lg="4" xl="3">
         <!-- v-sheet represents "card" with information -->
         <v-sheet class="pa-3 sticky">
-          <slot name="item"></slot>
+          <!-- Binding close (: -> dynamic) attribute to some function -->
+          <slot name="item" :close="() => {}"></slot>
         </v-sheet>
       </v-col>
     </v-row>
 
-    <!-- Dialog -> Popup -> onclick(when is opened) sets dialog to true -->
+    <!-- * Dialog -> Popup -> onclick(when is opened) sets dialog to true, only visible on MOBILE -->
     <v-dialog v-model="dialog">
 
       <template v-slot:activator="{on}">
@@ -29,7 +30,8 @@
       <!-- Inject modItem(card) slot -->
       <!-- v-sheet represents "card" with information -->
       <v-sheet class="pa-3" rounded>
-        <slot name="item"></slot>
+        <!-- Binding close (: -> dynamic) attribute to some function => setting dialog to false -->
+        <slot name="item" :close="() => dialog = false"></slot>
       </v-sheet>
 
     </v-dialog>

@@ -1,8 +1,8 @@
 ﻿<template>
   <div>
     <!-- Button for displaying modItem for moderation -->
-    <!-- id |> moderation modItem id, type |> e.g. technique, target |> particular technique -->
-    <v-btn :to="`/moderation/${modItem.id}/${modItem.type}/${modItem.target}`" v-for="modItem in modItems" :key="modItem.id">
+    <!-- id |> moderation modItem id -->
+    <v-btn :to="`/moderation/${modItem.id}`" v-for="modItem in modItems" :key="modItem.id">
       {{modItem.target}} <- Target
     </v-btn>
   </div>

@@ -64,7 +64,7 @@
 </template>
 
 <script>
-  import {mapGetters, mapActions, mapMutations} from "vuex";
+import {mapGetters, mapActions, mapMutations, mapState} from "vuex";
   import {close} from "./_shared";
 
   // Component that is responsible for creating/saving technique
@@ -95,6 +95,17 @@
 
     computed: {
       ...mapGetters("techniques", ["techniqueItems", "categoryItems", "subcategoryItems"]),
+      ...mapState("video-upload", ["editing", "editPayload"])
+    },
+
+    // When this component get's created => grab the editingPayload and stick it on the form
+    created() {
+      // If editing is true
+      if (this.editing) {
+        // Assign editPayload to existing form | target, source
+        // Useful because it will pre-populate fields that where filled
+        Object.assign(this.form, this.editPayload)
+      }
     },
 
     // Mapping modules mutation and action functions
@@ -102,13 +113,19 @@
       // Map mutations for video-upload module
       ...mapMutations("video-upload", ["reset"]),
       // Map actions for technique module
-      ...mapActions("techniques", ["createTechnique"]),
+      ...mapActions("techniques", ["createTechnique", "updateTechnique"]),
 
       // Saving technique | #2
       async save() {
-        // Creating new obj with data from our local form(state), binding local form to form
-        // Local form is gonna get passed to store as payload
-        await this.createTechnique({form: this.form});
+        // If we are editing
+        if (this.editing) {
+          // Make an update -> PUT req.
+          await this.updateTechnique({form: this.form});
+        } else {
+          // Creating new obj with data from our local form(state), binding local form to form
+          // Local form is gonna get passed to store as payload
+          await this.createTechnique({form: this.form});
+        }
 
         // * this refers to VueComponent, close will set component to null and hide it, eventually -> pipeline
         this.close();

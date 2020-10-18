@@ -85,6 +85,11 @@ export const actions = {
 
     // Make post request to url, sendComment payload <- from, return Promise
     return this.$axios.$post("/api/techniques", form);
+  },
+
+  updateTechnique({state, commit, dispatch}, {form}) {
+    // Make put request to url, sendComment payload <- from, return Promise
+    return this.$axios.$put("api/techniques", form);
   }
 
 }

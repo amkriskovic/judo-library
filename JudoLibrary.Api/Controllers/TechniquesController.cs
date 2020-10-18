@@ -33,10 +33,32 @@ namespace JudoLibrary.Api.Controllers
 
         // GET -> /api/techniques/{id}
         [HttpGet("{id}")]
-        public object GetTechnique(string id) => _context.Techniques
-            .Where(t => t.Slug.Equals(id, StringComparison.InvariantCultureIgnoreCase) && t.Active)
-            .Select(TechniqueViewModels.Projection)
-            .FirstOrDefault();
+        public IActionResult GetTechnique(string id)
+        {
+           // Make an Query -> DbSet<Techniques>
+           var query = _context.Techniques.AsQueryable();
+           
+           // Try to parse id as int => means _modId is calling it => /moderation => current & target
+           if (int.TryParse(id, out var intId))
+           {
+               // Technique Id is an Int32
+               query = query.Where(t => t.Id == intId);
+           }
+           else
+           {
+               // Technique Id is an string => grab only active ones => compare the slug with id => /index/techniqueSlug
+               query = query.Where(t => t.Slug.Equals(id, StringComparison.CurrentCultureIgnoreCase) && t.Active);
+           }
+           
+           // Get the technique from query
+           var technique = query
+               .Select(TechniqueViewModels.Projection)
+               .FirstOrDefault();
+
+           if (technique == null) return NoContent();
+
+           return Ok(technique);
+        }
 
         // GET -> /api/techniques/{techniqueId}/submissions
         // Get all submissions for particular technique | Passing technique Id as param | Including videos for technique
@@ -111,12 +133,11 @@ namespace JudoLibrary.Api.Controllers
             var newTechnique = new Technique
             {
                 // Those 3 will come from original Technique -> NOT modifying -> Slug depends on the Name
-                Id = technique.Id,
                 Slug = technique.Slug,
+                Name = technique.Name,
                 // Bump the new Technique Version to + 1 from original Technique that we trying to edit
                 Version = technique.Version + 1,
                 
-                Name = techniqueForm.Name,
                 Description = techniqueForm.Description,
                 Category = techniqueForm.Category,
                 SubCategory = techniqueForm.SubCategory,

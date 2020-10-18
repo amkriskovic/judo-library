@@ -1,10 +1,9 @@
-﻿﻿
-<template>
+﻿<template>
   <div>
     <!-- Check for modItem "technique" -->
-    <div v-if="modItem">
+    <div v-if="item">
       <!-- Display modItem's description -->
-      {{modItem.description}}
+      {{ item.description }}
     </div>
 
     <v-row>
@@ -44,8 +43,13 @@
             <v-text-field label="Review Comment" clearable v-model="reviewComment"></v-text-field>
           </v-card-text>
 
+          <!-- Outdated section -->
+          <div v-if="outdated">
+            Outdated
+          </div>
+
           <!-- Review actions => buttons -->
-          <v-card-actions class="justify-center">
+          <v-card-actions v-else class="justify-center">
             <!-- Loop over reviewActions arr and dynamically create buttons with corresponding titles and statuses -->
             <!-- :color =>> dynamic binding of colors for each button based on status from reviewAction arr -->
             <!-- onClick create review based on status, and passing content that's typed -->
@@ -73,6 +77,7 @@
   // Resolves endpoint based on type it's passed, @ =>> root of web-client
   import CommentSection from "@/components/comments/comment-section";
 
+  // Produce the endpoint based on url type parameter, e.g. techniques
   const endpointResolver = (type) => {
     // If type is technique, returns techniques string which we will use for resolving our API endpoint
     if (type === 'technique') return 'techniques'
@@ -117,7 +122,8 @@
     components: {CommentSection},
     // Local state
     data: () => ({
-      modItem: null,
+      item: null,
+      current: null,
       comments: [],
       reviews: [],
       reviewComment: "",
@@ -125,30 +131,36 @@
     }),
 
     // Every time you need to get asynchronous data. fetch is called on server-side when rendering the route, and on client-side when navigating.
-    created() {
-      // We want extract data that we passed in from url params in /moderation/{}/{}/{}
-      const {modItemId, type, techniqueId} = this.$route.params
+    async created() {
+      // We want extract data that we passed in from url params in /moderation/{modId.id}
+      // Needs to be called modId coz of file => _modId.vue
+      const {modId} = this.$route.params
 
-      // Produce the endpoint based on url type parameter, e.g. techniques
-      const endpoint = endpointResolver(type)
+      // Getting moderation item via GET req., passing modId from URL params
+      const modItem = await this.$axios.$get(`/api/moderation-items/${modId}`)
 
-      // Assign endpoint to the modItemId in local state
+      // Extract the comments from modItem and assign to page local state
+      this.comments = modItem.comments
+
+      // Extract the reviews from modItem and assign to page local state
+      this.reviews = modItem.reviews
+
+      // Produce the endpoint based on url type parameter, e.g. techniques => extract the type from modItem
+      const endpoint = endpointResolver(modItem.type)
+
+      // Assign endpoint to the item in local state
       // Get dynamic API controller => response - data, based on URL parameters that we extracted
-      // * Getting particular technique that we wanna moderate?
-      this.$axios.$get(`/api/${endpoint}/${techniqueId}`)
+      // * Provide current from modItem which is int => current version of item we editing
+      this.$axios.$get(`/api/${endpoint}/${modItem.current}`)
         // Fire and forget
-        // Then assign modItemId(technique) that came from GET req. to local state item
-        .then(modItemId => this.modItem = modItemId)
+        // Then assign item(curr) that came from GET req. to local state item -> current
+        .then(currItem => this.current = currItem)
 
-      // * Getting comments for particular moderation item
-      this.$axios.$get(`/api/moderation-items/${modItemId}/comments`)
-        // Then assign comments that came from GET req. to local state comments arr
-        .then(comments => this.comments = comments)
-
-      // * Getting reviews for particular moderation item
-      this.$axios.$get(`/api/moderation-items/${modItemId}/reviews`)
-        // Then assign reviews that came from GET req. to local state reviews arr
-        .then(reviews => this.reviews = reviews)
+      // Make GET req to get the target(next) version
+      this.$axios.$get(`api/${endpoint}/${modItem.target}`)
+        // Fire and forget
+        // Then assign item(targetItem) that came from GET req. to local state item
+        .then(targetItem => this.item = targetItem)
     },
 
     // Computed properties allow us to define a property that is used the same way as data,
@@ -167,17 +179,22 @@
       // Returns number of approved reviews => length
       approveCount() {
         return this.reviews.filter(r => r.status === REVIEW_STATUS.APPROVED).length
+      },
+
+      // If target(next) - current is less than or equal to zero -> it's outdated
+      outdated() {
+        return this.current && this.item && this.item.version - this.current.version <= 0
       }
     },
 
     methods: {
       sendComment(content) {
         // Extract moderation item id from URL param
-        const {modItemId} = this.$route.params;
+        const {modId} = this.$route.params;
 
         // Returning promise | Creating comment for particular moderation item, based on his Id that's passed via URL
         // As data to save to our API, pass object with content prop, which is comment "" from local state, v-model, binding
-        return this.$axios.$post(`/api/moderation-items/${modItemId}/comments`, {content: content})
+        return this.$axios.$post(`/api/moderation-items/${modId}/comments`, {content: content})
           // Then push comment to local state arr of comments
           .then(comment => this.comments.push(comment));
       },
@@ -185,9 +202,9 @@
       // Depending on which button we press, status of that will be passed to createReview
       createReview(status) {
         // Extract moderation item id from URL param
-        const {modItemId} = this.$route.params;
+        const {modId} = this.$route.params;
 
-        return this.$axios.$post(`/api/moderation-items/${modItemId}/reviews`,
+        return this.$axios.$post(`/api/moderation-items/${modId}/reviews`,
           {
             // Data payload that we send to POST API, needs to mimick Review.cs
             comment: this.reviewComment,

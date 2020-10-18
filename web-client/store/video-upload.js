@@ -4,7 +4,9 @@ const initState = () => ({
   uploadCancelSource: null,
   uploadCompleted: false,
   active: false,
-  component: null
+  component: null,
+  editing: false,
+  editPayload: null
 })
 
 // Export initState function as constant state
@@ -15,9 +17,16 @@ export const mutations = {
 
   // Get's stepper based on action that we wanna perform, create technique or upload submission, passing component as payload
   // Which will be activated once we select it from menu/dropdown
-  activate(state, {component}) {
+  activate(state, {component, edit = false, editPayload = null}) {
     state.active = true;
     state.component = component;
+
+    // If we are editing
+    if (edit) {
+      // Set the state of editing to true, & editPayload
+      state.editing = true;
+      state.editPayload = editPayload;
+    }
   },
 
   // Hide in order to prevent nullifying state (uploadPromise) when creating submission

@@ -16,7 +16,8 @@
     </template>
 
     <!-- Template for Item(card) -->
-    <template v-slot:item>
+    <!-- Item template == right, expand the close func -->
+    <template v-slot:item="{close}">
       <div class="text-h5">
         <span>{{ technique.name }}</span>
         <!-- :to= corresponds to page that we created | category == folder | category.id == page?  -->
@@ -40,15 +41,24 @@
           </v-chip>
         </v-chip-group>
       </div>
+
+      <v-divider class="my-1"></v-divider>
+
+      <!-- Technique Edit Button -->
+      <div>
+        <!-- We run edit func first, then close func 2nd -->
+        <v-btn outlined small @click="edit(); close()">Edit</v-btn>
+      </div>
     </template>
   </item-content-layout>
 
 </template>
 
 <script>
-  import {mapState, mapGetters} from "vuex";
+import {mapState, mapGetters, mapMutations} from "vuex";
   import VideoPlayer from "../../components/video-player";
   import ItemContentLayout from "../../components/item-content-layout";
+  import TechniqueSteps from "../../components/content-creation/techniques-steps"
 
   export default {
     components: {ItemContentLayout, VideoPlayer},
@@ -92,6 +102,17 @@
         ]
       },
 
+    },
+
+    methods: {
+      ...mapMutations("video-upload", ["activate"]),
+
+      // Method for editing Technique
+      edit() {
+        // Invoke activate mutation from video-upload store
+        // Passing TechniqueSteps as component, set edit as true, and editPayload as this technique => page data/local state
+        this.activate({component: TechniqueSteps, edit: true, editPayload: this.technique})
+      }
     },
 
     // Pre-fetching data asynchronously for this particular page

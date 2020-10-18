@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -25,11 +26,18 @@ namespace JudoLibrary.Api.Controllers
         
         // GET -> /api/moderation-items
         [HttpGet]
-        public IEnumerable<ModerationItem> GetModerationItems() => _ctx.ModerationItems.ToList();
+        public IEnumerable<ModerationItem> GetModerationItems() => _ctx.ModerationItems
+            .Where(mi => !mi.Deleted)
+            .ToList();
         
         // GET -> /api/moderation-items/{id}
         [HttpGet("{id}")]
-        public ModerationItem GetModerationItem(int id) => _ctx.ModerationItems.FirstOrDefault(mi => mi.Id.Equals(id));
+        public object GetModerationItem(int id) => _ctx.ModerationItems
+            .Include(mi => mi.Comments)
+            .Include(mi => mi.Reviews)
+            .Where(mi => mi.Id == id)
+            .Select(ModerationItemViewModels.Projection)
+            .FirstOrDefault();
         
         // GET -> /api/moderation-items/{id}/comments
         // Listing comments for particular moderation item(id)
@@ -100,7 +108,10 @@ namespace JudoLibrary.Api.Controllers
         // Create review for particular moderation modItem
         // Passing id from url, and from body -> review 
         [HttpPost("{id}/reviews")]
-        public async Task<IActionResult> CreateReviewForModerationItem(int id, [FromBody] ReviewForm reviewForm)
+        public async Task<IActionResult> CreateReviewForModerationItem(
+            int id, 
+            [FromBody] ReviewForm reviewForm,
+            [FromServices] VersionMigrationContext versionMigrationContext)
         {
             // Get the moderation item by comparing Id's -> include Reviews with it
             var modItem = _ctx.ModerationItems
@@ -127,10 +138,24 @@ namespace JudoLibrary.Api.Controllers
             // Add review to moderation item list of reviews
             _ctx.Add(review);
 
-            // If moderation item Reviews count is greater or equal to 3 -> approved/rejected/pending
-            if (modItem.Reviews.Count >= 3)
+            try
             {
-                // todo: Implement Versioning
+                // If moderation item Reviews count is greater or equal to 3 -> approved/rejected/pending
+                if (modItem.Reviews.Count >= 3)
+                {
+                    // Passing ModerationItem to Migrate process
+                    versionMigrationContext.Migrate(modItem);
+                    
+                    // "Delete" after migration
+                    modItem.Deleted = true;
+                }
+                
+                // Save changes to DB
+                await _ctx.SaveChangesAsync();
+            }
+            catch (VersionMigrationContext.InvalidVersionException e)
+            {
+                return BadRequest(e.Message);
             }
 
             // Return Ok response with created review

@@ -52,6 +52,9 @@ namespace JudoLibrary.Api
 
             // Adding singleton service as Channel of type <EditVideoMessage>, _ without service provider
             services.AddSingleton(_ => Channel.CreateUnbounded<EditVideoMessage>());
+            
+            // Registering VersionMigrationContext as scoped => Used for migrating versions
+            services.AddScoped<VersionMigrationContext>();
 
             // Adding FileManager which is extenstion method responsible for registering services => pass _config, for configuring options
             services.AddFileManager(_config);
