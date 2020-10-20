@@ -63,9 +63,11 @@ namespace JudoLibrary.Api.Controllers
         // GET -> /api/techniques/{techniqueId}/submissions
         // Get all submissions for particular technique | Passing technique Id as param | Including videos for technique
         [HttpGet("{techniqueId}/submissions")]
-        public IEnumerable<Submission> GetAllSubmissionsForTechnique(string techniqueId) => _context.Submissions
+        public object GetAllSubmissionsForTechnique(string techniqueId) => _context.Submissions
             .Include(s => s.Video)
+            .Include(s => s.User)
             .Where(s => s.TechniqueId.Equals(techniqueId))
+            .Select(SubmissionViewModels.Projection)
             .ToList();
         
         // POST -> /api/techniques

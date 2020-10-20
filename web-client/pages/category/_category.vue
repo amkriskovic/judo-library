@@ -25,7 +25,7 @@
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
+import {mapState} from "vuex";
   import TechniqueList from "../../components/technique-list";
   import ItemContentLayout from "../../components/item-content-layout";
 
@@ -39,16 +39,14 @@
       category: null
     }),
 
-    computed: mapGetters("techniques", ["categoryById"]),
+    computed: mapState("techniques", ["dictionary"]),
 
     // Pre-fetching data asynchronously for this particular page
     async fetch() {
       // Getting categoryId from URL param
       const categoryId = this.$route.params.category;
 
-      // Invoking categoryById, which get's us particular category based on categoryId we provide,
-      // storing result in page state
-      this.category = this.categoryById(categoryId);
+      this.category = this.dictionary.categories[categoryId];
 
       // Getting techniques for particular category(from our Category API controller) (async call)
       this.techniques = await this.$axios.$get(`/api/categories/${categoryId}/techniques`);

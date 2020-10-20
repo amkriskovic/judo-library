@@ -4,7 +4,7 @@ using JudoLibrary.Models.Abstractions;
 namespace JudoLibrary.Models.Moderation
 {
     // Container for moderated items => used for separation concerns
-    public class ModerationItem : TemporalModel
+    public class ModerationItem : BaseModel<int>
     {
         // Current version of particular thing(item) that we are moderating
         public int Current { get; set; }

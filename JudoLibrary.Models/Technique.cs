@@ -3,8 +3,9 @@ using JudoLibrary.Models.Abstractions;
 
 namespace JudoLibrary.Models
 {
-    public class Technique : SlugModel
+    public class Technique : VersionedModel
     {
+        public string Slug { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
         public string Category { get; set; } // One Technique can have One Category

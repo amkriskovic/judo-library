@@ -2,7 +2,7 @@
 
 namespace JudoLibrary.Models.Moderation
 {
-    public class Review : TemporalModel
+    public class Review : BaseModel<int>
     {
         // Review can have One Moderation Item => belongs to
         public int ModerationItemId { get; set; }

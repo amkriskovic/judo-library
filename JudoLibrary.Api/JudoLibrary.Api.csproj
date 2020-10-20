@@ -11,7 +11,6 @@
 
     <ItemGroup>
       <Folder Include="ffmpeg" />
-      <Folder Include="wwwroot" />
     </ItemGroup>
 
     <ItemGroup>

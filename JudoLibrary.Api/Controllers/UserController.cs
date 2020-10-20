@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using JudoLibrary.Api.BackgroundServices.VideoEditing;
 using JudoLibrary.Api.Settings;
+using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -70,11 +71,13 @@ namespace JudoLibrary.Api.Controllers
 
         // Getting a Submissions for particular User based on User id
         [HttpGet("{id}/submissions")]
-        public Task<List<Submission>> GetUserSubmissions(string id)
+        public Task<List<object>> GetUserSubmissions(string id)
         {
             return _ctx.Submissions
                 .Include(s => s.Video)
+                .Include(s => s.User)
                 .Where(s => s.UserId.Equals(id))
+                .Select(SubmissionViewModels.Projection)
                 .ToListAsync();
         }
         

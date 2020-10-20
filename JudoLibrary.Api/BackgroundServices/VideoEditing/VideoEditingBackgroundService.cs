@@ -17,18 +17,18 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
     {
         private readonly ILogger<VideoEditingBackgroundService> _logger;
         private readonly IServiceProvider _serviceProvider;
-        private readonly IFileManager _fileManagerLocal;
+        private readonly IFileManager _fileManager;
         private readonly ChannelReader<EditVideoMessage> _channelReader;
 
         public VideoEditingBackgroundService(
             ILogger<VideoEditingBackgroundService> logger,
             Channel<EditVideoMessage> channel,
             IServiceProvider serviceProvider,
-            IFileManager fileManagerLocal)
+            IFileManager fileManager)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;
-            _fileManagerLocal = fileManagerLocal;
+            _fileManager = fileManager;
             _channelReader = channel.Reader;
         }
         
@@ -46,7 +46,7 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                 var message = await _channelReader.ReadAsync(stoppingToken);
                 
                 // Creating input path, wwwroot + message that is video string <- original from channel
-                var inputPath = _fileManagerLocal.TemporarySavePath(message.Input);
+                var inputPath = _fileManager.TemporarySavePath(message.Input);
 
                 // Creating converted output name for a video to be able to access it
                 var outputConvertedName = JudoLibraryConstants.Files.GenerateConvertedFileName();
@@ -55,10 +55,10 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                 var outputThumbnailName = JudoLibraryConstants.Files.GenerateThumbnailFileName();
 
                 // Creating output converted path based on output video name
-                var outputConvertedPath = _fileManagerLocal.TemporarySavePath(outputConvertedName);
+                var outputConvertedPath = _fileManager.TemporarySavePath(outputConvertedName);
                     
                 // Creating output thumbnail path based on output video name
-                var outputThumbnailPath = _fileManagerLocal.TemporarySavePath(outputThumbnailName);
+                var outputThumbnailPath = _fileManager.TemporarySavePath(outputThumbnailName);
                 
                 // Try/Cath to now blow up program
                 try
@@ -69,7 +69,7 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                     {
                         // Gets or sets the application or document to start.
                         // Getting ffmpeg executable which provides CLI tools
-                        FileName = _fileManagerLocal.GetFFMPEGPath(),
+                        FileName = _fileManager.GetFFMPEGPath(),
 
                         // Gets or sets the set of command-line arguments to use when starting the application.
                         // Specifying arguments for manipulating video,
@@ -95,14 +95,14 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                     }
 
                     // If temporary converted video does NOT exist -> problem!!
-                    if (!_fileManagerLocal.TemporaryFileExists(outputConvertedName))
+                    if (!_fileManager.TemporaryFileExists(outputConvertedName))
                     {
                         // Throw an exception
                         throw new Exception("FFMPEG failed to generate converted video!");
                     }
                     
                     // If thumbnail for a video does NOT exist -> problem!!
-                    if (!_fileManagerLocal.TemporaryFileExists(outputThumbnailName))
+                    if (!_fileManager.TemporaryFileExists(outputThumbnailName))
                     {
                         // Throw an exception
                         throw new Exception("FFMPEG failed to generate thumbnail for a video!");
@@ -121,8 +121,8 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                         // which contains Video prop inside itself
                         submission.Video = new Video
                         {
-                            ThumbLink = _fileManagerLocal.GetFileUrl(outputThumbnailName, FileType.Image),
-                            VideoLink = _fileManagerLocal.GetFileUrl(outputConvertedName, FileType.Video)
+                            ThumbLink = _fileManager.GetFileUrl(outputThumbnailName, FileType.Image),
+                            VideoLink = _fileManager.GetFileUrl(outputConvertedName, FileType.Video)
                         };
 
                         // Once video is updated -> mark video as Processed
@@ -138,15 +138,15 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                     _logger.LogError(ex, $"Video processing has failed for {message.Input}");
                     
                     // Catch if some of these failed
-                    _fileManagerLocal.DeleteTemporaryFileInPath(outputConvertedName);
-                    _fileManagerLocal.DeleteTemporaryFileInPath(outputThumbnailName);
+                    _fileManager.DeleteTemporaryFileInPath(outputConvertedName);
+                    _fileManager.DeleteTemporaryFileInPath(outputThumbnailName);
                 }
                 finally
                 {
                     // finally block run when control leaves a try statement.
                     // * This is responsible for deleting temp video when everything went fine, when we pressed Save on the form
                     // Finally -> no matter what happens =>> delete temporary video based on channel message input
-                    _fileManagerLocal.DeleteTemporaryFileInPath(message.Input);
+                    _fileManager.DeleteTemporaryFileInPath(message.Input);
                 }
             }
 

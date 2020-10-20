@@ -1,15 +1,8 @@
 ﻿<template>
   <item-content-layout>
     <template v-slot:content>
-      <div class="mx-2" v-if="submissions">
-        <v-card class="mb-3" v-for="submission in submissions" :key="`${submission.id}`">
-          <!-- Injecting video player component with dynamic binding of video where video is string -->
-          <!-- * Getting specific videos from submissions store |> state => fetchSubmissionsForTechnique filling state -->
-          <video-player :video="submission.video" :key="`v-${submission.id}`"/>
-
-          <v-card-text>{{ submission.description }}</v-card-text>
-        </v-card>
-      </div>
+      <!-- Injecting submission component -> passing submission as prop from looped collection of submissions -->
+      <submission :submission="submission" v-for="submission in submissions" :key="`submission-${submission.id}`"/>
     </template>
 
     <template v-slot:item>
@@ -41,12 +34,12 @@
 </template>
 
 <script>
-import VideoPlayer from "@/components/video-player";
 import ItemContentLayout from "@/components/item-content-layout";
 import {mapMutations, mapState} from "vuex";
+import Submission from "@/components/submission";
 
 export default {
-  components: {ItemContentLayout, VideoPlayer},
+  components: {Submission, ItemContentLayout},
 
   // Local state
   data: () => ({

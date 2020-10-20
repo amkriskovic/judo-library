@@ -57,8 +57,8 @@
         </v-menu>
 
         <!-- Login / Logout section -->
-        <!-- Else => not authenticated => Sign in => redirect to our client plugin -->
-        <v-btn depressed outlined v-else @click="$auth.signinRedirect()">
+        <!-- Else => not authenticated => Sign in => redirect to our client plugin =>> login -->
+        <v-btn depressed outlined v-else @click="login">
           <v-icon outlined left>mdi-account-circle-outline</v-icon>
           Log in
         </v-btn>
@@ -78,7 +78,7 @@
 
 <script>
 import ContentCreationDialog from "../components/content-creation/content-creation-dialog";
-import {mapGetters, mapState} from "vuex";
+import {mapActions, mapGetters, mapState} from "vuex";
 
 export default {
   name: "Default",
@@ -93,6 +93,8 @@ export default {
     ...mapState('auth', ['loading', 'profile']),
     ...mapGetters('auth', ['authenticated', 'moderator']),
   },
+
+  methods: mapActions('auth', ['login'])
 
 }
 </script>

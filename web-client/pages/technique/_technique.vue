@@ -4,15 +4,8 @@
   <item-content-layout>
     <!-- Template for Content-->
     <template v-slot:content>
-      <div class="mx-2" v-if="submissions">
-        <v-card class="mb-3" v-for="submission in submissions" :key="`${technique.slug}-${submission.id}`">
-          <!-- Injecting video player component with dynamic binding of video where video is string -->
-          <!-- * Getting specific videos from submissions store |> state => fetchSubmissionsForTechnique filling state -->
-          <video-player :video="submission.video" :key="`v-${technique.slug}-${submission.id}`"/>
-
-          <v-card-text>{{submission.description}}</v-card-text>
-        </v-card>
-      </div>
+      <!-- Injecting submission component -> passing submission as prop from looped collection of submissions -->
+      <submission :submission="submission" v-for="submission in submissions" :key="`submission-${submission.id}`"/>
     </template>
 
     <!-- Template for Item(card) -->
@@ -21,8 +14,8 @@
       <div class="text-h5">
         <span>{{ technique.name }}</span>
         <!-- :to= corresponds to page that we created | category == folder | category.id == page?  -->
-        <v-chip small label class="mb-1 ml-2" :to="`/category/${category.slug}`">{{ category.name }}</v-chip>
-        <v-chip small label class="mb-1 ml-2" :to="`/subcategory/${subcategory.slug}`">{{ subcategory.name }}</v-chip>
+        <v-chip small label class="mb-1 ml-2" :to="`/category/${category.id}`">{{ category.name }}</v-chip>
+        <v-chip small label class="mb-1 ml-2" :to="`/subcategory/${subcategory.id}`">{{ subcategory.name }}</v-chip>
       </div>
 
       <v-divider class="my-1"></v-divider>
@@ -42,7 +35,7 @@
         </v-chip-group>
       </div>
 
-      <v-divider class="my-1"></v-divider>
+      <v-divider class="mb-2"></v-divider>
 
       <!-- Technique Edit Button -->
       <div>
@@ -55,98 +48,97 @@
 </template>
 
 <script>
-import {mapState, mapGetters, mapMutations} from "vuex";
-  import VideoPlayer from "../../components/video-player";
-  import ItemContentLayout from "../../components/item-content-layout";
-  import TechniqueSteps from "../../components/content-creation/techniques-steps"
+import {mapState, mapMutations} from "vuex";
+import ItemContentLayout from "../../components/item-content-layout";
+import TechniqueSteps from "../../components/content-creation/techniques-steps"
+import Submission from "@/components/submission";
 
-  export default {
-    components: {ItemContentLayout, VideoPlayer},
-    // Page local state
-    data: () => ({
-      technique: null,
-      category: null,
-      subcategory: null,
-    }),
+export default {
+  components: {Submission, ItemContentLayout},
+  // Page local state
+  data: () => ({
+    technique: null,
+    category: null,
+    subcategory: null,
+  }),
 
-    // Map state for submissions and techniques, mapping getters for returning technique by id
-    computed: {
-      ...mapState("submissions", ["submissions"]),
-      ...mapState("techniques", ["techniques"]),
+  // Map state for submissions and techniques, mapping getters for returning technique by id
+  computed: {
+    ...mapState("submissions", ["submissions"]),
 
-      ...mapGetters("techniques", ["techniqueById", "categoryById", "subcategoryById"]),
+    // Importing dictionary from initial state of techniques store => for particular technique we use dict => indexing
+    ...mapState("techniques", ["dictionary"]),
 
-      // Function that returns object with title, data -> for specific technique, related data in this case filters:
-      // subcategory, setup attacks and followup attacks, idFactory for uniqueness and routeFactory for navigating
-      // thorough chips to respective technique
-      relatedData() {
-        return [
-          {
-            title: "Set Up Attacks",
-            data: this.techniques.filter(t => this.technique.followUpAttacks.indexOf(t.slug) >= 0), // filter() creates a new array
-            idFactory: t => `technique-${t.slug}`,
-            routeFactory: t => `/technique/${t.slug}`,
-          },
-          {
-            title: "Follow Up Attacks",
-            data: this.techniques.filter(t => this.technique.setUpAttacks.indexOf(t.slug) >= 0),
-            idFactory: t => `technique-${t.slug}`,
-            routeFactory: t => `/technique/${t.slug}`,
-          },
-          {
-            title: "Counters",
-            data: this.techniques.filter(t => this.technique.counters.indexOf(t.slug) >= 0),
-            idFactory: t => `technique-${t.slug}`,
-            routeFactory: t => `/technique/${t.slug}`
-          }
-        ]
-      },
-
+    // Function that returns object with title, data -> for specific technique, related data in this case filters:
+    // subcategory, setup attacks and followup attacks, idFactory for uniqueness and routeFactory for navigating
+    // thorough chips to respective technique
+    // * Already fetched
+    relatedData() {
+      return [
+        {
+          title: "Set Up Attacks",
+          data: this.technique.setUpAttacks.map(t => this.dictionary.techniques[t]), // t is Id of technique
+          idFactory: t => `technique-${t.id}`,
+          routeFactory: t => `/technique/${t.slug}`,
+        },
+        {
+          title: "Follow Up Attacks",
+          data: this.technique.followUpAttacks.map(t => this.dictionary.techniques[t]), // t is Id of technique
+          idFactory: t => `technique-${t.id}`,
+          routeFactory: t => `/technique/${t.slug}`,
+        },
+        {
+          title: "Counters",
+          data: this.technique.counters.map(t => this.dictionary.techniques[t]), // t is Id of technique
+          idFactory: t => `technique-${t.id}`,
+          routeFactory: t => `/technique/${t.slug}`
+        }
+      ]
     },
 
-    methods: {
-      ...mapMutations("video-upload", ["activate"]),
+  },
 
-      // Method for editing Technique
-      edit() {
-        // Invoke activate mutation from video-upload store
-        // Passing TechniqueSteps as component, set edit as true, and editPayload as this technique => page data/local state
-        this.activate({component: TechniqueSteps, edit: true, editPayload: this.technique})
-      }
-    },
+  methods: {
+    ...mapMutations("video-upload", ["activate"]),
 
-    // Pre-fetching data asynchronously for this particular page
-    async fetch() {
-      // Getting techniqueId from URL param
-      const techniqueId = this.$route.params.technique;
-
-      // Assigning particular grabbed technique from url -> id to pages local state technique
-      this.technique = this.techniqueById(this.$route.params.technique);
-
-      // Assign category(which we get based on technique above | grabbing from technique) and assign to local state category
-      this.category = this.categoryById(this.technique.category);
-
-      // Assign subcategory(which we get based on technique above | grabbing from technique) and assign to local state subCategory
-      this.subcategory = this.subcategoryById(this.technique.subCategory);
-
-      // dispatching fetchSubmissionsForTechnique action from submissions store, passing techniqueId as argument
-      await this.$store.dispatch("submissions/fetchSubmissionsForTechnique", {techniqueId}, {root: true}); // Dispatch action as root
-    },
-
-    // Setting via head method the HTML Head tags for the current page.
-    head() {
-      // If there is no technique return empty object
-      if (!this.technique) return {}
-
-      return {
-        title: this.technique.name,
-        meta: [
-          {hid: 'description', name: 'description', content: this.technique.description}
-        ]
-      }
+    // Method for editing Technique
+    edit() {
+      // Invoke activate mutation from video-upload store
+      // Passing TechniqueSteps as component, set edit as true, and editPayload as this technique => page data/local state
+      this.activate({component: TechniqueSteps, edit: true, editPayload: this.technique})
     }
+  },
 
+  // Pre-fetching data asynchronously for this particular page
+  async fetch() {
+    // Getting techniqueId from URL param
+    const techniqueSlug = this.$route.params.technique
+
+    // Assigning particular grabbed technique slug after /technique/... from url -> id to pages local state technique
+    this.technique = this.dictionary.techniques[techniqueSlug]
+
+    this.category = this.dictionary.categories[this.technique.category]
+
+    this.subcategory = this.dictionary.subcategories[this.technique.subCategory]
+
+    // dispatching fetchSubmissionsForTechnique action from submissions store, passing techniqueId as argument
+    await this.$store.dispatch("submissions/fetchSubmissionsForTechnique", {techniqueId: techniqueSlug}, {root: true}); // Dispatch action as root
+  },
+
+  // Setting via head method the HTML Head tags for the current page.
+  head() {
+    // If there is no technique return empty object
+    if (!this.technique) return {}
+
+    return {
+      title: this.technique.name,
+      meta: [
+        {hid: 'description', name: 'description', content: this.technique.description}
+      ]
+    }
   }
+
+}
 </script>
 
 <style scoped>

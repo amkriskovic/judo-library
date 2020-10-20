@@ -45,56 +45,64 @@ namespace JudoLibrary.Api
                         .GetAwaiter()
                         .GetResult();
 
+                    // Seeding User
+                    context.Add(new User
+                    {
+                        Id = testUser.Id,
+                        Username = testUser.UserName,
+                        Image = "https://localhost:5001/api/files/image/user.jpg"
+                    });
+
                     // Seeding Categories
                     context.Add(new Category
                     {
-                        Id = 1, Version = 1, Active = true, Slug = "nage-waza", Name = "Nage Waza",
+                        Id = "nage-waza", Name = "Nage Waza",
                         Description = "Throwing Techniques"
                     });
                     context.Add(new Category
                     {
-                        Id = 2, Version = 1, Active = true, Slug = "katame-waza", Name = "Katame Waza",
+                        Id = "katame-waza", Name = "Katame Waza",
                         Description = "Grappling Techniques"
                     });
                     context.Add(new Category
                     {
-                        Id = 3, Version = 1, Active = true, Slug = "atemi-waza", Name = "Atemi Waza",
+                        Id = "atemi-waza", Name = "Atemi Waza",
                         Description = "Body Striking Techniques"
                     });
                     context.Add(new Category
                     {
-                        Id = 4, Version = 1, Active = true, Slug = "uke-waza", Name = "Uke Waza",
+                        Id = "uke-waza", Name = "Uke Waza",
                         Description = "Blocks And Parries"
                     });
 
                     // Seeding SubCategories
                     context.Add(new SubCategory
                     {
-                        Id = 1, Version = 1, Active = true, Slug = "te-waza", Name = "Te Waza",
+                        Id = "te-waza", Name = "Te Waza",
                         Description = "Hand throwing techniques", CategoryId = "nage-waza"
                     });
 
                     context.Add(new SubCategory
                     {
-                        Id = 2, Version = 1, Active = true, Slug = "koshi-waza", Name = "Koshi Waza",
+                        Id = "koshi-waza", Name = "Koshi Waza",
                         Description = "Hip throwing techniques", CategoryId = "nage-waza"
                     });
 
                     context.Add(new SubCategory
                     {
-                        Id = 3, Version = 1, Active = true, Slug = "ashi-waza", Name = "Ashi Waza",
+                        Id = "ashi-waza", Name = "Ashi Waza",
                         Description = "Foot throwing techniques", CategoryId = "nage-waza"
                     });
 
                     context.Add(new SubCategory
                     {
-                        Id = 4, Version = 1, Active = true, Slug = "sutemi-waza", Name = "Sutemi waza",
+                        Id = "sutemi-waza", Name = "Sutemi waza",
                         Description = "Sacrifice techniques", CategoryId = "nage-waza"
                     });
 
                     context.Add(new SubCategory
                     {
-                        Id = 5, Version = 1, Active = true, Slug = "osaekomi-waza", Name = "Osaekomi waza ",
+                        Id = "osaekomi-waza", Name = "Osaekomi waza ",
                         Description = "Pins or matholds", CategoryId = "katame-waza"
                     });
 

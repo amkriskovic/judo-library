@@ -7,8 +7,9 @@
 
         <div>
           <!-- Loop over collections -->
-          <v-btn class="mx-1" v-for="item in section.collection" :key="`${section.title}-${item.slug}`"
-                 :to="section.routeFactory(item.slug)">{{ item.name }}
+          <v-btn class="mx-1" v-for="item in section.collection"
+                 :key="`${section.title}-${item.id}`"
+                 :to="section.routeFactory(item)">{{ item.name }}
           </v-btn>
         </div>
       </div>
@@ -25,28 +26,19 @@
   export default {
     // * Techniques, categories, subcategories are getting fetched from index.js
     computed: {
-      ...mapState("techniques", ["techniques", "category", "subcategory"]),
+      // Importing lists from initial state of techniques store
+      ...mapState("techniques", ["lists"]),
 
       // Function that returns array of objects of data from techniques store state
       sections() {
         return [
           // Collection is ARRAY of techniques || categories || subcategories and we can access their model props, like id
-          // /technique corresponds to folder _technique
-          {collection: this.techniques, title: "Techniques", routeFactory: slug => `/technique/${slug}`},
-          {collection: this.category, title: "Categories", routeFactory: slug => `/category/${slug}`},
-          {collection: this.subcategory, title: "Subcategories", routeFactory: slug => `/subcategory/${slug}`},
+          // /technique corresponds to folder _technique, i => item, only technique uses slug
+          {collection: this.lists.techniques, title: "Techniques", routeFactory: i => `/technique/${i.slug}`},
+          {collection: this.lists.categories, title: "Categories", routeFactory: i => `/category/${i.id}`},
+          {collection: this.lists.subcategories, title: "Subcategories", routeFactory: i => `/subcategory/${i.id}`},
         ]
       }
     },
-
-    methods: {
-      // Making API call
-      api(endpoint) {
-        // Making get request to our API with provided endpoint, we can call this resource if we are authenticated and authorized with specifidc
-        return this.$axios.$get(`/api/techniques/` + endpoint)
-          .then(msg => {console.log('msg from API call', msg)})
-      }
-    },
-
   }
 </script>

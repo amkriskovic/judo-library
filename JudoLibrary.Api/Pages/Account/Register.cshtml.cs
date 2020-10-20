@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace JudoLibrary.Api.Pages.Account
 {
-    public class Register : PageModel
+    public class Register : BasePage // Inherits from BasePage which inherits PageModel
     {
         // Binds properties from register form, something like v-model, contains props from RegisterForm class
         [BindProperty]
@@ -56,6 +56,13 @@ namespace JudoLibrary.Api.Pages.Account
                 // If signInResult succeeded we want to pop user back on from where he came from, returnUrl contains all the info
                 // that server need to redirect us back to the App
                 return Redirect(Form.ReturnUrl);
+            }
+
+            // Loop over errors in createUserResult -> when we try to create user and he fked up or didnt filled form correctly
+            foreach (var error in createUserResult.Errors)
+            {
+                // Adding to our List of errors, error (it's description -> describes what error is) that popped for the reason above
+                CustomErrors.Add(error.Description);
             }
 
             return Page();

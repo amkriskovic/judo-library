@@ -33,8 +33,12 @@
         // userinfo === profile
         console.log('User after we authenticate ', user)
 
-        // Clear the code from the URL query param
-        window.location = '/'
+        // Grabbing the value from localStorage by key (post-login-redirect-path) that we set in auth.js, so user can continue where
+        // he left off
+        let returnRedirectPath = localStorage.getItem('post-login-redirect-path')
+
+        // If we have returnRedirectPath set it to window.location which will remove URL with the code or maybe not if not just '/'
+        window.location = returnRedirectPath ? returnRedirectPath : '/'
       }
     })
 </script>

@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace JudoLibrary.Api.Controllers
 {
@@ -26,7 +27,7 @@ namespace JudoLibrary.Api.Controllers
         // GET -> /api/categories/{id}
         [HttpGet("{id}")]
         public Category GetCategory(string id) => _context.Categories
-            .FirstOrDefault(c => c.Slug.Equals(id, StringComparison.InvariantCultureIgnoreCase));
+            .FirstOrDefault(c => c.Id.Equals(id, StringComparison.InvariantCultureIgnoreCase));
         
         // GET -> /api/categories/{id}/subcategories
         // Get all subcategories for particular category | Passing category Id as param
@@ -49,8 +50,8 @@ namespace JudoLibrary.Api.Controllers
         [HttpPost]
         public async Task<Category> CreateCategory([FromBody] Category category)
         {
-            // Create Category -> Slug, replacing white spaces with dashes, to lower ==> slug
-            category.Slug = category.Name.Replace(" ", "-").ToLowerInvariant();
+            // Create Category -> Id, replacing white spaces with dashes, to lower ==> slug
+            category.Id = category.Name.Replace(" ", "-").ToLowerInvariant();
             
             // Add category to DB
             _context.Add(category);
@@ -66,7 +67,7 @@ namespace JudoLibrary.Api.Controllers
         public async Task<Category> UpdateCategory([FromBody] Category category)
         {
             // Check if category exists
-            if (string.IsNullOrEmpty(category.Slug))
+            if (string.IsNullOrEmpty(category.Id))
                 return null;
 
             // Update

@@ -16,14 +16,25 @@
 
     <!-- #2 If we are authorized we redirect back to our App with [code] that we can exchange for access token and ID token -->
     <input type="hidden" asp-for="Form.ReturnUrl" value="@Model.Form.ReturnUrl">
-    
+
+    <!-- If we have any errors in out list of errors, e.g. User name 'test' is already taken. -->
+     @if (Model.CustomErrors.Count > 0)
+        {
+            <div class="field">
+                @foreach (var error in Model.CustomErrors)
+                {
+                    <div class="error">@error</div>
+                }
+            </div>
+        }
+
     <!-- Username field -->
     <div class="field">
         <label>Username</label>
         <input asp-for="Form.Username">
         <span asp-validation-for="Form.Username"></span>
     </div>
-    
+
     <!-- Email field -->
     <div class="field">
         <label>Email</label>

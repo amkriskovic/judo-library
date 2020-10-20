@@ -17,8 +17,6 @@
     <!-- #2 If we are authorized we redirect back to our App with [code] that we can exchange for access token and ID token -->
     <input type="hidden" asp-for="Form.ReturnUrl" value="@Model.Form.ReturnUrl">
 
-    @* <h3 class="title">Login</h3> *@
-
     <!-- Username field -->
     <div class="field">
         <label>Username</label>
@@ -33,13 +31,24 @@
         <span asp-validation-for="Form.Password"></span>
     </div>
 
+    <!-- If we have any errors in out list of errors -->
+    @if (Model.CustomErrors.Count > 0)
+    {
+        <div class="field">
+            @foreach (var error in Model.CustomErrors)
+            {
+                <div class="error">@error</div>
+            }
+        </div>
+    }
+
     <!-- Button -->
     <div class="field flex-row">
         <button type="submit">Log In</button>
     </div>
-    
+
     <hr>
-    
+
     <div class="field flex-row">
         <!-- Populating -> passing returnUrl if we click  link, Create account which is generated on get -->
         <a asp-page="/Account/Register" asp-route-returnUrl="@Model.Form.ReturnUrl">Create account</a>

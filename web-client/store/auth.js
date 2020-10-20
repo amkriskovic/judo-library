@@ -91,8 +91,19 @@ export const actions = {
       .finally(() => commit('finish'))
   },
 
+  login() {
+    // Fuck off
+    if (process.server) return
+
+    // * Before we log in, set the item to local storage, location.pathname => return URL pathname e.g. "/technique/osoto-gari"
+    localStorage.setItem('post-login-redirect-path', location.pathname)
+
+    /** Trigger a redirect of the current window to the authorization endpoint */
+    return this.$auth.signinRedirect()
+  },
+
   // Action corresponds to what we want to perform once user is initialized/loaded => executed only on client side
-  _watchUserLoaded({state, getters}, action) {
+  _watchUserLoaded({state, getters, dispatch}, action) {
     // Fuck off
     if (process.server) return
 
@@ -117,8 +128,8 @@ export const actions = {
 
             // If we are not authenticated
             if (!getters.authenticated){
-              // Pop back to the sign in form
-              this.$auth.signinRedirect()
+              // Dispatching login -> redirect to authorization endpoint
+              dispatch('login')
             } else if(!newValue) {
               // If loading is false => loading is finished
               console.log('User finished loading... => executing action!')

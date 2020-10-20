@@ -1,50 +1,61 @@
 ﻿// Root store function, with initial state - acts like "factory"
 const initState = () => ({
+  // Dict -> for fast look up -> indexing
+  // Set techniques,category,subcategory to null as initial state
+  dictionary: {
+    techniques: null,
+    categories: null,
+    subcategories: null
+  },
+
   // Set techniques,category,subcategory to empty array as initial state
-  techniques: [],
-  category: [],
-  subcategory: []
+  lists: {
+    techniques: [],
+    categories: [],
+    subcategories: []
+  },
 })
 
 // Export initState function as constant state
 export const state = initState;
 
-// Getters for techniques,category,subcategory mapping data from initial state
-export const getters = {
-  // * Lambda that is returning Lambda, returning technique by id
-  techniqueById: state => id => state.techniques.find(t => t.slug === id),
+// Func for setting entities data that's retrieved from API, type is what we accessing, data === payload
+const setEntities = (state, type, data) => {
+  // Initialize dict for particular type to empty obj.
+  state.dictionary[type] = {}
 
-  categoryById: state => id => state.category.find(c => c.slug === id),
+  // Loop over data
+  data.forEach(t => {
+    // Push particular type from data to arr of types => for front page where we load collection
+    state.lists[type].push(t)
 
-  subcategoryById: state => id => state.subcategory.find(sc => sc.slug === id),
+    // Dynamically resolve type from dict and assign data which is coming from some data collection to particular type id
+    state.dictionary[type][t.id] = t
 
-  techniqueItems: state => state.techniques.map(t => ({
-    text: t.name,
-    value: t.id // slug ??
-  })),
-
-  categoryItems: state => state.category.map(c => ({
-    text: c.name,
-    value: c.slug
-  })),
-
-  subcategoryItems: state => state.subcategory.map(sc => ({
-    text: sc.name,
-    value: sc.slug
-  })),
+    // If we have slug on particular type
+    if (t.slug) {
+      // Assign it to dict of specific type
+      state.dictionary[type][t.slug] = t
+    }
+  })
 }
 
 // Mutations (sync) - object with functions <- that will change the state
 // When write to state, use mutations
 export const mutations = {
 
-  setTechniques(state, {techniques, categories, subcategories}) {
-    // Assigning techniques from payload to techniques state
-    state.techniques = techniques;
+  // Writing to state techniques that get's retrieved from our API
+  setTechniques(state, {techniques}) {
+    // Calling set entities with state, type which is acting like key and data as value for that key
+    setEntities(state, 'techniques', techniques)
+  },
 
-    // Assigning category and subcategory from payload to store state
-    state.category = categories;
-    state.subcategory = subcategories;
+  setCategories(state, {categories}) {
+    setEntities(state, 'categories', categories)
+  },
+
+  setSubCategories(state, {subcategories}) {
+    setEntities(state, 'subcategories', subcategories)
   },
 
   // Resets state to initial state
@@ -60,24 +71,16 @@ export const actions = {
 
   // # Base URL is set in nuxt.config.js
   // Fetching techniques, commit <- context of store, commit func is to invoke one of the mutation func's
-  async fetchTechniques({commit}) {
-    try {
-      // Await for response from GET request, getting data from response (url)
-      const techniques = await this.$axios.$get("/api/techniques");
+  fetchTechniques({commit}) {
+    // Promise for making all 3 calls to API at the "same" time
+    return Promise.all([
+      // Passing array of Tasks => API cals to fetch data
 
-      // Await for response from GET request, getting data for category and subcategory
-      const categories = await this.$axios.$get("/api/categories");
-      const subcategories = await this.$axios.$get("/api/subcategories");
-
-      console.log('techniques::', techniques);
-
-      // Trigger a mutation func with commit func and provide payload <- techniques, category, subcategory
-      // Mutation function setTechniques renders UI
-      commit("setTechniques", {techniques, categories, subcategories});
-    } catch (err) {
-      console.log(err)
-    }
-
+      // Getting techniques, then commiting to write to store state
+      this.$axios.$get("/api/techniques").then(techniques => commit("setTechniques", {techniques})),
+      this.$axios.$get("/api/categories").then(categories => commit("setCategories", {categories})),
+      this.$axios.$get("/api/subcategories").then(subcategories => commit("setSubCategories", {subcategories})),
+    ])
   },
 
   // Create technique with accessing state of store, and with payload <- form

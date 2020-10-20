@@ -14,8 +14,8 @@
       ref="video"
       width="400"
       muted loop
-      :src="video.videoLink"
-      :poster="video.thumbLink"
+      :src="video"
+      :poster="thumb"
       preload="none"
       playsinline
     >
@@ -32,7 +32,12 @@
     props: {
       video: {
         required: true, // Required
-        type: Object, // Video is type of String -> now it's object
+        type: String, // Video is type of String
+      },
+
+      thumb: {
+        required: true, // Required
+        type: String, // Video is type of String
       }
     },
 

@@ -5,7 +5,7 @@ using JudoLibrary.Models.Moderation;
 namespace JudoLibrary.Models
 {
     // Self referencing table
-    public class Comment : TemporalModel
+    public class Comment : BaseModel<int>
     {
         public string Content { get; set; }
         public string HtmlContent { get; set; }
