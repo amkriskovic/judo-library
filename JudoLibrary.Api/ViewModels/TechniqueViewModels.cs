@@ -9,7 +9,7 @@ namespace JudoLibrary.Api.ViewModels
     {
         // Assign to create delegate, projection expression that we compile, so we can use it in controller
         public static readonly Func<Technique, object> Create = Projection.Compile();
-        
+
         // Projection ViewModel
         // Expression holds information about function, returning a function that later can be traversed
         // EF will take Expression and translate it into Select statement
@@ -23,9 +23,23 @@ namespace JudoLibrary.Api.ViewModels
                 technique.Description,
                 technique.Category, // Id
                 technique.SubCategory, // Id
-                SetUpAttacks = technique.SetUpAttacks.Select(tsa => tsa.SetUpAttackId), // Selecting Counters for TechniqueForm
-                FollowUpAttacks = technique.FollowUpAttacks.Select(tfa => tfa.FollowUpAttackId), // Selecting Counters for TechniqueForm
-                Counters = technique.Counters.Select(tc => tc.CounterId), // Selecting Counters for TechniqueForm
+                technique.Version,
+                technique.Active,
+                SetUpAttacks = technique.SetUpAttacks
+                    .AsQueryable()
+                    .Where(x => x.Active)
+                    .Select(tsa => tsa.SetUpAttackId) // Selecting Counters for TechniqueForm
+                    .ToList(),
+                FollowUpAttacks = technique.FollowUpAttacks
+                    .AsQueryable()
+                    .Where(x => x.Active)
+                    .Select(tfa => tfa.FollowUpAttackId) // Selecting Counters for TechniqueForm
+                    .ToList(),
+                Counters = technique.Counters
+                    .AsQueryable()
+                    .Where(x => x.Active)
+                    .Select(tc => tc.CounterId) // Selecting Counters for TechniqueForm
+                    .ToList()
             };
     }
 }

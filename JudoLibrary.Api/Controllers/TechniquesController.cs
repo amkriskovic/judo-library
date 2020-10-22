@@ -22,12 +22,16 @@ namespace JudoLibrary.Api.Controllers
         {
             _context = context;
         }
-        
+
         // GET -> /api/techniques
         // TechniqueViewModels.Projection is responsible for giving us response => grab all active Techniques
         [HttpGet]
         public IEnumerable<object> GetAllTechniques() => _context.Techniques
+            .AsNoTracking()
             .Where(t => t.Active)
+            .Include(t => t.SetUpAttacks)
+            .Include(t => t.FollowUpAttacks)
+            .Include(t => t.Counters)
             .Select(TechniqueViewModels.Projection)
             .ToList();
 
@@ -35,29 +39,29 @@ namespace JudoLibrary.Api.Controllers
         [HttpGet("{id}")]
         public IActionResult GetTechnique(string id)
         {
-           // Make an Query -> DbSet<Techniques>
-           var query = _context.Techniques.AsQueryable();
-           
-           // Try to parse id as int => means _modId is calling it => /moderation => current & target
-           if (int.TryParse(id, out var intId))
-           {
-               // Technique Id is an Int32
-               query = query.Where(t => t.Id == intId);
-           }
-           else
-           {
-               // Technique Id is an string => grab only active ones => compare the slug with id => /index/techniqueSlug
-               query = query.Where(t => t.Slug.Equals(id, StringComparison.CurrentCultureIgnoreCase) && t.Active);
-           }
-           
-           // Get the technique from query
-           var technique = query
-               .Select(TechniqueViewModels.Projection)
-               .FirstOrDefault();
+            // Make an Query -> DbSet<Techniques>
+            var query = _context.Techniques.AsQueryable();
 
-           if (technique == null) return NoContent();
+            // Try to parse id as int => means _modId is calling it => /moderation => current & target
+            if (int.TryParse(id, out var intId))
+            {
+                // Technique Id is an Int32
+                query = query.Where(t => t.Id == intId);
+            }
+            else
+            {
+                // Technique Id is an string => grab only active ones => compare the slug with id => /index/techniqueSlug
+                query = query.Where(t => t.Slug.Equals(id, StringComparison.CurrentCultureIgnoreCase) && t.Active);
+            }
 
-           return Ok(technique);
+            // Get the technique from query
+            var technique = query
+                .Select(TechniqueViewModels.Projection)
+                .FirstOrDefault();
+
+            if (technique == null) return NoContent();
+
+            return Ok(technique);
         }
 
         // GET -> /api/techniques/{techniqueId}/submissions
@@ -69,7 +73,7 @@ namespace JudoLibrary.Api.Controllers
             .Where(s => s.TechniqueId.Equals(techniqueId))
             .Select(SubmissionViewModels.Projection)
             .ToList();
-        
+
         // POST -> /api/techniques
         // Create technique, sending json from the body of the request, TechniqueForm is responsible for creating technique
         [HttpPost]
@@ -80,11 +84,14 @@ namespace JudoLibrary.Api.Controllers
             {
                 // Create TechniqueForm -> Slug | based on TechniqueForm -> Name | ' ' -> '-' ==> slug
                 Slug = techniqueForm.Name.Replace(" ", "-").ToLowerInvariant(),
-                Version = 1,
                 Name = techniqueForm.Name,
+                Version = 1,
+
                 Description = techniqueForm.Description,
                 Category = techniqueForm.Category,
                 SubCategory = techniqueForm.SubCategory,
+
+                // Collections
                 SetUpAttacks = techniqueForm.SetUpAttacks
                     // setUpAttackId is pulling values from TechniqueSetupAttack table -> SetUpAttackId prop, and we are
                     // Selecting that and assigning to SetUpAttacks
@@ -99,10 +106,10 @@ namespace JudoLibrary.Api.Controllers
                     .Select(counterId => new TechniqueCounter {CounterId = counterId})
                     .ToList()
             };
-            
+
             // Add technique to DB
             _context.Add(technique);
-            
+
             // Save Technique to DB
             await _context.SaveChangesAsync();
 
@@ -113,24 +120,24 @@ namespace JudoLibrary.Api.Controllers
                 Target = technique.Id, // This is where Id is going to be generated
                 Type = ModerationTypes.Technique
             });
-            
+
             // Save ModerationItem to DB
             await _context.SaveChangesAsync();
 
             // Invoke delegate Create which is our ViewModel then return ViewModel
             return TechniqueViewModels.Create(technique);
         }
-        
+
         // PUT -> /api/techniques
         [HttpPut]
         public async Task<IActionResult> UpdateTechnique([FromBody] TechniqueForm techniqueForm)
         {
             // Extract existing technique from DB by comparing Id(int)
             var technique = _context.Techniques.FirstOrDefault(t => t.Id == techniqueForm.Id);
-            
+
             // If technique is null -> NoContent 204
             if (technique == null) return NoContent();
-            
+
             // When we are updating the technique we are NOT modifying existing one, we are creating New one
             var newTechnique = new Technique
             {
@@ -139,33 +146,33 @@ namespace JudoLibrary.Api.Controllers
                 Name = technique.Name,
                 // Bump the new Technique Version to + 1 from original Technique that we trying to edit
                 Version = technique.Version + 1,
-                
+
                 Description = techniqueForm.Description,
                 Category = techniqueForm.Category,
                 SubCategory = techniqueForm.SubCategory,
-                
+
                 // Collections
                 SetUpAttacks = techniqueForm.SetUpAttacks
                     // saId is collection of int's that's coming from form SetUpAttacks(IE<int>), then we are selecting that int which
                     // represents SetUpAttack and assigning it to SetUpAttackId 
-                    .Select(saId => new TechniqueSetupAttack{SetUpAttackId = saId})
+                    .Select(saId => new TechniqueSetupAttack {SetUpAttackId = saId})
                     .ToList(),
-                
+
                 FollowUpAttacks = techniqueForm.FollowUpAttacks
-                    .Select(faId => new TechniqueFollowupAttack{FollowUpAttackId = faId})
+                    .Select(faId => new TechniqueFollowupAttack {FollowUpAttackId = faId})
                     .ToList(),
-                
+
                 Counters = techniqueForm.Counters
-                    .Select(cId => new TechniqueCounter{CounterId = cId})
+                    .Select(cId => new TechniqueCounter {CounterId = cId})
                     .ToList()
             };
-            
+
             // Add newTechnique to DB
             _context.Add(newTechnique);
-            
+
             // Save newTechnique to DB
             await _context.SaveChangesAsync();
-            
+
             // Adding this newTechnique to MI -> First need to approve it to be visible
             _context.Add(new ModerationItem
             {
@@ -178,29 +185,29 @@ namespace JudoLibrary.Api.Controllers
 
                 Type = ModerationTypes.Technique
             });
-            
+
             // Save MI to DB
             await _context.SaveChangesAsync();
 
             // Return created technique that we pass to TechniqueViewModels
             return Ok(TechniqueViewModels.Create(newTechnique));
         }
-        
-        
+
+
         // DELETE -> /api/techniques/{id}
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteTechnique(string id)
         {
             // Grab technique from DB by comparing Slugs
             var technique = _context.Techniques.FirstOrDefault(t => t.Slug == id);
-            
+
             // If technique not exists
             if (technique == null)
                 return NotFound();
-            
+
             // Mark as deleted
             technique.Deleted = true;
-            
+
             await _context.SaveChangesAsync();
 
             return Ok();
