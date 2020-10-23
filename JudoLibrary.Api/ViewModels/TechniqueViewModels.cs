@@ -28,12 +28,12 @@ namespace JudoLibrary.Api.ViewModels
                 SetUpAttacks = technique.SetUpAttacks
                     .AsQueryable()
                     .Where(x => x.Active)
-                    .Select(tsa => tsa.SetUpAttackId) // Selecting Counters for TechniqueForm
+                    .Select(x => x.SetUpAttackId) // Selecting Counters for TechniqueForm
                     .ToList(),
                 FollowUpAttacks = technique.FollowUpAttacks
                     .AsQueryable()
                     .Where(x => x.Active)
-                    .Select(tfa => tfa.FollowUpAttackId) // Selecting Counters for TechniqueForm
+                    .Select(x => x.FollowUpAttackId) // Selecting Counters for TechniqueForm
                     .ToList(),
                 Counters = technique.Counters
                     .AsQueryable()

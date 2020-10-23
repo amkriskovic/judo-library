@@ -127,47 +127,47 @@ namespace JudoLibrary.Api
 
                     context.Add(new Technique
                     {
-                        Id = 4, Version = 1, Active = true, Slug = "Kesa-gatame", Name = "Kesa-gatame",
+                        Id = 4, Version = 1, Active = true, Slug = "kesa-gatame", Name = "Kesa-gatame",
                         Description = "Scarf hold", Category = "katame-waza", SubCategory = "osaekomi-waza"
                     });
 
                     // * Main Technique *
                     context.Add(new Technique
                     {
-                        Id = 6, Version = 1, Active = true, Slug = "osoto-gari", Name = "Osoto gari",
-                        Description = "Major Outer Reaping",
-                        Category = "nage-waza", SubCategory = "ashi-waza",
-                        SetUpAttacks = new List<TechniqueSetupAttack>
+                        Id = 5, Version = 1, Active = true, Slug = "seoi-nage", Name = "Seoi Nage",
+                        Description = "Shoulder throw", Category = "nage-waza", SubCategory = "te-waza",
+                        SetUpAttacks = new List<TechniqueRelationships>
                         {
-                            new TechniqueSetupAttack {TechniqueId = 6, SetUpAttackId = 3, Active = true},
+                            new TechniqueRelationships {SetUpAttackId = 1, Active = true}
                         },
-                        FollowUpAttacks = new List<TechniqueFollowupAttack>
+                        FollowUpAttacks = new List<TechniqueRelationships>
                         {
-                            new TechniqueFollowupAttack {TechniqueId = 6, FollowUpAttackId = 1, Active = true}
+                            new TechniqueRelationships {FollowUpAttackId = 6, Active = true}
                         },
                         Counters = new List<TechniqueCounter>
                         {
-                            new TechniqueCounter {TechniqueId = 6, CounterId = 2, Active = true}
+                            new TechniqueCounter {CounterId = 2,  Active = true},
+                            new TechniqueCounter {CounterId = 3, Active = true}
                         }
                     });
-
+                    
                     context.Add(new Technique
                     {
-                        Id = 5, Version = 1, Active = true, Slug = "seoi-nage", Name = "Seoi Nage",
-                        Description = "Shoulder throw", Category = "nage-waza", SubCategory = "te-waza",
-                        // SetUpAttacks = new List<TechniqueSetupAttack>
-                        // {
-                        //     new TechniqueSetupAttack {TechniqueId = 5, SetUpAttackId = 1, Active = true}
-                        // },
-                        // FollowUpAttacks = new List<TechniqueFollowupAttack>
-                        // {
-                        //     new TechniqueFollowupAttack {TechniqueId = 5, FollowUpAttackId = 6, Active = true}
-                        // },
-                        // Counters = new List<TechniqueCounter>
-                        // {
-                        //     new TechniqueCounter {TechniqueId = 5, CounterId = 2, Active = true},
-                        //     new TechniqueCounter {TechniqueId = 5, CounterId = 3, Active = true}
-                        // }
+                        Id = 6, Version = 1, Active = true, Slug = "osoto-gari", Name = "Osoto gari",
+                        Description = "Major Outer Reaping",
+                        Category = "nage-waza", SubCategory = "ashi-waza",
+                        SetUpAttacks = new List<TechniqueRelationships>
+                        {
+                            // new TechniqueRelationships {SetUpAttackId = 5, Active = true},
+                        },
+                        FollowUpAttacks = new List<TechniqueRelationships>
+                        {
+                            // new TechniqueRelationships {FollowUpAttackId = 1, Active = true}
+                        },
+                        Counters = new List<TechniqueCounter>
+                        {
+                            // new TechniqueCounter {CounterId = 2, Active = true}
+                        }
                     });
 
                     // Seeding submissions

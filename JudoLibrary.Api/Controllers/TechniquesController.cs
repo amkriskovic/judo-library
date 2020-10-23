@@ -93,15 +93,15 @@ namespace JudoLibrary.Api.Controllers
 
                 // Collections
                 SetUpAttacks = techniqueForm.SetUpAttacks
-                    // setUpAttackId is pulling values from TechniqueSetupAttack table -> SetUpAttackId prop, and we are
-                    // Selecting that and assigning to SetUpAttacks
-                    // * Assigning to SetUpAttackId value of setUpAttackId that came from [FromBody] when filling form.
-                    // * SetUpAttacks hold value/s then we are selecting them and as above described, mapping them to SetUpAttackId so EF knows what is what
-                    .Select(setUpAttackId => new TechniqueSetupAttack {SetUpAttackId = setUpAttackId})
+                    // saId is collection of int's that's coming from form SetUpAttacks(IE<int>), then we are selecting that int which
+                    // represents SetUpAttack and assigning it to SetUpAttackId 
+                    .Select(saId => new TechniqueRelationships {SetUpAttackId = saId})
                     .ToList(),
+
                 FollowUpAttacks = techniqueForm.FollowUpAttacks
-                    .Select(followUpAttackId => new TechniqueFollowupAttack {FollowUpAttackId = followUpAttackId})
+                    .Select(faId => new TechniqueRelationships {FollowUpAttackId = faId})
                     .ToList(),
+
                 Counters = techniqueForm.Counters
                     .Select(counterId => new TechniqueCounter {CounterId = counterId})
                     .ToList()
@@ -155,15 +155,15 @@ namespace JudoLibrary.Api.Controllers
                 SetUpAttacks = techniqueForm.SetUpAttacks
                     // saId is collection of int's that's coming from form SetUpAttacks(IE<int>), then we are selecting that int which
                     // represents SetUpAttack and assigning it to SetUpAttackId 
-                    .Select(saId => new TechniqueSetupAttack {SetUpAttackId = saId})
+                    .Select(saId => new TechniqueRelationships {SetUpAttackId = saId})
                     .ToList(),
 
                 FollowUpAttacks = techniqueForm.FollowUpAttacks
-                    .Select(faId => new TechniqueFollowupAttack {FollowUpAttackId = faId})
+                    .Select(faId => new TechniqueRelationships {FollowUpAttackId = faId})
                     .ToList(),
 
                 Counters = techniqueForm.Counters
-                    .Select(cId => new TechniqueCounter {CounterId = cId})
+                    .Select(counterId => new TechniqueCounter {CounterId = counterId})
                     .ToList()
             };
 
@@ -172,6 +172,16 @@ namespace JudoLibrary.Api.Controllers
 
             // Save newTechnique to DB
             await _context.SaveChangesAsync();
+            
+            // Iterate over techniqueCounters where CounterId which points to specific Technique is equal to Technique Id
+            var techniqueCounters = _context.TechniqueCounters.Where(x => x.CounterId == technique.Id);
+            
+            // Loop over those techniqueCounters
+            foreach (var techniqueCounter in techniqueCounters)
+            {
+                // Add them to DB, but with updated Technique Id (new technique that we edited)
+                _context.Add(new TechniqueCounter {TechniqueId = techniqueCounter.TechniqueId, CounterId = newTechnique.Id});
+            }
 
             // Adding this newTechnique to MI -> First need to approve it to be visible
             _context.Add(new ModerationItem
