@@ -1,14 +1,20 @@
 ﻿<template>
   <div>
-    <!-- Check for modItem "technique" -->
-    <div v-if="item">
-      <!-- Display modItem's description -->
-      {{ item.description }}
-    </div>
-
     <v-row>
       <!-- * Comment section part -->
-      <v-col cols="7">
+      <v-col cols="8">
+        <v-row justify="center">
+          <v-col cols="4" v-if="current">
+            <technique-info-card :technique="current"/>
+          </v-col>
+          <v-col cols="4" class="d-flex justify-center" v-if="current">
+            <v-icon size="46">mdi-arrow-right</v-icon>
+          </v-col>
+          <v-col cols="4" v-if="target">
+            <technique-info-card :technique="target"/>
+          </v-col>
+        </v-row>
+
         <!-- Injecting comment section component, dyn binding comments so we can display them, hooking sendComment event -->
         <!-- This is the place where moderator creates comment, and place where all replies are created aswell -->
         <!-- :comments is coming from comment-section prop -->
@@ -16,7 +22,7 @@
       </v-col>
 
       <!-- * Review section part -->
-      <v-col cols="5">
+      <v-col cols="4">
         <v-card>
           <!-- Displaying approved count -->
           <v-card-title>Reviews ({{approveCount}} / {{reviews.length}})</v-card-title>
@@ -76,6 +82,7 @@
   // Separate from component, easier to re-use it
   // Resolves endpoint based on type it's passed, @ =>> root of web-client
   import CommentSection from "@/components/comments/comment-section";
+  import TechniqueInfoCard from "@/components/technique-info-card";
 
   // Produce the endpoint based on url type parameter, e.g. techniques
   const endpointResolver = (type) => {
@@ -119,10 +126,10 @@
   }
 
   export default {
-    components: {CommentSection},
+    components: {TechniqueInfoCard, CommentSection},
     // Local state
     data: () => ({
-      item: null,
+      target: null,
       current: null,
       comments: [],
       reviews: [],
@@ -150,17 +157,17 @@
 
       // Assign endpoint to the item in local state
       // Get dynamic API controller => response - data, based on URL parameters that we extracted
-      // * Provide current from modItem which is int => current version of item we editing
+      // * Provide current from modItem which is int => current version of item we editing =>> CURRENT
       this.$axios.$get(`/api/${endpoint}/${modItem.current}`)
         // Fire and forget
         // Then assign item(curr) that came from GET req. to local state item -> current
         .then(currItem => this.current = currItem)
 
-      // Make GET req to get the target(next) version
+      // * Make GET req to get the target(next) version =>> TARGET
       this.$axios.$get(`api/${endpoint}/${modItem.target}`)
         // Fire and forget
         // Then assign item(targetItem) that came from GET req. to local state item
-        .then(targetItem => this.item = targetItem)
+        .then(targetItem => this.target = targetItem)
     },
 
     // Computed properties allow us to define a property that is used the same way as data,
@@ -183,7 +190,7 @@
 
       // If target(next) - current is less than or equal to zero -> it's outdated
       outdated() {
-        return this.current && this.item && this.item.version - this.current.version <= 0
+        return this.current && this.target && this.target.version - this.current.version <= 0
       }
     },
 

@@ -9,5 +9,7 @@ namespace JudoLibrary.Models.Abstractions
         public int Version { get; set; } // Default = 0
         public bool Active { get; set; } // Default = false
         public DateTime TimeStamp { get; set; }
+        public string UserId { get; set; }
+        public User User { get; set; }
     }
 }

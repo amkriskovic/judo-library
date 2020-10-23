@@ -109,32 +109,32 @@ namespace JudoLibrary.Api
                     // Seeding Techniques
                     context.Add(new Technique
                     {
-                        Id = 1, Version = 1, Active = true, Slug = "kouchi-gari", Name = "Kouchi gari",
+                        Id = 1, UserId = testUser.Id, Version = 1, Active = true, Slug = "kouchi-gari", Name = "Kouchi gari",
                         Description = "Small inner reap", Category = "nage-waza", SubCategory = "ashi-waza"
                     });
 
                     context.Add(new Technique
                     {
-                        Id = 2, Version = 1, Active = true, Slug = "ushiro-goshi", Name = "Ushiro goshi",
+                        Id = 2, UserId = testUser.Id, Version = 1, Active = true, Slug = "ushiro-goshi", Name = "Ushiro goshi",
                         Description = "Rear hip throw", Category = "nage-waza", SubCategory = "koshi-waza"
                     });
 
                     context.Add(new Technique
                     {
-                        Id = 3, Version = 1, Active = true, Slug = "tani-otoshi", Name = "Tani otoshi",
+                        Id = 3, UserId = testUser.Id, Version = 1, Active = true, Slug = "tani-otoshi", Name = "Tani otoshi",
                         Description = "Valley drop", Category = "nage-waza", SubCategory = "sutemi-waza"
                     });
 
                     context.Add(new Technique
                     {
-                        Id = 4, Version = 1, Active = true, Slug = "kesa-gatame", Name = "Kesa-gatame",
+                        Id = 4, UserId = testUser.Id, Version = 1, Active = true, Slug = "kesa-gatame", Name = "Kesa-gatame",
                         Description = "Scarf hold", Category = "katame-waza", SubCategory = "osaekomi-waza"
                     });
 
                     // * Main Technique *
                     context.Add(new Technique
                     {
-                        Id = 5, Version = 1, Active = true, Slug = "seoi-nage", Name = "Seoi Nage",
+                        Id = 5, UserId = testUser.Id, Version = 1, Active = true, Slug = "seoi-nage", Name = "Seoi Nage",
                         Description = "Shoulder throw", Category = "nage-waza", SubCategory = "te-waza",
                         SetUpAttacks = new List<TechniqueRelationships>
                         {
@@ -153,7 +153,7 @@ namespace JudoLibrary.Api
                     
                     context.Add(new Technique
                     {
-                        Id = 6, Version = 1, Active = true, Slug = "osoto-gari", Name = "Osoto gari",
+                        Id = 6, UserId = testUser.Id, Version = 1, Active = true, Slug = "osoto-gari", Name = "Osoto gari",
                         Description = "Major Outer Reaping",
                         Category = "nage-waza", SubCategory = "ashi-waza",
                         SetUpAttacks = new List<TechniqueRelationships>
@@ -162,11 +162,11 @@ namespace JudoLibrary.Api
                         },
                         FollowUpAttacks = new List<TechniqueRelationships>
                         {
-                            // new TechniqueRelationships {FollowUpAttackId = 1, Active = true}
+                            // new TechniqueRelationships {FollowUpAttackId = 1, Active = true},
                         },
                         Counters = new List<TechniqueCounter>
                         {
-                            // new TechniqueCounter {CounterId = 2, Active = true}
+                            // new TechniqueCounter {CounterId = 2, Active = true},
                         }
                     });
 

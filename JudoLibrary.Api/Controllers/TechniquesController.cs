@@ -7,14 +7,14 @@ using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using JudoLibrary.Models.Moderation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace JudoLibrary.Api.Controllers
 {
-    [ApiController]
     [Route("api/techniques")]
-    public class TechniquesController : ControllerBase
+    public class TechniquesController : ApiController
     {
         private readonly AppDbContext _context;
 
@@ -32,7 +32,8 @@ namespace JudoLibrary.Api.Controllers
             .Include(t => t.SetUpAttacks)
             .Include(t => t.FollowUpAttacks)
             .Include(t => t.Counters)
-            .Select(TechniqueViewModels.Projection)
+            .Include(t => t.User)
+            .Select(TechniqueViewModels.UserProjection)
             .ToList();
 
         // GET -> /api/techniques/{id}
@@ -56,7 +57,11 @@ namespace JudoLibrary.Api.Controllers
 
             // Get the technique from query
             var technique = query
-                .Select(TechniqueViewModels.Projection)
+                .Include(t => t.SetUpAttacks)
+                .Include(t => t.FollowUpAttacks)
+                .Include(t => t.Counters)
+                .Include(t => t.User)
+                .Select(TechniqueViewModels.FullProjection)
                 .FirstOrDefault();
 
             if (technique == null) return NoContent();
@@ -77,6 +82,7 @@ namespace JudoLibrary.Api.Controllers
         // POST -> /api/techniques
         // Create technique, sending json from the body of the request, TechniqueForm is responsible for creating technique
         [HttpPost]
+        [Authorize(Policy = JudoLibraryConstants.Policies.User)]
         public async Task<object> CreateTechnique([FromBody] TechniqueForm techniqueForm)
         {
             // Create Technique, mapping props from trickForm to Technique
@@ -104,7 +110,10 @@ namespace JudoLibrary.Api.Controllers
 
                 Counters = techniqueForm.Counters
                     .Select(counterId => new TechniqueCounter {CounterId = counterId})
-                    .ToList()
+                    .ToList(),
+
+                // UserId is coming from ApiController -> JwtClaimTypes.Subject
+                UserId = UserId
             };
 
             // Add technique to DB
@@ -130,6 +139,7 @@ namespace JudoLibrary.Api.Controllers
 
         // PUT -> /api/techniques
         [HttpPut]
+        [Authorize(Policy = JudoLibraryConstants.Policies.User)]
         public async Task<IActionResult> UpdateTechnique([FromBody] TechniqueForm techniqueForm)
         {
             // Extract existing technique from DB by comparing Id(int)
@@ -164,7 +174,10 @@ namespace JudoLibrary.Api.Controllers
 
                 Counters = techniqueForm.Counters
                     .Select(counterId => new TechniqueCounter {CounterId = counterId})
-                    .ToList()
+                    .ToList(),
+
+                // UserId is coming from ApiController -> JwtClaimTypes.Subject
+                UserId = UserId
             };
 
             // Add newTechnique to DB
@@ -172,15 +185,17 @@ namespace JudoLibrary.Api.Controllers
 
             // Save newTechnique to DB
             await _context.SaveChangesAsync();
-            
+
             // Iterate over techniqueCounters where CounterId which points to specific Technique is equal to Technique Id
             var techniqueCounters = _context.TechniqueCounters.Where(x => x.CounterId == technique.Id);
-            
+
             // Loop over those techniqueCounters
             foreach (var techniqueCounter in techniqueCounters)
             {
+                // Need to separately update TechniqueCounter, so that CounterId points to newTechniques id
                 // Add them to DB, but with updated Technique Id (new technique that we edited)
-                _context.Add(new TechniqueCounter {TechniqueId = techniqueCounter.TechniqueId, CounterId = newTechnique.Id});
+                _context.Add(new TechniqueCounter
+                    {TechniqueId = techniqueCounter.TechniqueId, CounterId = newTechnique.Id});
             }
 
             // Adding this newTechnique to MI -> First need to approve it to be visible
