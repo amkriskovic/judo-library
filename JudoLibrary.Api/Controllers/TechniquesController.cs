@@ -99,15 +99,15 @@ namespace JudoLibrary.Api.Controllers
 
                 // Collections
                 SetUpAttacks = techniqueForm.SetUpAttacks
-                    // saId is collection of int's that's coming from form SetUpAttacks(IE<int>), then we are selecting that int which
-                    // represents SetUpAttack and assigning it to SetUpAttackId 
-                    .Select(saId => new TechniqueRelationships {SetUpAttackId = saId})
+                    // setUpAttackId is pulling values from TechniqueSetupAttack table -> SetUpAttackId prop, and we are
+                    // Selecting that and assigning to SetUpAttacks
+                    // * Assigning to SetUpAttackId value of setUpAttackId that came from [FromBody] when filling form.
+                    // * SetUpAttacks hold value/s then we are selecting them and as above described, mapping them to SetUpAttackId so EF knows what is what
+                    .Select(setUpAttackId => new TechniqueSetupAttack {SetUpAttackId = setUpAttackId})
                     .ToList(),
-
                 FollowUpAttacks = techniqueForm.FollowUpAttacks
-                    .Select(faId => new TechniqueRelationships {FollowUpAttackId = faId})
+                    .Select(followUpAttackId => new TechniqueFollowupAttack {FollowUpAttackId = followUpAttackId})
                     .ToList(),
-
                 Counters = techniqueForm.Counters
                     .Select(counterId => new TechniqueCounter {CounterId = counterId})
                     .ToList(),
@@ -163,15 +163,15 @@ namespace JudoLibrary.Api.Controllers
 
                 // Collections
                 SetUpAttacks = techniqueForm.SetUpAttacks
-                    // saId is collection of int's that's coming from form SetUpAttacks(IE<int>), then we are selecting that int which
-                    // represents SetUpAttack and assigning it to SetUpAttackId 
-                    .Select(saId => new TechniqueRelationships {SetUpAttackId = saId})
+                    // setUpAttackId is pulling values from TechniqueSetupAttack table -> SetUpAttackId prop, and we are
+                    // Selecting that and assigning to SetUpAttacks
+                    // * Assigning to SetUpAttackId value of setUpAttackId that came from [FromBody] when filling form.
+                    // * SetUpAttacks hold value/s then we are selecting them and as above described, mapping them to SetUpAttackId so EF knows what is what
+                    .Select(setUpAttackId => new TechniqueSetupAttack {SetUpAttackId = setUpAttackId})
                     .ToList(),
-
                 FollowUpAttacks = techniqueForm.FollowUpAttacks
-                    .Select(faId => new TechniqueRelationships {FollowUpAttackId = faId})
+                    .Select(followUpAttackId => new TechniqueFollowupAttack {FollowUpAttackId = followUpAttackId})
                     .ToList(),
-
                 Counters = techniqueForm.Counters
                     .Select(counterId => new TechniqueCounter {CounterId = counterId})
                     .ToList(),
@@ -186,14 +186,28 @@ namespace JudoLibrary.Api.Controllers
             // Save newTechnique to DB
             await _context.SaveChangesAsync();
 
-            // Iterate over techniqueCounters where CounterId which points to specific Technique is equal to Technique Id
+            // Iterate over TechniqueSetupAttacks where SetUpAttackId which points to specific Technique is equal to Technique Id
+            var techniqueSetupAttacks = _context.TechniqueSetupAttacks.Where(x => x.SetUpAttackId == technique.Id);
+            var techniqueFollowupAttacks = _context.TechniqueFollowupAttacks.Where(x => x.FollowUpAttackId == technique.Id);
             var techniqueCounters = _context.TechniqueCounters.Where(x => x.CounterId == technique.Id);
+            
+            // Loop over those techniqueSetupAttacks
+            foreach (var techniqueSetupAttack in techniqueSetupAttacks)
+            {
+                // Need to separately update TechniqueSetupAttack, so that SetUpAttackId points to newTechniques id
+                // Add them to DB, but with updated Technique Id (new technique that we edited)
+                _context.Add(new TechniqueSetupAttack
+                    {TechniqueId = techniqueSetupAttack.TechniqueId, SetUpAttackId = newTechnique.Id});
+            }
+            
+            foreach (var techniqueFollowupAttack in techniqueFollowupAttacks)
+            {
+                _context.Add(new TechniqueFollowupAttack
+                    {TechniqueId = techniqueFollowupAttack.TechniqueId, FollowUpAttackId = newTechnique.Id});
+            }
 
-            // Loop over those techniqueCounters
             foreach (var techniqueCounter in techniqueCounters)
             {
-                // Need to separately update TechniqueCounter, so that CounterId points to newTechniques id
-                // Add them to DB, but with updated Technique Id (new technique that we edited)
                 _context.Add(new TechniqueCounter
                     {TechniqueId = techniqueCounter.TechniqueId, CounterId = newTechnique.Id});
             }

@@ -23,12 +23,12 @@ namespace JudoLibrary.Api.ViewModels
                 SetUpAttacks = technique.SetUpAttacks
                     .AsQueryable()
                     .Where(x => x.Active)
-                    .Select(x => x.SetUpAttackId) // Selecting Counters for TechniqueForm
+                    .Select(x => x.SetUpAttackId) 
                     .ToList(),
                 FollowUpAttacks = technique.FollowUpAttacks
                     .AsQueryable()
                     .Where(x => x.Active)
-                    .Select(x => x.FollowUpAttackId) // Selecting Counters for TechniqueForm
+                    .Select(x => x.FollowUpAttackId) 
                     .ToList(),
                 Counters = technique.Counters
                     .AsQueryable()
@@ -52,17 +52,17 @@ namespace JudoLibrary.Api.ViewModels
                 SetUpAttacks = technique.SetUpAttacks
                     .AsQueryable()
                     .Where(x => x.Active)
-                    .Select(x => x.SetUpAttackId) // Selecting Counters for TechniqueForm
+                    .Select(x => x.SetUpAttackId) 
                     .ToList(),
                 FollowUpAttacks = technique.FollowUpAttacks
                     .AsQueryable()
                     .Where(x => x.Active)
-                    .Select(x => x.FollowUpAttackId) // Selecting Counters for TechniqueForm
+                    .Select(x => x.FollowUpAttackId) 
                     .ToList(),
                 Counters = technique.Counters
                     .AsQueryable()
                     .Where(x => x.Active)
-                    .Select(tc => tc.CounterId) // Selecting Counters for TechniqueForm
+                    .Select(tc => tc.CounterId) 
                     .ToList(),
                 User = UserViewModel.CreateFlat(technique.User)
             };
@@ -84,11 +84,11 @@ namespace JudoLibrary.Api.ViewModels
                 technique.Version,
                 SetUpAttacks = technique.SetUpAttacks
                     .AsQueryable()
-                    .Select(x => x.SetUpAttackId) // Selecting Counters for TechniqueForm
+                    .Select(x => x.SetUpAttackId) 
                     .ToList(),
                 FollowUpAttacks = technique.FollowUpAttacks
                     .AsQueryable()
-                    .Select(x => x.FollowUpAttackId) // Selecting Counters for TechniqueForm
+                    .Select(x => x.FollowUpAttackId)
                     .ToList(),
                 Counters = technique.Counters
                     .AsQueryable()

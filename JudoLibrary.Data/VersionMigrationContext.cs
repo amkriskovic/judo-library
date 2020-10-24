@@ -95,26 +95,36 @@ namespace JudoLibrary.Data
                 // If the current version is greater than 0, perform "deactivation" for particular Technique type (context)
                 if (current > 0)
                 {
-                    _ctx.TechniqueRelationships
-                        .Where(x => x.SetUpAttackId == current || x.FollowUpAttackId == current)
+                    _ctx.TechniqueSetupAttacks
+                        .Where(tsa => tsa.SetUpAttackId == current || tsa.TechniqueId == current)
                         .ToList()
-                        .ForEach(x => x.Active = false);
+                        .ForEach(tsa => tsa.Active = false);
+                    
+                    _ctx.TechniqueFollowupAttacks
+                        .Where(tfa => tfa.FollowUpAttackId == current || tfa.TechniqueId == current)
+                        .ToList()
+                        .ForEach(tfa => tfa.Active = false);
                     
                     _ctx.TechniqueCounters
-                        .Where(x => x.CounterId == current || x.TechniqueId == current)
+                        .Where(tc => tc.CounterId == current || tc.TechniqueId == current)
                         .ToList()
-                        .ForEach(x => x.Active = false);
+                        .ForEach(tc => tc.Active = false);
                 }
-
-                _ctx.TechniqueRelationships
-                    .Where(x => x.SetUpAttackId == target || x.FollowUpAttackId == target)
+                
+                _ctx.TechniqueSetupAttacks
+                    .Where(tsa => tsa.SetUpAttackId == target || tsa.TechniqueId == target)
                     .ToList()
-                    .ForEach(x => x.Active = true);
+                    .ForEach(tsa => tsa.Active = true);
+                
+                _ctx.TechniqueFollowupAttacks
+                    .Where(tfa => tfa.FollowUpAttackId == target || tfa.TechniqueId == target)
+                    .ToList()
+                    .ForEach(tfa => tfa.Active = true);
                 
                 _ctx.TechniqueCounters
-                    .Where(x => x.CounterId == target || x.TechniqueId == target)
+                    .Where(tc => tc.CounterId == target || tc.TechniqueId == target)
                     .ToList()
-                    .ForEach(x => x.Active = true);
+                    .ForEach(tc => tc.Active = true);
             }
             else
             {
