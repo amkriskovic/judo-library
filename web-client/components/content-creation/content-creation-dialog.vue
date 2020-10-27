@@ -37,7 +37,7 @@
 </template>
 
 <script>
-  import {mapState, mapMutations, mapActions} from "vuex";
+import {mapState, mapMutations, mapActions, mapGetters} from "vuex";
   import TechniquesSteps from "./techniques-steps";
   import SubmissionSteps from "./submission-steps";
   import CategoryForm from "./category-form";
@@ -53,16 +53,19 @@
     // Mapping state for video-upload store | computed === state
     computed: {
       ...mapState("video-upload", ["active", "component"]),
+      ...mapGetters("auth", ["moderator"]),
+
 
       // Binding out components to menu items
       menuItems() {
         return [
-          // Returns array of objects, Affects component order
-          {component: TechniquesSteps, title: "Technique"},
-          {component: SubmissionSteps, title: "Submission"},
-          {component: CategoryForm, title: "Category"},
-          {component: SubcategoryForm, title: "Sub-Category"},
-        ]
+          // Returns array of objects, Affects component order,
+          // Only Mod's will be able to create Category,Sub-Category of Technique
+          {component: TechniquesSteps, title: "Technique", display: true},
+          {component: SubmissionSteps, title: "Submission", display: true},
+          {component: CategoryForm, title: "Category", display: this.moderator},
+          {component: SubcategoryForm, title: "Sub-Category", display: this.moderator},
+        ].filter(x => x.display)
       }
     },
 

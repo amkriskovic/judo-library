@@ -6,7 +6,8 @@ const initState = () => ({
   active: false,
   component: null,
   editing: false,
-  editPayload: null
+  editPayload: null,
+  setup: null
 })
 
 // Export initState function as constant state
@@ -17,7 +18,7 @@ export const mutations = {
 
   // Get's stepper based on action that we wanna perform, create technique or upload submission, passing component as payload
   // Which will be activated once we select it from menu/dropdown
-  activate(state, {component, edit = false, editPayload = null}) {
+  activate(state, {component, edit = false, editPayload = null, setup = null}) {
     state.active = true;
     state.component = component;
 
@@ -26,6 +27,11 @@ export const mutations = {
       // Set the state of editing to true, & editPayload
       state.editing = true;
       state.editPayload = editPayload;
+    }
+
+    // If there is setup
+    if (setup) {
+      state.setup = setup
     }
   },
 

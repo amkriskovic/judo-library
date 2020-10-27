@@ -26,27 +26,43 @@
 
     <v-divider class="mb-2"></v-divider>
 
-    <!-- Technique Edit Button -->
-    <div>
-      <!-- We run edit func first, then close func 2nd -->
-      <v-btn outlined small @click="edit(); close()">Edit</v-btn>
-    </div>
+    <if-auth>
+      <!-- If we are authenticated => allowed -->
+      <template v-slot:allowed>
+        <div>
+          <!-- We run edit func first, then close func 2nd -->
+          <v-btn outlined small @click="edit(); close()">Edit</v-btn>
+          <v-btn outlined small @click="upload(); close()">Upload</v-btn>
+        </div>
+      </template>
+
+      <!-- If we are not authenticated => forbidden -->
+      <template v-slot:forbidden="{login}">
+        <v-btn small outlined @click="login">
+          Log in to edit/update
+        </v-btn>
+      </template>
+    </if-auth>
 
     <v-divider class="mt-2"></v-divider>
 
     <!-- Injecting user-header component for displaying User info -->
-    <user-header :username="technique.user.username" :image-url="technique.user.image" append="Edited by" reverse/>
+    <user-header :username="technique.user.username" :image-url="technique.user.image"
+                 :append="technique.version === 1 ? `Created by` : `Edited by`"
+                 reverse/>
   </div>
 </template>
 
 <script>
 import {mapMutations, mapState} from "vuex";
 import TechniqueSteps from "@/components/content-creation/techniques-steps";
+import SubmissionSteps from "@/components/content-creation/submission-steps";
 import UserHeader from "@/components/user-header";
+import IfAuth from "@/components/auth/if-auth";
 
 export default {
   name: "technique-info-card",
-  components: {UserHeader},
+  components: {IfAuth, UserHeader, SubmissionSteps},
   props: {
     technique: {
       required: true,
@@ -69,6 +85,15 @@ export default {
       // Invoke activate mutation from video-upload store
       // Passing TechniqueSteps as component, set edit as true, and editPayload as this technique => page data/local state
       this.activate({component: TechniqueSteps, edit: true, editPayload: this.technique})
+    },
+
+    // Method for uploading Technique => Submission
+    upload() {
+      // Invoke activate mutation from video-upload store
+      this.activate({
+        component: SubmissionSteps,
+        setup: (form) => form.techniqueId = this.technique.slug
+      })
     }
   },
 

@@ -83,6 +83,7 @@
   // Resolves endpoint based on type it's passed, @ =>> root of web-client
   import CommentSection from "@/components/comments/comment-section";
   import TechniqueInfoCard from "@/components/technique-info-card";
+  import {guard, GUARD_LEVEL} from "@/components/auth/auth-mixins";
 
   // Produce the endpoint based on url type parameter, e.g. techniques
   const endpointResolver = (type) => {
@@ -127,6 +128,9 @@
 
   export default {
     components: {TechniqueInfoCard, CommentSection},
+
+    mixins: [guard(GUARD_LEVEL.AUTH)],
+
     // Local state
     data: () => ({
       target: null,

@@ -46,7 +46,8 @@
             <!-- # Dropdown for selecting technique -->
             <!-- Step 2, Vuetify component for selecting technique from dropdown, on click goes to next step -->
             <!-- Binds selected technique to techniqueId which lives in local form state -->
-            <v-select :items="techniqueItems" v-model="form.techniqueId" label="Select Technique"></v-select>
+            <v-select :items="lists.techniques.map(t => ({value: t.slug, text: t.name}))" v-model="form.techniqueId"
+                      label="Select Technique"></v-select>
 
             <!-- Button -->
             <div class="d-flex justify-center">
@@ -79,61 +80,65 @@
 </template>
 
 <script>
-  import {mapGetters, mapActions, mapMutations} from "vuex";
-  import {close} from "./_shared";
+import {mapActions, mapMutations, mapState} from "vuex";
+import {close, form} from "@/components/content-creation/_shared";
 
-  export default {
-    // Component name
-    name: "submission-steps",
+export default {
+  // Component name
+  name: "submission-steps",
 
-    // Data is referencing initState function which holds local state of component -> this.$data
-    data: () => ({
-      step: 1,
-      form: {
-        techniqueId: "",
-        video: "",
-        description: ""
-      }
-    }),
+  mixins: [
+    close,
 
-    mixins: [close],
+    // This is the form that we are gonna be appending in case of upload
+    form(() => ({
+      techniqueId: "",
+      video: "",
+      description: ""
+    }))
+  ],
 
-    computed: mapGetters("techniques", ["techniqueItems"]),
+  // Data is referencing initState function which holds local state of component -> this.$data
+  data: () => ({
+    step: 1,
+  }),
 
-    methods: {
-      ...mapMutations("video-upload", ["hide"]),
-      ...mapActions("video-upload", ["startVideoUpload", "createSubmission"]),
+  computed: mapState("techniques", ["lists"]),
 
-      // Handling file for upload <- saving video | #1
-      async handleFile(file) {
-        // If there is no file, return <- undefined
-        if (!file) return;
+  methods: {
+    ...mapMutations("video-upload", ["hide"]),
+    ...mapActions("video-upload", ["startVideoUpload", "createSubmission"]),
 
-        // Create dynamic form for step 1
-        const form = new FormData();
+    // Handling file for upload <- saving video | #1
+    async handleFile(file) {
+      // If there is no file, return <- undefined
+      if (!file) return;
 
-        // Append to form name="video" and actual data, which is video file | name="video" value=file
-        form.append("video", file);
+      // Create dynamic form for step 1
+      const form = new FormData();
 
-        // Invoke video uploading after creating form, by passing that form(FormData) which contains only video information
-        this.startVideoUpload({form});
+      // Append to form name="video" and actual data, which is video file | name="video" value=file
+      form.append("video", file);
 
-        // Increment step by 1
-        this.step++;
-      },
+      // Invoke video uploading after creating form, by passing that form(FormData) which contains only video information
+      this.startVideoUpload({form});
 
-      // Saving technique | #2
-      save() {
-        // Invoke createSubmission action with payload of form object, which is in our local component state
-        this.createSubmission({form: this.form});
+      // Increment step by 1
+      this.step++;
+    },
 
-        // Hides whatever stepper(component) was active <- dropping
-        this.hide();
-      }
+    // Saving technique | #2
+    save() {
+      // Invoke createSubmission action with payload of form object, which is in our local component state
+      this.createSubmission({form: this.form});
 
+      // Hides whatever stepper(component) was active <- dropping
+      this.hide();
     }
 
   }
+
+}
 </script>
 
 <style scoped>

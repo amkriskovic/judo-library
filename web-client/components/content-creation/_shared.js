@@ -1,6 +1,6 @@
 ﻿// * Mixin for shared functionality * //
 
-import {mapActions} from 'vuex';
+import {mapActions, mapState} from 'vuex';
 
 export const close = {
   methods: {
@@ -12,3 +12,21 @@ export const close = {
     }
   }
 }
+
+
+export const form = (formFactory) => ({
+  data: () => ({
+    // Execute formFactory and assign it to form prop in form function => acts like generic
+    form: formFactory()
+  }),
+
+  created: function() {
+    // Call this setup which comes from video-upload, with this form that's generated with formFactory
+    this.setup(this.form)
+  },
+
+  computed: {
+    ...mapState("video-upload", ["setup"])
+  }
+})
+
