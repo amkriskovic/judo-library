@@ -32,7 +32,7 @@ namespace JudoLibrary.Api.Controllers
                 .ToList();
 
         // POST -> /api/comments/{id}/replies
-        // Create reply for particular comment => base comment =>> {id} is base comment
+        // Created reply for particular comment => base comment =>> {id} is base comment
         [HttpPost("{id}/replies")]
         public async Task<IActionResult> CreateReplyForComment(int id, [FromBody] Comment reply)
         {
@@ -46,7 +46,7 @@ namespace JudoLibrary.Api.Controllers
                 return NoContent();
             }
             
-            // Create regex
+            // Created regex
             var regex = new Regex(@"\B(?<tag>@[a-zA-Z0-9-_]+)");
 
             // Assign original reply content that's being processed via LINQ, to Html reply content

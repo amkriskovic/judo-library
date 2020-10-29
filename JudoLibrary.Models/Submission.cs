@@ -1,4 +1,6 @@
-﻿using JudoLibrary.Models.Abstractions;
+﻿using System;
+using System.Collections.Generic;
+using JudoLibrary.Models.Abstractions;
 
 namespace JudoLibrary.Models
 {
@@ -12,5 +14,9 @@ namespace JudoLibrary.Models
         
         public string UserId { get; set; } // Submission can have One User
         public User User { get; set; } // Navigation prop
+        
+        public DateTime Created { get; set; } = DateTime.UtcNow;
+
+        public IList<SubmissionVote> UpVotes { get; set; } = new List<SubmissionVote>();
     }
 }

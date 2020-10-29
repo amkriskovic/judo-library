@@ -7,6 +7,14 @@
     <!-- * Getting specific videos from submissions store |> state => fetchSubmissionsForTechnique filling state -->
     <video-player :video="submission.video" :thumb="submission.thumb"/>
 
+    <v-card-text class="d-flex justify-center">
+      <span>{{submission.upVotes}}</span>
+
+      <v-spacer/>
+
+      <span>{{submission.created}}</span>
+    </v-card-text>
+
     <v-card-text>{{ submission.description }}</v-card-text>
   </v-card>
 </template>

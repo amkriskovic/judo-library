@@ -48,7 +48,7 @@ namespace JudoLibrary.Api.Controllers
                 return BadRequest();
             }
             
-            // Create new Submission
+            // Created new Submission
             var submission = new Submission
             {
                 // Grab the input fields from submission form / content creation

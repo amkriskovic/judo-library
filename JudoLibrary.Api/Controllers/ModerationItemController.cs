@@ -50,7 +50,7 @@ namespace JudoLibrary.Api.Controllers
                 .ToList();
         
         // POST -> /api/moderation-items/{id}/comments
-        // Create comment for particular moderation modItem
+        // Created comment for particular moderation modItem
         // Passing id from url, and from body -> comment
         [HttpPost("{id}/comments")]
         public async Task<IActionResult> CreateCommentForModerationItem(int id, [FromBody] Comment comment)
@@ -105,7 +105,7 @@ namespace JudoLibrary.Api.Controllers
                 .ToList();
         
         // POST -> /api/moderation-items/{id}/reviews
-        // Create review for particular moderation modItem
+        // Created review for particular moderation modItem
         // Passing id from url, and from body -> review 
         [HttpPost("{id}/reviews")]
         public async Task<IActionResult> CreateReviewForModerationItem(
@@ -126,7 +126,7 @@ namespace JudoLibrary.Api.Controllers
             if (modItem.Deleted)
                 return BadRequest("Moderation item no longer exists!");
             
-            // Create new Review for this particular MI
+            // Created new Review for this particular MI
             var review = new Review
             {
                 // Assign moderation-item - {id} (That's passed in) to Review's ModerationItemId

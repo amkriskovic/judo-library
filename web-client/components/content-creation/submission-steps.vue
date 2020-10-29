@@ -107,7 +107,7 @@ export default {
 
   methods: {
     ...mapMutations("video-upload", ["hide"]),
-    ...mapActions("video-upload", ["startVideoUpload", "createSubmission"]),
+    ...mapActions("video-upload", ["startVideoUpload"]),
 
     // Handling file for upload <- saving video | #1
     async handleFile(file) {
@@ -129,8 +129,8 @@ export default {
 
     // Saving technique | #2
     save() {
-      // Invoke createSubmission action with payload of form object, which is in our local component state
-      this.createSubmission({form: this.form});
+      // Make POST request to submissions(creating), with payload of form
+      this.$axios.$post("/api/submissions", this.form);
 
       // Hides whatever stepper(component) was active <- dropping
       this.hide();

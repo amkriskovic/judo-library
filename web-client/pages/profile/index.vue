@@ -1,8 +1,8 @@
 ﻿<template>
   <item-content-layout>
     <template v-slot:content>
-      <!-- Injecting submission component -> passing submission as prop from looped collection of submissions -->
-      <submission :submission="submission" v-for="submission in submissions" :key="`submission-${submission.id}`"/>
+      <!-- Injecting submission-feed component -->
+      <submission-feed :load-submissions="loadSubmissions"/>
     </template>
 
     <template v-slot:item>
@@ -20,8 +20,7 @@
               </v-btn>
 
               <!-- Make use of videos controller method for getting the profile image-->
-              <img v-else-if="profile.image" :src="profile.image"
-                   alt="profile image"/>
+              <img v-else-if="profile.image" :src="profile.image" alt="profile image"/>
 
               <v-icon v-else>mdi-account</v-icon>
             </v-avatar>
@@ -38,9 +37,10 @@ import ItemContentLayout from "@/components/item-content-layout";
 import {mapMutations, mapState} from "vuex";
 import Submission from "@/components/submission";
 import {guard, GUARD_LEVEL} from "@/components/auth/auth-mixins";
+import SubmissionFeed from "@/components/submission-feed";
 
 export default {
-  components: {Submission, ItemContentLayout},
+  components: {SubmissionFeed, Submission, ItemContentLayout},
 
   mixins: [guard(GUARD_LEVEL.AUTH)],
 
@@ -52,23 +52,12 @@ export default {
     uploadingImage: false
   }),
 
-  // Called when DOM is rendered and reactive
-  async mounted() {
-    // Trigger _watchUserLoaded watcher which will try to synchronize, our store with client
-    // * Payload -> action => kick off =>> this function/action should be executed only after loading is finished
-    return this.$store.dispatch("auth/_watchUserLoaded", async () => {
-
-      // Grabbing profile from auth.js state
-      const profile = this.$store.state.auth.profile
-
-      console.log('mounted profile:: ', profile)
-
-      // Make HTTP GET req to our users controller which will return list of submissions based on profile id
-      this.submissions = await this.$axios.$get(`/api/users/${profile.id}/submissions`)
-    })
-  },
-
   methods: {
+    loadSubmissions(query) {
+      const profileId = this.$store.state.auth.profile.id
+      return this.$axios.$get(`/api/users/${profileId}/submissions${query}`)
+    },
+
     // On changing profile image
     changeProfileImage(e) {
       // If uploadingImage is true (false initial value), return

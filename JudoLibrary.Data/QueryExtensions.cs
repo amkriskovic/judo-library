@@ -1,16 +1,26 @@
-﻿using System.Linq;
-using JudoLibrary.Models.Abstractions;
+﻿using System;
+using System.Linq;
+using System.Linq.Expressions;
+using JudoLibrary.Models;
 
 namespace JudoLibrary.Data
 {
     public static class QueryExtensions
     {
-        // This IQueryable is working for VersionedModel class =>> where, returns maximum version which is Int
-        // Specifying offset which is used to bump up the version
-        public static int LatestVersion<TSource>(this IQueryable<TSource> source, int offset = 0)
-            where TSource : VersionedModel
+        public static IQueryable<Submission> PickSubmissions(this IQueryable<Submission> source, string order, int cursor)
         {
-            return source.Max(x => x.Version) + offset;
+            // Exp, takes Submission return object, switching based on passed order string
+            Expression<Func<Submission, object>> orderBySelector = order switch
+            {
+                "latest" => submission => submission.Created,
+                "top" => submission => submission.UpVotes.Count,
+                _ => _ => 1,
+            };
+
+            return source
+                .OrderByDescending(orderBySelector)
+                .Skip(cursor) // Skip (0)
+                .Take(10); // Take 10 of the items per page
         }
     }
 }

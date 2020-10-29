@@ -108,7 +108,7 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
                         throw new Exception("FFMPEG failed to generate thumbnail for a video!");
                     }
 
-                    // Create scope, after using is finished, we get disposed of service that we injected
+                    // Created scope, after using is finished, we get disposed of service that we injected
                     using (var scope = _serviceProvider.CreateScope())
                     {
                         // Get AppDbContext from scope

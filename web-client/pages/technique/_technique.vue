@@ -4,8 +4,8 @@
   <item-content-layout>
     <!-- Template for Content-->
     <template v-slot:content>
-      <!-- Injecting submission component -> passing submission as prop from looped collection of submissions -->
-      <submission :submission="submission" v-for="submission in submissions" :key="`submission-${submission.id}`"/>
+      <!-- Injecting submission feed component which will take care for loading content feed -->
+      <submission-feed :load-submissions="loadSubmissions"/>
     </template>
 
     <!-- Template for Item(card) -->
@@ -23,35 +23,30 @@
 <script>
 import {mapState, mapMutations} from "vuex";
 import ItemContentLayout from "../../components/item-content-layout";
-import TechniqueSteps from "../../components/content-creation/techniques-steps"
 import Submission from "@/components/submission";
 import TechniqueInfoCard from "@/components/technique-info-card";
+import SubmissionFeed from "@/components/submission-feed";
 
 export default {
-  components: {TechniqueInfoCard, Submission, ItemContentLayout},
-  // Page local state
-  data: () => ({
-    technique: null,
-  }),
+  components: {SubmissionFeed, TechniqueInfoCard, Submission, ItemContentLayout},
 
   // Map state for submissions and techniques, mapping getters for returning technique by id
   computed: {
-    ...mapState("submissions", ["submissions"]),
-
     // Importing dictionary from initial state of techniques store => for particular technique we use dict => indexing
     ...mapState("techniques", ["dictionary"]),
+
+    technique() {
+      // Getting techniqueId from URL param
+      // Assigning particular grabbed technique slug after /technique/... from url -> id to pages local state technique
+      return this.dictionary.techniques[this.$route.params.technique]
+    }
   },
 
-  // Pre-fetching data asynchronously for this particular page
-  async fetch() {
-    // Getting techniqueId from URL param
-    const techniqueSlug = this.$route.params.technique
-
-    // Assigning particular grabbed technique slug after /technique/... from url -> id to pages local state technique
-    this.technique = this.dictionary.techniques[techniqueSlug]
-
-    // dispatching fetchSubmissionsForTechnique action from submissions store, passing techniqueId as argument
-    await this.$store.dispatch("submissions/fetchSubmissionsForTechnique", {techniqueId: techniqueSlug}, {root: true}); // Dispatch action as root
+  methods: {
+    loadSubmissions(query) {
+      // Loading submissions for particular technique based on Slug from technique(), passing query
+      return this.$axios.$get(`/api/techniques/${this.technique.slug}/submissions${query}`)
+    }
   },
 
   // Setting via head method the HTML Head tags for the current page.

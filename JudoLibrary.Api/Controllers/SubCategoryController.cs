@@ -36,11 +36,11 @@ namespace JudoLibrary.Api.Controllers
             .ToList();
         
         // POST -> /api/subcategories
-        // Create category, sending json from the body of the request
+        // Created category, sending json from the body of the request
         [HttpPost]
         public async Task<SubCategory> CreateSubCategory([FromBody] SubCategory subCategory)
         {
-            // Create SubCategory -> Id | based on SubCategory -> Name | ' ' -> '-' ==> slug
+            // Created SubCategory -> Id | based on SubCategory -> Name | ' ' -> '-' ==> slug
             subCategory.Id = subCategory.Name.Replace(" ", "-").ToLowerInvariant();
             
             // Add SubCategory to DB

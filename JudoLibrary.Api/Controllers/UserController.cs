@@ -71,12 +71,13 @@ namespace JudoLibrary.Api.Controllers
 
         // Getting a Submissions for particular User based on User id
         [HttpGet("{id}/submissions")]
-        public Task<List<object>> GetUserSubmissions(string id)
+        public Task<List<object>> GetUserSubmissions(string id, string order, int cursor)
         {
             return _ctx.Submissions
                 .Include(s => s.Video)
                 .Include(s => s.User)
                 .Where(s => s.UserId.Equals(id))
+                .PickSubmissions(order, cursor)
                 .Select(SubmissionViewModels.Projection)
                 .ToListAsync();
         }
@@ -100,7 +101,7 @@ namespace JudoLibrary.Api.Controllers
             // Generate profile picture file name
             var fileName = JudoLibraryConstants.Files.GenerateProfileFileName();
 
-            // Create a IO File => provide temporary save path based on fileName
+            // Created a IO File => provide temporary save path based on fileName
             await using (var stream = System.IO.File.Create(fileManager.GetSavePath(fileName)))
             {
                 // Input stream -> IFF -> image -> open the input stream -> write

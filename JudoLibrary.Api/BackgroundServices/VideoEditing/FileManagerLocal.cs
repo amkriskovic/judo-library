@@ -71,7 +71,7 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
         // Returns bool -> checks if temporary file exists in working dir path
         public bool TemporaryFileExists(string fileName)
         {
-            // Create temporary save path based on file name
+            // Created temporary save path based on file name
             var path = TemporarySavePath(fileName);
 
             // Return true if file is in provided path
@@ -81,7 +81,7 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
         // Deletes temporary file in path based on provided file name
         public void DeleteTemporaryFileInPath(string fileName)
         {
-            // Create temporary save path based on file name
+            // Created temporary save path based on file name
             var path = TemporarySavePath(fileName);
 
             // If file exists in path
@@ -107,11 +107,11 @@ namespace JudoLibrary.Api.BackgroundServices.VideoEditing
             // getting extension from video file name, example: .mp4, .mpeg
             var fileName = string.Concat(TempPrefix, DateTime.Now.Ticks, Path.GetExtension(video.FileName));
 
-            // Create temp save path based on video name
+            // Created temp save path based on video name
             var savePath = TemporarySavePath(fileName);
 
             // Use File Stream where we provide save path <- where to save video, create, and write
-            // FileMode.Create specifies that the operating system should create a new file
+            // FileMode.Created specifies that the operating system should create a new file
             // FileAccess.Write specifies that data can be written to the file
             await using (var fileStream = new FileStream(savePath, FileMode.Create, FileAccess.Write))
             {

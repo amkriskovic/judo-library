@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using JudoLibrary.Api.Form;
 using JudoLibrary.Api.ViewModels;
@@ -71,24 +72,29 @@ namespace JudoLibrary.Api.Controllers
 
         // GET -> /api/techniques/{techniqueId}/submissions
         // Get all submissions for particular technique | Passing technique Id as param | Including videos for technique
+        // Passing order which indicates (top, latest...) & cursor which determines how much we take per page
         [HttpGet("{techniqueId}/submissions")]
-        public object GetAllSubmissionsForTechnique(string techniqueId) => _context.Submissions
-            .Include(s => s.Video)
-            .Include(s => s.User)
-            .Where(s => s.TechniqueId.Equals(techniqueId))
-            .Select(SubmissionViewModels.Projection)
-            .ToList();
-
+        public object GetAllSubmissionsForTechnique(string techniqueId, string order, int cursor)
+        {
+            return _context.Submissions
+                .Include(s => s.Video)
+                .Include(s => s.User)
+                .Where(s => s.TechniqueId.Equals(techniqueId))
+                .PickSubmissions(order, cursor) // QueryExtension
+                .Select(SubmissionViewModels.Projection)
+                .ToList();
+        }
+        
         // POST -> /api/techniques
-        // Create technique, sending json from the body of the request, TechniqueForm is responsible for creating technique
+        // Created technique, sending json from the body of the request, TechniqueForm is responsible for creating technique
         [HttpPost]
         [Authorize(Policy = JudoLibraryConstants.Policies.User)]
         public async Task<object> CreateTechnique([FromBody] TechniqueForm techniqueForm)
         {
-            // Create Technique, mapping props from trickForm to Technique
+            // Created Technique, mapping props from trickForm to Technique
             var technique = new Technique
             {
-                // Create TechniqueForm -> Slug | based on TechniqueForm -> Name | ' ' -> '-' ==> slug
+                // Created TechniqueForm -> Slug | based on TechniqueForm -> Name | ' ' -> '-' ==> slug
                 Slug = techniqueForm.Name.Replace(" ", "-").ToLowerInvariant(),
                 Name = techniqueForm.Name,
                 Version = 1,
@@ -133,7 +139,7 @@ namespace JudoLibrary.Api.Controllers
             // Save ModerationItem to DB
             await _context.SaveChangesAsync();
 
-            // Invoke delegate Create which is our ViewModel then return ViewModel
+            // Invoke delegate Created which is our ViewModel then return ViewModel
             return TechniqueViewModels.Create(technique);
         }
 

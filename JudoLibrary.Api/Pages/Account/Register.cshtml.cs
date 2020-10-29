@@ -37,7 +37,7 @@ namespace JudoLibrary.Api.Pages.Account
             if (!ModelState.IsValid)
                 return Page();
             
-            // Create a User, with Username -> what he typed in the form
+            // Created a User, with Username -> what he typed in the form
             var user = new IdentityUser(Form.Username)
             {
                 // Adding email from form to user object as-well

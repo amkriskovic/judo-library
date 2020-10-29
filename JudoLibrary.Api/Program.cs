@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Security.Claims;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
@@ -27,15 +29,28 @@ namespace JudoLibrary.Api
                 // If Environment is Development seed Combines data
                 if (environment.IsDevelopment())
                 {
+                    var fakeCounter = 20;
+                    
                     // * Identity seeding part -> we need Users to exist before submission coz they relate to them
                     // Get user manager service
                     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
-                    // Create a test User
+                    // Created a test User
                     var testUser = new IdentityUser("test") {Email = "test@test.com"};
                     userManager.CreateAsync(testUser, "password").GetAwaiter().GetResult();
+                    
+                    // Creating(Blueprinting) fake users based on counter above
+                    var fakeUsers = Enumerable.Range(0, fakeCounter)
+                        .Select(i => new IdentityUser($"fake{i}") {Email = $"fake{i}@test.com"})
+                        .ToList();
 
-                    // Create a mod
+                    // Loop over fake users and seed them
+                    foreach (var fakeUser in fakeUsers)
+                    {
+                        userManager.CreateAsync(fakeUser, "password").GetAwaiter().GetResult();
+                    }
+
+                    // Created a mod
                     var mod = new IdentityUser("mod") {Email = "mod@test.com"};
                     userManager.CreateAsync(mod, "password").GetAwaiter().GetResult();
                     // Adds the specified claim to the user(Mod) with providing claim type and value that we specified in
@@ -205,6 +220,35 @@ namespace JudoLibrary.Api
                     });
 
                     // Saving changes to in-memory DB
+                    context.SaveChanges();
+
+                    // Created fakeCounter amount of fake submissions
+                    for (int i = 1; i <= fakeCounter; i++)
+                    {
+                        context.Add(new Submission
+                        {
+                            TechniqueId = "osoto-gari",
+                            Description = $"Fake submission {i}",
+                            Video = new Video
+                            {
+                                ThumbLink = "https://localhost:5001/api/files/image/osoto.jpg",
+                                VideoLink = "https://localhost:5001/api/files/video/osoto.mp4"
+                            },
+                            VideoProcessed = true,
+                            UserId = testUser.Id,
+
+                            Created = DateTime.UtcNow.AddDays(-i),
+                            UpVotes = Enumerable
+                                .Range(0, i)
+                                .Select(ii => new SubmissionVote
+                                {
+                                    UserId = fakeUsers[ii].Id,
+                                })
+                                .ToList()
+                        }); 
+                    }
+                    
+                    // Save fake Submissions to DB
                     context.SaveChanges();
                 }
             }

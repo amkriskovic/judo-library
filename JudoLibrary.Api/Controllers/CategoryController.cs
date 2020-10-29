@@ -46,11 +46,11 @@ namespace JudoLibrary.Api.Controllers
                 .ToList();
         
         // POST -> /api/categories
-        // Create category, sending json from the body of the request
+        // Created category, sending json from the body of the request
         [HttpPost]
         public async Task<Category> CreateCategory([FromBody] Category category)
         {
-            // Create Category -> Id, replacing white spaces with dashes, to lower ==> slug
+            // Created Category -> Id, replacing white spaces with dashes, to lower ==> slug
             category.Id = category.Name.Replace(" ", "-").ToLowerInvariant();
             
             // Add category to DB

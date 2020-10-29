@@ -153,7 +153,7 @@ namespace JudoLibrary.Api
             // * 
 
             // * Identity Server layer (IS4)
-            // Create identity server builder -> adding to services
+            // Created identity server builder -> adding to services
             var identityServiceBuilder = services.AddIdentityServer();
 
             // # We need to hook up IS4 with Identity(.NET Core), provide IdentityUser

@@ -6,7 +6,7 @@ namespace JudoLibrary.Api.ViewModels
 {
     public static class SubmissionViewModels
     {
-        public static readonly Func<Submission, object> Create = Projection.Compile();
+        public static readonly Func<Submission, object> Created = Projection.Compile();
 
         public static Expression<Func<Submission, object>> Projection =>
             submission => new
@@ -15,6 +15,10 @@ namespace JudoLibrary.Api.ViewModels
                 submission.Description,
                 Thumb = submission.Video.ThumbLink,
                 Video = submission.Video.VideoLink,
+                Created = submission.Created
+                    .ToLocalTime()
+                    .ToString("HH:mm dd/MM/yyyy"),
+                UpVotes = submission.UpVotes.Count,
                 User = new
                 {
                     submission.User.Image,
