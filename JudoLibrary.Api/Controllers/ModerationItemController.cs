@@ -48,53 +48,7 @@ namespace JudoLibrary.Api.Controllers
                 .Where(c => c.ModerationItemId.Equals(id))
                 .Select(CommentViewModel.Projection)
                 .ToList();
-        
-        // POST -> /api/moderation-items/{id}/comments
-        // Created comment for particular moderation modItem
-        // Passing id from url, and from body -> comment
-        [HttpPost("{id}/comments")]
-        public async Task<IActionResult> CreateCommentForModerationItem(int id, [FromBody] Comment comment)
-        {
-            // If moderationItem doesnt exist -> we dont have anything to moderate
-            if (!_ctx.ModerationItems.Any(mi => mi.Id.Equals(id)))
-                return NoContent();
-            
-            // First group starts with 2nd @ symbol, \B -> non word boundary => means as soon it tied to some word without space, it
-            // will ignore it. Allowing lower & upper case characters, numbers, dash and underscore, + -> one or more from collection
-            // that is specified in ([]), ?<tag> is used to name group => (), used as reference to a group when we want to find that
-            // particular regex group
-            var regex = new Regex(@"\B(?<tag>@[a-zA-Z0-9-_]+)");
 
-            // Assign original comment content that's being processed via LINQ, to Html comment content
-            comment.HtmlContent = regex
-                // This is what we want to match -> plain comment
-                .Matches(comment.Content)
-                // We start with comment.Content as initial value, 2nd param is func that takes string, which is original comment content
-                // and match parameter which gives us Match options
-                .Aggregate(comment.Content, (content, match) =>
-                {
-                    // Extract from regex <tag> group and grab the value => string
-                    var tag = match.Groups["tag"].Value;
-
-                    // Replacing matched regex tag which is a string, with link, so we have navigation, taggable/linkable ?user?
-                    // And return that as content, which becomes link
-                    return content.Replace(tag, $"<a href=\"{tag}-user-link\">{tag}</a>");
-                });
-
-            
-            // Assign id from moderation item that we moderating to comment's moderation item id
-            comment.ModerationItemId = id;
-            
-            // Add comment to particular moderation modItem that we found by id, to list of comments
-            _ctx.Add(comment);
-            
-            // Save changes to DB
-            await _ctx.SaveChangesAsync();
-            
-            // Return Ok response with created comment
-            return Ok(CommentViewModel.Create(comment));
-        }
-        
         // GET -> /api/moderation-items/{id}/reviews
         // Listing reviews for particular moderation item(id)
         [HttpGet("{id}/reviews")]

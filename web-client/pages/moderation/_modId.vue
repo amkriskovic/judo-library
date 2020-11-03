@@ -1,6 +1,6 @@
 ﻿<template>
   <div>
-    <v-row>
+    <v-row v-if="modItem">
       <!-- * Comment section part -->
       <v-col cols="8">
         <v-row justify="center">
@@ -15,10 +15,7 @@
           </v-col>
         </v-row>
 
-        <!-- Injecting comment section component, dyn binding comments so we can display them, hooking sendComment event -->
-        <!-- This is the place where moderator creates comment, and place where all replies are created aswell -->
-        <!-- :comments is coming from comment-section prop -->
-        <comment-section :comments="comments" @send="sendComment"/>
+        <comment-section :parent-id="modItem.id" :parent-type="moderationItemParentType"/>
       </v-col>
 
       <!-- * Review section part -->
@@ -84,6 +81,7 @@
   import CommentSection from "@/components/comments/comment-section";
   import TechniqueInfoCard from "@/components/technique-info-card";
   import {guard, GUARD_LEVEL} from "@/components/auth/auth-mixins";
+  import {COMMENT_PARENT_TYPE} from "@/components/comments/_shared";
 
   // Produce the endpoint based on url type parameter, e.g. techniques
   const endpointResolver = (type) => {
@@ -135,10 +133,8 @@
     data: () => ({
       target: null,
       current: null,
-      comments: [],
-      reviews: [],
+      modItem: null,
       reviewComment: "",
-      parentCommentId: 0
     }),
 
     // Every time you need to get asynchronous data. fetch is called on server-side when rendering the route, and on client-side when navigating.
@@ -148,27 +144,23 @@
       const {modId} = this.$route.params
 
       // Getting moderation item via GET req., passing modId from URL params
-      const modItem = await this.$axios.$get(`/api/moderation-items/${modId}`)
+      this.modItem = await this.$axios.$get(`/api/moderation-items/${modId}`)
 
-      // Extract the comments from modItem and assign to page local state
-      this.comments = modItem.comments
-
-      // Extract the reviews from modItem and assign to page local state
-      this.reviews = modItem.reviews
+      const {type, current, target} = this.modItem
 
       // Produce the endpoint based on url type parameter, e.g. techniques => extract the type from modItem
-      const endpoint = endpointResolver(modItem.type)
+      const endpoint = endpointResolver(type)
 
       // Assign endpoint to the item in local state
       // Get dynamic API controller => response - data, based on URL parameters that we extracted
       // * Provide current from modItem which is int => current version of item we editing =>> CURRENT
-      this.$axios.$get(`/api/${endpoint}/${modItem.current}`)
+      this.$axios.$get(`/api/${endpoint}/${current}`)
         // Fire and forget
         // Then assign item(curr) that came from GET req. to local state item -> current
         .then(currItem => this.current = currItem)
 
       // * Make GET req to get the target(next) version =>> TARGET
-      this.$axios.$get(`api/${endpoint}/${modItem.target}`)
+      this.$axios.$get(`api/${endpoint}/${target}`)
         // Fire and forget
         // Then assign item(targetItem) that came from GET req. to local state item
         .then(targetItem => this.target = targetItem)
@@ -195,6 +187,14 @@
       // If target(next) - current is less than or equal to zero -> it's outdated
       outdated() {
         return this.current && this.target && this.target.version - this.current.version <= 0
+      },
+
+      reviews() {
+        return this.modItem.reviews
+      },
+
+      moderationItemParentType() {
+        return COMMENT_PARENT_TYPE.MODERATION_ITEM
       }
     },
 

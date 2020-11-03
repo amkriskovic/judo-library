@@ -56,6 +56,8 @@ namespace JudoLibrary.Api
             // Registering VersionMigrationContext as scoped => Used for migrating versions
             services.AddScoped<VersionMigrationContext>();
 
+            services.AddTransient<CommentCreationContext>();
+
             // Adding FileManager which is extenstion method responsible for registering services => pass _config, for configuring options
             services.AddFileManager(_config);
 

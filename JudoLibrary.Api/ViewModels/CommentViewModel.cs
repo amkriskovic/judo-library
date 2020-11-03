@@ -16,7 +16,8 @@ namespace JudoLibrary.Api.ViewModels
                 comment.Id,
                 comment.ParentId, // ParentId in case it is reply, created automatically by EF
                 comment.Content, // Content in case we are editing the comment content
-                comment.HtmlContent
+                comment.HtmlContent,
+                User = UserViewModel.CreateFlat(comment.User),
             };
     }
 }

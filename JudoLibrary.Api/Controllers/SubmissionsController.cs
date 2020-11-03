@@ -4,6 +4,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using JudoLibrary.Api.BackgroundServices.VideoEditing;
 using JudoLibrary.Api.Form;
+using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -116,5 +117,16 @@ namespace JudoLibrary.Api.Controllers
             
             return Ok();
         }
+        
+        // GET -> /api/moderation-items/{id}/comments
+        // Listing comments for particular moderation item(id)
+        [HttpGet("{id}/comments")]
+        public IEnumerable<object> GetCommentsForModerationItem(int id) =>
+            _context.Comments
+                // Where SubmissionId for comment is equal to id that is passed
+                .Where(c => c.SubmissionId.Equals(id))
+                .Select(CommentViewModel.Projection)
+                .ToList();
+
     }
 }

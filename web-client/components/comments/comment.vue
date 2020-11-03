@@ -2,19 +2,27 @@
   <div>
     <!-- 1# Binding from comment-body component :comment prop to our comment prop, emitting sendComment event -> both sending to same func -->
     <!-- Replaying to top comment, @load-replies event => loads replies -->
-    <comment-body :comment="comment" @send="send" @load-replies="loadReplies"/>
+    <comment-body :comment="comment"
+                  :parent-id="comment.id"
+                  :parent-type="commentParentType"
+                  @comment-created="appendComment"
+                  @load-replies="loadReplies"/>
 
     <!-- 2# -->
     <div class="ml-5">
-      <!-- Replies part, pulling reply from replies, binding reply to comment prop, emitting sendComment event -> both sending to same func -->
-      <!-- Replying to one of repays -->
-      <comment-body v-for="reply in replies" :comment="reply" @send="send" :key="`reply-${reply.id}`"/>
+      <comment-body v-for="comment in comments"
+                    :comment="comment"
+                    :parent-id="comment.id"
+                    :parent-type="commentParentType"
+                    @comment-created="appendComment"
+                    :key="`reply-${comment.id}`"/>
     </div>
   </div>
 </template>
 
 <script>
   import CommentBody from "./comment-body";
+  import {COMMENT_PARENT_TYPE, container} from "@/components/comments/_shared";
 
   export default {
     // Component name
@@ -22,6 +30,8 @@
 
     // Injected components
     components: {CommentBody},
+
+    mixins: [container],
 
     // Component props => this is where comment info is stored
     props: {
@@ -32,30 +42,21 @@
       }
     },
 
-    // Component local state
-    data: () => ({
-      // Replies collection
-      replies: [],
-    }),
-
     // Component methods
     methods: {
-      // Passing content from @sendComment event -> creating reply for base comment
-      send(content) {
-        // Create reply for particular comment
-        return this.$axios.$post(`/api/comments/${this.comment.id}/replies`, {content: content})
-          // Push actual comment "reply" to arr of replies, we dont need to search for particular comment, we are already getting it
-          // at this point, since we specified comment.id in route
-          .then(reply => this.replies.push(reply))
-      },
-
       // Load replies for specified comment
       loadReplies() {
         // comment.id is parent comment (base) for reply => comes from props
         return this.$axios.$get(`/api/comments/${this.comment.id}/replies`)
           // Assign replies that we got for specified comment to replies arr
-          .then(replies => this.replies = replies)
+          .then(replies => this.comments = replies)
       },
+    },
+
+    computed: {
+      commentParentType() {
+        return COMMENT_PARENT_TYPE.COMMENT
+      }
     }
 
   }
