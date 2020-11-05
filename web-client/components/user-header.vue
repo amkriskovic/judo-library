@@ -3,7 +3,8 @@
   <div class="d-flex align-center pa-2" :class="{'flex-row-reverse': reverse}">
     <!-- Avatar/Img section-->
     <v-avatar :size="size">
-      <img :src="imageUrl"/>
+      <img v-if="imageUrl" :src="imageUrl"/>
+      <v-icon v-else>mdi-account</v-icon>
     </v-avatar>
 
     <!-- Username section -->

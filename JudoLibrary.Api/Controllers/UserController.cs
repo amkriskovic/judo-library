@@ -71,13 +71,13 @@ namespace JudoLibrary.Api.Controllers
 
         // Getting a Submissions for particular User based on User id
         [HttpGet("{id}/submissions")]
-        public Task<List<object>> GetUserSubmissions(string id, string order, int cursor)
+        public Task<List<object>> GetUserSubmissions(string id, [FromQuery] FeedQuery feedQuery)
         {
             return _ctx.Submissions
                 .Include(s => s.Video)
                 .Include(s => s.User)
                 .Where(s => s.UserId.Equals(id))
-                .PickSubmissions(order, cursor)
+                .OrderFeed(feedQuery)
                 .Select(SubmissionViewModels.Projection)
                 .ToListAsync();
         }

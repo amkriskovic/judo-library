@@ -7,20 +7,25 @@
     <comment-input label="comment"
                    :parent-id="parentId"
                    :parent-type="parentType"
-                   @comment-created="prependComment" />
+                   @comment-created="(c) => content.unshift(c)" />
 
     <v-divider class="my-5"/>
 
     <!-- Injecting comment component => particular comment, this is actually reply ? -->
     <!-- Binding :comment which is prop in comment component, to comment that we get from arr of comments -->
-    <comment v-for="comment in comments" :comment="comment" :key="comment.id"/>
+    <comment v-for="comment in content" :comment="comment" :key="comment.id"/>
+
+    <div class="d-flex justify-center" v-if="!finished">
+      <v-btn outlined small @click="loadContent">Load More</v-btn>
+    </div>
   </div>
 </template>
 
 <script>
   import CommentInput from "./comment-input";
   import Comment from "./comment";
-  import {COMMENT_PARENT_TYPE, configurable, container} from "@/components/comments/_shared";
+  import {configurable} from "@/components/comments/_shared";
+  import {feed} from "@/components/feed";
 
   export default {
     // Component name
@@ -29,23 +34,15 @@
     // Injected components
     components: {Comment, CommentInput},
 
-    mixins: [configurable, container],
+    mixins: [configurable, feed('first')],
 
     created() {
-      return this.$axios.$get(this.endpoint)
-        .then((comments) => comments.forEach(comment => this.comments.push(comment)))
+      this.loadContent()
     },
 
-    computed: {
-      endpoint() {
-        if (this.parentType === COMMENT_PARENT_TYPE.MODERATION_ITEM) {
-          return `/api/moderation-items/${this.parentId}/comments`
-        }
-
-        if (this.parentType === COMMENT_PARENT_TYPE.SUBMISSION) {
-          return `/api/submissions/${this.parentId}/comments`
-        }
-
+    methods: {
+      getContentUrl() {
+        return `/api/comments/${this.parentId}/${this.parentType}${this.query}`
       }
     }
   }

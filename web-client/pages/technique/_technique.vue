@@ -5,7 +5,7 @@
     <!-- Template for Content-->
     <template v-slot:content>
       <!-- Injecting submission feed component which will take care for loading content feed -->
-      <submission-feed :load-submissions="loadSubmissions"/>
+      <submission-feed :content-endpoint="`/api/techniques/${technique.slug}/submissions`"/>
     </template>
 
     <!-- Template for Item(card) -->
@@ -39,13 +39,6 @@ export default {
       // Getting techniqueId from URL param
       // Assigning particular grabbed technique slug after /technique/... from url -> id to pages local state technique
       return this.dictionary.techniques[this.$route.params.technique]
-    }
-  },
-
-  methods: {
-    loadSubmissions(query) {
-      // Loading submissions for particular technique based on Slug from technique(), passing query
-      return this.$axios.$get(`/api/techniques/${this.technique.slug}/submissions${query}`)
     }
   },
 

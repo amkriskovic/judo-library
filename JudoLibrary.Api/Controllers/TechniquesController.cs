@@ -72,15 +72,14 @@ namespace JudoLibrary.Api.Controllers
 
         // GET -> /api/techniques/{techniqueId}/submissions
         // Get all submissions for particular technique | Passing technique Id as param | Including videos for technique
-        // Passing order which indicates (top, latest...) & cursor which determines how much we take per page
         [HttpGet("{techniqueId}/submissions")]
-        public object GetAllSubmissionsForTechnique(string techniqueId, string order, int cursor)
+        public object GetAllSubmissionsForTechnique(string techniqueId, [FromQuery] FeedQuery feedQuery)
         {
             return _context.Submissions
                 .Include(s => s.Video)
                 .Include(s => s.User)
                 .Where(s => s.TechniqueId.Equals(techniqueId))
-                .PickSubmissions(order, cursor) // QueryExtension
+                .OrderFeed(feedQuery)
                 .Select(SubmissionViewModels.Projection)
                 .ToList();
         }

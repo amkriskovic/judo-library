@@ -38,16 +38,6 @@ namespace JudoLibrary.Api.Controllers
             .Where(mi => mi.Id == id)
             .Select(ModerationItemViewModels.Projection)
             .FirstOrDefault();
-        
-        // GET -> /api/moderation-items/{id}/comments
-        // Listing comments for particular moderation item(id)
-        [HttpGet("{id}/comments")]
-        public IEnumerable<object> GetCommentsForModerationItem(int id) =>
-            _ctx.Comments
-                // Where moderation item id for comment is equal to id that is passed
-                .Where(c => c.ModerationItemId.Equals(id))
-                .Select(CommentViewModel.Projection)
-                .ToList();
 
         // GET -> /api/moderation-items/{id}/reviews
         // Listing reviews for particular moderation item(id)

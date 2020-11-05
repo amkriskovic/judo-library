@@ -1,6 +1,6 @@
 ﻿<template>
   <div>
-    <v-row v-if="modItem">
+    <v-row v-if="modItem && authenticated">
       <!-- * Comment section part -->
       <v-col cols="8">
         <v-row justify="center">

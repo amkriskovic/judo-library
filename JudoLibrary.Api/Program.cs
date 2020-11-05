@@ -48,6 +48,12 @@ namespace JudoLibrary.Api
                     foreach (var fakeUser in fakeUsers)
                     {
                         userManager.CreateAsync(fakeUser, "password").GetAwaiter().GetResult();
+                        
+                        context.Add(new User
+                        {
+                            Id = fakeUser.Id,
+                            Username = fakeUser.UserName
+                        });
                     }
 
                     // Created a mod
@@ -244,7 +250,25 @@ namespace JudoLibrary.Api
                                 {
                                     UserId = fakeUsers[ii].Id,
                                 })
-                                .ToList()
+                                .ToList(),
+                            Comments = Enumerable
+                                .Range(0, fakeCounter)
+                                .Select(ii => new Comment
+                                {
+                                    UserId = fakeUsers[ii].Id,
+                                    Content = $"Main Comment {ii}",
+                                    HtmlContent = $"Main Comment {ii}",
+                                    Replies = Enumerable
+                                        .Range(0, fakeCounter)
+                                        .Select(iii => new Comment
+                                        {
+                                            UserId = fakeUsers[iii].Id,
+                                            Content = $"Reply to Comment {iii}",
+                                            HtmlContent = $"Reply to Comment {iii}",
+                                        })
+                                        .ToList(),
+                                })
+                                .ToList(),
                         }); 
                     }
                     

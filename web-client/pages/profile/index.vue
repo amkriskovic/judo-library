@@ -2,7 +2,7 @@
   <item-content-layout>
     <template v-slot:content>
       <!-- Injecting submission-feed component -->
-      <submission-feed :load-submissions="loadSubmissions"/>
+      <submission-feed :content-endpoint="`/api/users/${$store.state.auth.profile.id}/submissions`"/>
     </template>
 
     <template v-slot:item>
@@ -46,18 +46,10 @@ export default {
 
   // Local state
   data: () => ({
-    // User should have some submissions
-    submissions: [],
-
     uploadingImage: false
   }),
 
   methods: {
-    loadSubmissions(query) {
-      const profileId = this.$store.state.auth.profile.id
-      return this.$axios.$get(`/api/users/${profileId}/submissions${query}`)
-    },
-
     // On changing profile image
     changeProfileImage(e) {
       // If uploadingImage is true (false initial value), return

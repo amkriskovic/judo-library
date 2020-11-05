@@ -118,15 +118,5 @@ namespace JudoLibrary.Api.Controllers
             return Ok();
         }
         
-        // GET -> /api/moderation-items/{id}/comments
-        // Listing comments for particular moderation item(id)
-        [HttpGet("{id}/comments")]
-        public IEnumerable<object> GetCommentsForModerationItem(int id) =>
-            _context.Comments
-                // Where SubmissionId for comment is equal to id that is passed
-                .Where(c => c.SubmissionId.Equals(id))
-                .Select(CommentViewModel.Projection)
-                .ToList();
-
     }
 }
