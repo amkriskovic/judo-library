@@ -27,7 +27,7 @@ namespace JudoLibrary.Api.Controllers
 
         // GET -> /api/{parentId}/{parentType}
         [HttpGet("{parentId}/{parentType}")]
-        public IEnumerable<object> GetRepliesForComment(int parentId, 
+        public IEnumerable<object> GetRepliesForComment(int parentId,
             CommentCreationContext.ParentType parentType,
             [FromQuery] FeedQuery feedQuery)
         {
@@ -38,7 +38,7 @@ namespace JudoLibrary.Api.Controllers
                 CommentCreationContext.ParentType.Comment => comment => comment.ParentId == parentId,
                 _ => throw new ArgumentException()
             };
-                
+
             return _ctx.Comments
                 .Where(filter)
                 .OrderFeed(feedQuery)
@@ -52,13 +52,20 @@ namespace JudoLibrary.Api.Controllers
             [FromBody] CommentForm commentForm,
             [FromServices] CommentCreationContext commentCreationContext)
         {
-            // Provide UserId when creating comment, so we know who it belongs to
-            var comment = await commentCreationContext
-                .Setup(UserId)
-                .CreateCommentAsync(commentForm);
+            try
+            {
+                // Provide UserId when creating comment, so we know who it belongs to
+                var comment = await commentCreationContext
+                    .Setup(UserId)
+                    .CreateCommentAsync(commentForm);
 
-            // Return ok with created comment
-            return Ok(CommentViewModel.Create(comment));
+                // Return ok with created comment
+                return Ok(CommentViewModel.Create(comment));
+            }
+            catch (CommentCreationContext.ParentNotFoundException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 }

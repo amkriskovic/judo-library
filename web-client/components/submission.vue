@@ -1,7 +1,11 @@
 ﻿<template>
   <v-card class="my-3">
     <!-- Injecting user-header component, providing username from submission -->
-    <user-header :username="submission.user.username" :image-url="submission.user.image" :append="submission.created"/>
+    <user-header :username="submission.user.username" :image-url="submission.user.image">
+      <template v-slot:append>
+        <span class="caption grey--text">{{submission.created}}</span>
+      </template>
+    </user-header>
 
     <v-card-text>{{ submission.description }}</v-card-text>
 
@@ -10,9 +14,12 @@
     <video-player :video="submission.video" :thumb="submission.thumb"/>
 
     <v-card-actions>
-      <span>{{submission.upVotes}}</span>
-      <v-btn icon>
-        <v-icon>mdi-thumb-up</v-icon>
+      <v-btn small icon :color="submission.vote === 1 ? 'blue' : ''" @click="vote(1)">
+        <v-icon>mdi-chevron-up</v-icon>
+      </v-btn>
+      <span class="mx-2">{{submission.score}}</span>
+      <v-btn small icon :color="submission.vote === -1 ? 'blue' : ''" @click="vote(-1)">
+        <v-icon>mdi-chevron-down</v-icon>
       </v-btn>
 
       <v-spacer/>
@@ -63,7 +70,21 @@ export default {
     submissionParentType() {
       return COMMENT_PARENT_TYPE.SUBMISSION
     }
+  },
+
+  methods: {
+    vote(value){
+      if (this.submission.vote === value) return;
+
+      // If it's the 1st time we are voting, add the value (+1), otherwise +2
+      this.submission.score += this.submission.vote === 0 ? value : value * 2
+
+      this.submission.vote = value
+
+      return this.$axios.$put(`/api/submissions/${this.submission.id}/vote?value=${value}`, null)
+    }
   }
+
 }
 </script>
 

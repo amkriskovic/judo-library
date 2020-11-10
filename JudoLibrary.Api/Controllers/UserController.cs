@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JudoLibrary.Api.BackgroundServices.VideoEditing;
@@ -65,11 +66,18 @@ namespace JudoLibrary.Api.Controllers
             return Ok(user);
         }
 
-        // Getting a particular User based on id
-        [HttpGet("{id}")]
-        public IActionResult GetUser(string id) => Ok();
+        // Getting a particular User based on username
+        [AllowAnonymous]
+        [HttpGet("{username}")]
+        public object GetUser(string username) =>
+            _ctx.Users
+                .Where(u => u.Username.Equals(username, StringComparison.InvariantCultureIgnoreCase))
+                .Select(UserViewModel.FlatProjection)
+                .FirstOrDefault();
+                
 
         // Getting a Submissions for particular User based on User id
+        [AllowAnonymous]
         [HttpGet("{id}/submissions")]
         public Task<List<object>> GetUserSubmissions(string id, [FromQuery] FeedQuery feedQuery)
         {

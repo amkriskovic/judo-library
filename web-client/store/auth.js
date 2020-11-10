@@ -103,7 +103,7 @@ export const actions = {
   },
 
   // Action corresponds to what we want to perform once user is initialized/loaded => executed only on client side
-  _watchUserLoaded({state, getters, dispatch}, action) {
+  _waitAuthenticated({state, getters}) {
     // Fuck off
     if (process.server) return
 
@@ -123,25 +123,17 @@ export const actions = {
           // New and old value corresponds to value of loading
           (newValue, oldValue) => {
             // Get rid of watcher -> we no longer need it since loading is finished
-            console.log('UN-WATCHING')
             unwatch()
 
-            // If we are not authenticated
-            if (!getters.authenticated){
-              // Dispatching login -> redirect to authorization endpoint
-              dispatch('login')
-            } else if(!newValue) {
-              // If loading is false => loading is finished
-              console.log('User finished loading... => executing action!')
-              resolve(action())
-            }
+            // If loading is false => loading is finished
+            resolve(getters.authenticated)
           }
         )
       } else {
         // Else -> User is loaded.
         // Pass action to resolve, whatever action returns it's gonna be resolved value of the Promise
         console.log('User is already loaded => executing action!')
-        resolve(action())
+        resolve(getters.authenticated)
       }
     })
   }

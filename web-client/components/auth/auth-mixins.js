@@ -15,7 +15,8 @@ export const guard = (level) => ({
     } else {
       // * Browser
       next(nuxt => {
-        nuxt.$store.dispatch('auth/_watchUserLoaded', () => {
+        nuxt.$store.dispatch('auth/_waitAuthenticated')
+          .then(() => {
           // Initial value is false
           let allowed = false
 

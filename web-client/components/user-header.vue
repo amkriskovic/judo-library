@@ -1,22 +1,22 @@
 ﻿<template>
   <!-- If reverse is true, apply this class -->
   <div class="d-flex align-center pa-2" :class="{'flex-row-reverse': reverse}">
-    <!-- Avatar/Img section-->
-    <v-avatar :size="size">
-      <img v-if="imageUrl" :src="imageUrl"/>
-      <v-icon v-else>mdi-account</v-icon>
-    </v-avatar>
+    <div :class="{pointer: link}" @click="gotoUser" class="d-flex align-center">
+      <!-- Avatar/Img section-->
+      <v-avatar :size="size">
+        <img v-if="imageUrl" :src="imageUrl"/>
+        <v-icon v-else>mdi-account</v-icon>
+      </v-avatar>
 
-    <!-- Username section -->
-    <div class="mx-3" v-if="username">
-      {{ username }}
+      <!-- Username section -->
+      <div class="mx-3" v-if="username">
+        {{ username }}
+      </div>
     </div>
 
     <v-spacer/>
 
-    <div v-if="append">
-      {{ append }}
-    </div>
+    <slot name="append"></slot>
   </div>
 </template>
 
@@ -44,18 +44,27 @@ export default {
       default: '42',
     },
 
-    append: {
-      required: false,
-      type: String,
-      default: ''
-    },
-
     reverse: {
       required: false,
       type: Boolean,
       default: false
+    },
+
+    link: {
+      required: false,
+      type: Boolean,
+      default: true
+    }
+  },
+
+  methods: {
+    gotoUser() {
+      if (this.link) {
+        return this.$router.push(`/profile/${this.username}`)
+      }
     }
   }
+
 }
 </script>
 

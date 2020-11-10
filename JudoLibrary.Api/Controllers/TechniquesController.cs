@@ -73,14 +73,15 @@ namespace JudoLibrary.Api.Controllers
         // GET -> /api/techniques/{techniqueId}/submissions
         // Get all submissions for particular technique | Passing technique Id as param | Including videos for technique
         [HttpGet("{techniqueId}/submissions")]
-        public object GetAllSubmissionsForTechnique(string techniqueId, [FromQuery] FeedQuery feedQuery)
+        [Authorize(Policy = JudoLibraryConstants.Policies.Anon)]
+        public IEnumerable<object> GetAllSubmissionsForTechnique(string techniqueId, [FromQuery] FeedQuery feedQuery)
         {
             return _context.Submissions
                 .Include(s => s.Video)
                 .Include(s => s.User)
-                .Where(s => s.TechniqueId.Equals(techniqueId))
+                .Where(s => s.TechniqueId.Equals(techniqueId, StringComparison.InvariantCultureIgnoreCase))
                 .OrderFeed(feedQuery)
-                .Select(SubmissionViewModels.Projection)
+                .Select(SubmissionViewModels.PerspectiveProjection(UserId))
                 .ToList();
         }
         
@@ -256,5 +257,6 @@ namespace JudoLibrary.Api.Controllers
 
             return Ok();
         }
+        
     }
 }

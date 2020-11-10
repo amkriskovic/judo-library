@@ -8,14 +8,14 @@ using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using JudoLibrary.Models.Moderation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace JudoLibrary.Api.Controllers
 {
-    [ApiController]
     [Route("/api/moderation-items")]
-    public class ModerationItemController : ControllerBase
+    public class ModerationItemController : ApiController
     {
         private readonly AppDbContext _ctx;
 
@@ -33,7 +33,6 @@ namespace JudoLibrary.Api.Controllers
         // GET -> /api/moderation-items/{id}
         [HttpGet("{id}")]
         public object GetModerationItem(int id) => _ctx.ModerationItems
-            .Include(mi => mi.Comments)
             .Include(mi => mi.Reviews)
             .Where(mi => mi.Id == id)
             .Select(ModerationItemViewModels.Projection)
@@ -52,6 +51,7 @@ namespace JudoLibrary.Api.Controllers
         // Created review for particular moderation modItem
         // Passing id from url, and from body -> review 
         [HttpPost("{id}/reviews")]
+        [Authorize(JudoLibraryConstants.Policies.Mod)]
         public async Task<IActionResult> CreateReviewForModerationItem(
             int id, 
             [FromBody] ReviewForm reviewForm,
@@ -76,7 +76,8 @@ namespace JudoLibrary.Api.Controllers
                 // Assign moderation-item - {id} (That's passed in) to Review's ModerationItemId
                 ModerationItemId = id,
                 Status = reviewForm.Status,
-                Comment = reviewForm.Comment
+                Comment = reviewForm.Comment,
+                UserId = UserId
             };
 
             // Add review to moderation item list of reviews

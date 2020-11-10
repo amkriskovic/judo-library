@@ -3,12 +3,10 @@
 namespace JudoLibrary.Models
 {
     // User will vote for particular submission
-    public class SubmissionVote : BaseModel<int>
+    public class SubmissionVote : Vote
     {
-        public string SubmissionId { get; set; } 
-        public Submission Submission { get; set; } 
-        
-        public string UserId { get; set; } 
-        public User User { get; set; } 
+        public int SubmissionId { get; set; } 
+        public Submission Submission { get; set; }
+        public int Value { get; set; }
     }
 }

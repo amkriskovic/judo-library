@@ -118,5 +118,38 @@ namespace JudoLibrary.Api.Controllers
             return Ok();
         }
         
+        
+        // PUT -> /api/submissions/{id}/vote
+        [HttpPut("{id}/vote")]
+        [Authorize(JudoLibraryConstants.Policies.User)]
+        public async Task<IActionResult> UpdateVote(int id, int value)
+        {
+            // Doesn't fit in one of the categories of upvote or down vote
+            if (value != -1 && value != 1)
+            {
+                return BadRequest();
+            }
+
+            var vote = _context.SubmissionVotes
+                .FirstOrDefault(sv => sv.SubmissionId == id && sv.UserId == UserId);
+
+            if (vote == null)
+            {
+                _context.Add(new SubmissionVote
+                {
+                    SubmissionId = id,
+                    UserId = UserId,
+                    Value = value
+                });
+            }
+            else
+            {
+                vote.Value = value;
+            }
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }

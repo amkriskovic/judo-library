@@ -58,7 +58,7 @@ namespace JudoLibrary.Api
                 comment.ParentId = commentForm.ParentId;
             }
 
-            comment.Content = comment.Content;
+            comment.Content = commentForm.Content;
             comment.UserId = _userId;
             
             // Assign original commentForm content that's being processed via LINQ, to Html comment content

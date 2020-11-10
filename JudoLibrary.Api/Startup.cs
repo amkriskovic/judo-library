@@ -1,11 +1,13 @@
 using System.Security.Claims;
 using System.Threading.Channels;
+using System.Threading.Tasks;
 using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Models;
 using JudoLibrary.Api.BackgroundServices;
 using JudoLibrary.Api.BackgroundServices.VideoEditing;
 using JudoLibrary.Data;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -300,6 +302,14 @@ namespace JudoLibrary.Api
             // Custom authorization for MOD role
             services.AddAuthorization(options =>
             {
+                options.AddPolicy(JudoLibraryConstants.Policies.Anon, policy =>
+                {
+                    policy.AddAuthenticationSchemes(IdentityServerConstants.LocalApi.AuthenticationScheme);
+
+                    policy.AddRequirements(new AnonymousRequirement());
+                });
+                
+                
                 // Elevating default IS4 policy
                 options.AddPolicy(JudoLibraryConstants.Policies.Mod, policy =>
                 {
@@ -318,5 +328,14 @@ namespace JudoLibrary.Api
             // * 
         }
 
+    }
+
+    internal class AnonymousRequirement : IAuthorizationHandler, IAuthorizationRequirement
+    {
+        public Task HandleAsync(AuthorizationHandlerContext context)
+        {
+            context.Succeed(this);
+            return Task.CompletedTask;
+        }
     }
 }

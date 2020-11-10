@@ -18,7 +18,7 @@
                     :key="`reply-${comment.id}`"/>
     </div>
 
-    <div class="d-flex justify-center" v-if="content.length > 0 && !finished">
+    <div class="d-flex justify-center" v-if="started && !finished">
       <v-btn outlined small @click="loadContent">Load More</v-btn>
     </div>
   </div>
@@ -59,7 +59,7 @@
       },
 
       loadRepliesEvent() {
-        return this.content.length === 0 ? 'load-replies' : ''
+        return this.started ? 'load-replies' : ''
       }
     }
 

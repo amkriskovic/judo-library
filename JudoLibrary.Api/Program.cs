@@ -203,6 +203,14 @@ namespace JudoLibrary.Api
                         Description = "This Seoi nage was very hard to pull of...",
                         VideoProcessed = true,
                         UserId = testUser.Id,
+                        Votes = new List<SubmissionVote>
+                        {
+                            new SubmissionVote
+                            {
+                                UserId = testUser.Id,
+                                Value = 1,
+                            }
+                        }
                     });
 
                     context.Add(new Submission
@@ -244,7 +252,7 @@ namespace JudoLibrary.Api
                             UserId = testUser.Id,
 
                             Created = DateTime.UtcNow.AddDays(-i),
-                            UpVotes = Enumerable
+                            Votes = Enumerable
                                 .Range(0, i)
                                 .Select(ii => new SubmissionVote
                                 {

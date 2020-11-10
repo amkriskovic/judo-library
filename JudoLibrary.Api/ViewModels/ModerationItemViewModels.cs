@@ -23,12 +23,6 @@ namespace JudoLibrary.Api.ViewModels
                 moderationItem.Target,
                 moderationItem.Type,
                 
-                // Iterate over moderationItem comments, cast them as query, select CommentViewModel, To List
-                Comments = moderationItem.Comments
-                    .AsQueryable()
-                    .Select(CommentViewModel.Projection)
-                    .ToList(),
-                
                 Reviews = moderationItem.Reviews
                     .AsQueryable()
                     .Select(ReviewViewModel.Projection)
