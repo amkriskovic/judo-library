@@ -30,25 +30,25 @@ namespace JudoLibrary.Api
                 if (environment.IsDevelopment())
                 {
                     var fakeCounter = 20;
-                    
+
                     // * Identity seeding part -> we need Users to exist before submission coz they relate to them
                     // Get user manager service
                     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
 
                     // Created a test User
-                    var testUser = new IdentityUser("test") {Email = "test@test.com"};
+                    var testUser = new IdentityUser("test") {Id = "test_user_id", Email = "test@test.com"};
                     userManager.CreateAsync(testUser, "password").GetAwaiter().GetResult();
-                    
+
                     // Creating(Blueprinting) fake users based on counter above
                     var fakeUsers = Enumerable.Range(0, fakeCounter)
-                        .Select(i => new IdentityUser($"fake{i}") {Email = $"fake{i}@test.com"})
+                        .Select(i => new IdentityUser($"fake{i}") {Id = $"fake_{i}_id", Email = $"fake{i}@test.com"})
                         .ToList();
 
                     // Loop over fake users and seed them
                     foreach (var fakeUser in fakeUsers)
                     {
                         userManager.CreateAsync(fakeUser, "password").GetAwaiter().GetResult();
-                        
+
                         context.Add(new User
                         {
                             Id = fakeUser.Id,
@@ -57,7 +57,7 @@ namespace JudoLibrary.Api
                     }
 
                     // Created a mod
-                    var mod = new IdentityUser("mod") {Email = "mod@test.com"};
+                    var mod = new IdentityUser("mod") {Id = "mod_user_id", Email = "mod@test.com"};
                     userManager.CreateAsync(mod, "password").GetAwaiter().GetResult();
                     // Adds the specified claim to the user(Mod) with providing claim type and value that we specified in
                     // our custom policy
@@ -130,32 +130,37 @@ namespace JudoLibrary.Api
                     // Seeding Techniques
                     context.Add(new Technique
                     {
-                        Id = 1, UserId = testUser.Id, Version = 1, Active = true, Slug = "kouchi-gari", Name = "Kouchi gari",
+                        Id = 1, UserId = testUser.Id, Version = 1, Active = true, Slug = "kouchi-gari",
+                        Name = "Kouchi gari",
                         Description = "Small inner reap", Category = "nage-waza", SubCategory = "ashi-waza"
                     });
 
                     context.Add(new Technique
                     {
-                        Id = 2, UserId = testUser.Id, Version = 1, Active = true, Slug = "ushiro-goshi", Name = "Ushiro goshi",
+                        Id = 2, UserId = testUser.Id, Version = 1, Active = true, Slug = "ushiro-goshi",
+                        Name = "Ushiro goshi",
                         Description = "Rear hip throw", Category = "nage-waza", SubCategory = "koshi-waza"
                     });
 
                     context.Add(new Technique
                     {
-                        Id = 3, UserId = testUser.Id, Version = 1, Active = true, Slug = "tani-otoshi", Name = "Tani otoshi",
+                        Id = 3, UserId = testUser.Id, Version = 1, Active = true, Slug = "tani-otoshi",
+                        Name = "Tani otoshi",
                         Description = "Valley drop", Category = "nage-waza", SubCategory = "sutemi-waza"
                     });
 
                     context.Add(new Technique
                     {
-                        Id = 4, UserId = testUser.Id, Version = 1, Active = true, Slug = "kesa-gatame", Name = "Kesa-gatame",
+                        Id = 4, UserId = testUser.Id, Version = 1, Active = true, Slug = "kesa-gatame",
+                        Name = "Kesa-gatame",
                         Description = "Scarf hold", Category = "katame-waza", SubCategory = "osaekomi-waza"
                     });
 
                     // * Main Technique *
                     context.Add(new Technique
                     {
-                        Id = 5, UserId = testUser.Id, Version = 1, Active = true, Slug = "seoi-nage", Name = "Seoi Nage",
+                        Id = 5, UserId = testUser.Id, Version = 1, Active = true, Slug = "seoi-nage",
+                        Name = "Seoi Nage",
                         Description = "Shoulder throw", Category = "nage-waza", SubCategory = "te-waza",
                         SetUpAttacks = new List<TechniqueSetupAttack>
                         {
@@ -171,10 +176,11 @@ namespace JudoLibrary.Api
                             new TechniqueCounter {TechniqueId = 5, CounterId = 3, Active = true}
                         }
                     });
-                    
+
                     context.Add(new Technique
                     {
-                        Id = 6, UserId = testUser.Id, Version = 1, Active = true, Slug = "osoto-gari", Name = "Osoto gari",
+                        Id = 6, UserId = testUser.Id, Version = 1, Active = true, Slug = "osoto-gari",
+                        Name = "Osoto gari",
                         Description = "Major Outer Reaping",
                         Category = "nage-waza", SubCategory = "ashi-waza",
                         SetUpAttacks = new List<TechniqueSetupAttack>
@@ -257,6 +263,7 @@ namespace JudoLibrary.Api
                                 .Select(ii => new SubmissionVote
                                 {
                                     UserId = fakeUsers[ii].Id,
+                                    Value = 1,
                                 })
                                 .ToList(),
                             Comments = Enumerable
@@ -277,9 +284,9 @@ namespace JudoLibrary.Api
                                         .ToList(),
                                 })
                                 .ToList(),
-                        }); 
+                        });
                     }
-                    
+
                     // Save fake Submissions to DB
                     context.SaveChanges();
                 }

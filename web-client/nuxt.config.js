@@ -11,6 +11,10 @@ export default {
 
   // Available on client & server side
   publicRuntimeConfig: {
+    auth: {
+      loginPath: process.env.LOGIN_PATH,
+      logoutPath: process.env.LOGOUT_PATH
+    },
     axios: {
       baseURL: "https://localhost:5001",
       https: true
@@ -65,7 +69,7 @@ export default {
   ** https://nuxtjs.org/guide/plugins
   */
   plugins: [
-    {src: '~/plugins/client-init.js', mode: 'client'},
+    '~/plugins/axios'
   ],
   /*
   ** Auto import components

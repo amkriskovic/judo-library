@@ -1,7 +1,9 @@
 ﻿using System.Threading.Tasks;
 using IdentityServer4.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Hosting;
 
 namespace JudoLibrary.Api.Controllers
 {
@@ -19,11 +21,17 @@ namespace JudoLibrary.Api.Controllers
         // IIdentityServerInteractionService DI at method level => used for discovering post logout redirect URI
         public async Task<IActionResult> Logout(string logoutId,
             [FromServices] SignInManager<IdentityUser> signInManager,
-            [FromServices] IIdentityServerInteractionService interactionService)
+            [FromServices] IIdentityServerInteractionService interactionService,
+            [FromServices] IWebHostEnvironment env)
         {
             // # 1 Sign Out
             // Signs the current user OUT of the application.
             await signInManager.SignOutAsync();
+
+            if (string.IsNullOrEmpty(logoutId))
+            {
+                return Redirect(env.IsDevelopment() ? "https://localhost:3000/" : "/");
+            }
 
             // # 2 Where do we wanna resume after signing out
             // Gets the logout context, need to provide logoutId

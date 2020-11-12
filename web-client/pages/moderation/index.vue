@@ -9,10 +9,7 @@
 </template>
 
 <script>
-import {guard, GUARD_LEVEL} from "@/components/auth/auth-mixins";
-
   export default {
-    mixins: [guard(GUARD_LEVEL.AUTH)],
 
     // Local state
     data: () => ({

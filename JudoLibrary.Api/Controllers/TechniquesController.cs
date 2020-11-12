@@ -73,7 +73,6 @@ namespace JudoLibrary.Api.Controllers
         // GET -> /api/techniques/{techniqueId}/submissions
         // Get all submissions for particular technique | Passing technique Id as param | Including videos for technique
         [HttpGet("{techniqueId}/submissions")]
-        [Authorize(Policy = JudoLibraryConstants.Policies.Anon)]
         public IEnumerable<object> GetAllSubmissionsForTechnique(string techniqueId, [FromQuery] FeedQuery feedQuery)
         {
             return _context.Submissions
@@ -88,7 +87,7 @@ namespace JudoLibrary.Api.Controllers
         // POST -> /api/techniques
         // Created technique, sending json from the body of the request, TechniqueForm is responsible for creating technique
         [HttpPost]
-        [Authorize(Policy = JudoLibraryConstants.Policies.User)]
+        [Authorize]
         public async Task<object> CreateTechnique([FromBody] TechniqueForm techniqueForm)
         {
             // Created Technique, mapping props from trickForm to Technique
@@ -145,7 +144,7 @@ namespace JudoLibrary.Api.Controllers
 
         // PUT -> /api/techniques
         [HttpPut]
-        [Authorize(Policy = JudoLibraryConstants.Policies.User)]
+        [Authorize]
         public async Task<IActionResult> UpdateTechnique([FromBody] TechniqueForm techniqueForm)
         {
             // Extract existing technique from DB by comparing Id(int)

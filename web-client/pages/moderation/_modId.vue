@@ -1,6 +1,6 @@
 ﻿<template>
   <div>
-    <v-row v-if="modItem && authenticated">
+    <v-row v-if="modItem">
       <!-- * Comment section part -->
       <v-col cols="8">
         <v-row justify="center">
@@ -80,7 +80,6 @@
   // Resolves endpoint based on type it's passed, @ =>> root of web-client
   import CommentSection from "@/components/comments/comment-section";
   import TechniqueInfoCard from "@/components/technique-info-card";
-  import {guard, GUARD_LEVEL} from "@/components/auth/auth-mixins";
   import {COMMENT_PARENT_TYPE} from "@/components/comments/_shared";
 
   // Produce the endpoint based on url type parameter, e.g. techniques
@@ -126,8 +125,6 @@
 
   export default {
     components: {TechniqueInfoCard, CommentSection},
-
-    mixins: [guard(GUARD_LEVEL.AUTH)],
 
     // Local state
     data: () => ({

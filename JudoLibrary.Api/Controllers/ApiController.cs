@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Security.Claims;
 using IdentityModel;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,8 +9,10 @@ namespace JudoLibrary.Api.Controllers
     public class ApiController : ControllerBase
     {
         // UserId & PreferredUsername "getters"
-        protected string UserId => GetClaim(JwtClaimTypes.Subject);
-        protected string PreferredUsername => GetClaim(JwtClaimTypes.PreferredUserName);
+        protected string UserId => GetClaim(ClaimTypes.NameIdentifier) ?? GetClaim(JwtClaimTypes.Subject);
+        protected string PreferredUsername => GetClaim(ClaimTypes.Name) ?? GetClaim(JwtClaimTypes.PreferredUserName);
+
+        protected bool IsMod => User.HasClaim(JudoLibraryConstants.Claims.Role, JudoLibraryConstants.Roles.Mod);
         
         // Returns Claim value based on claim type provided as parameter
         private string GetClaim(string claimType)

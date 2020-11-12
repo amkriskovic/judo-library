@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using JudoLibrary.Api.Form;
 using JudoLibrary.Api.ViewModels;
@@ -15,7 +14,7 @@ namespace JudoLibrary.Api.Controllers
 {
     // Class for creating replies to comments
     [Route("/api/comments")]
-    [Authorize(JudoLibraryConstants.Policies.User)]
+    [Authorize]
     public class CommentController : ApiController
     {
         private readonly AppDbContext _ctx;

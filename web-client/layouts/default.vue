@@ -42,7 +42,7 @@
                 </v-list-item>
 
                 <!-- Logout, means we are logged in => redirect to our client plugin -->
-                <v-list-item @click="$auth.signoutRedirect()">
+                <v-list-item @click="logout">
                   <v-list-item-title>
                     <v-icon outlined left>mdi-logout</v-icon>
                     Logout
@@ -82,7 +82,7 @@ import {mapActions, mapGetters, mapState} from "vuex";
 import IfAuth from "@/components/auth/if-auth";
 
 export default {
-  name: "Default",
+  name: "default",
 
   // Mapping components
   components: {
@@ -95,5 +95,11 @@ export default {
     ...mapState('auth', ['profile']),
     ...mapGetters('auth', ['moderator']),
   },
+
+  methods: {
+    logout() {
+      console.log('Logout not implemented')
+    }
+  }
 }
 </script>

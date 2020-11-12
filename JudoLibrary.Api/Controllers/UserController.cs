@@ -18,7 +18,7 @@ using SixLabors.ImageSharp.Processing;
 namespace JudoLibrary.Api.Controllers
 {
     [Route("api/users")]
-    [Authorize(JudoLibraryConstants.Policies.User)] // Authorize whole Controller => you need be a User to access this
+    [Authorize]
     public class UserController : ApiController
     {
         private readonly AppDbContext _ctx;
@@ -40,14 +40,17 @@ namespace JudoLibrary.Api.Controllers
                 return BadRequest();
 
             // Grab the User => compare User Id with userId that's coming from User Claim -> "sub"
-            var user = await _ctx.Users.FirstOrDefaultAsync(u => u.Id.Equals(userId));
+            var user = await _ctx.Users
+                .Where(x => x.Id.Equals(userId))
+                .Select(UserViewModel.ProfileProjection(IsMod))
+                .FirstOrDefaultAsync();
 
             // If user is not equal to null -> return the User
             if (user != null)
                 return Ok(user);
 
             // If User is null -> Instantiate new User
-            user = new User
+            var newUser = new User
             {
                 // Grab the userId and set it to Id
                 Id = userId,
@@ -57,13 +60,13 @@ namespace JudoLibrary.Api.Controllers
             };
 
             // Add the User to ctx
-            _ctx.Add(user);
+            _ctx.Add(newUser);
 
             // Save User to DB
             await _ctx.SaveChangesAsync();
 
             // Return User
-            return Ok(user);
+            return Ok(UserViewModel.CreateProfile(newUser, IsMod));
         }
 
         // Getting a particular User based on username

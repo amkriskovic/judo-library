@@ -35,7 +35,7 @@ namespace JudoLibrary.Api.Controllers
         // POST -> /api/submissions
         // [FromServices] =>> Dependency Injection as method parameter
         [HttpPost]
-        [Authorize(JudoLibraryConstants.Policies.User)] // You should be a User to access "this"
+        [Authorize]
         public async Task<IActionResult> CreateSubmission(
             [FromBody] SubmissionForm submissionForm,
             [FromServices] Channel<EditVideoMessage> channel,
@@ -121,7 +121,7 @@ namespace JudoLibrary.Api.Controllers
         
         // PUT -> /api/submissions/{id}/vote
         [HttpPut("{id}/vote")]
-        [Authorize(JudoLibraryConstants.Policies.User)]
+        [Authorize]
         public async Task<IActionResult> UpdateVote(int id, int value)
         {
             // Doesn't fit in one of the categories of upvote or down vote

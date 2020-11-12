@@ -18,5 +18,22 @@ namespace JudoLibrary.Api.ViewModels
                 user.Username,
                 user.Image
             };
+        
+        
+        
+        public static readonly Func<User, object> CreateProfileCache = ProfileProjection(false).Compile();
+        public static readonly Func<User, object> CreateModProfileCache = ProfileProjection(true).Compile();
+
+        public static object CreateProfile(User user, bool isMod) => isMod 
+            ? CreateModProfileCache(user)
+            : CreateProfileCache(user);
+        public static Expression<Func<User, object>> ProfileProjection(bool isMod) =>
+            user => new
+            {
+                user.Id,
+                user.Username,
+                user.Image,
+                IsMod = isMod,
+            };
     }
 }

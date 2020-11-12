@@ -21,9 +21,9 @@ namespace JudoLibrary.Api
 {
     public class Startup
     {
-        private const string AllCors = "All";
         private readonly IConfiguration _config;
         private readonly IWebHostEnvironment _env;
+        private const string NuxtJsApp = "NuxtJsApp";
 
         public Startup(IConfiguration config, IWebHostEnvironment env)
         {
@@ -70,10 +70,11 @@ namespace JudoLibrary.Api
 
             // Service for CORS mechanism, with current policy, everything is accepted
             services.AddCors(options => options
-                .AddPolicy(AllCors, build => build
-                    .AllowAnyHeader()
-                    .AllowAnyOrigin()
-                    .AllowAnyMethod()));
+                .AddPolicy(NuxtJsApp, build => build
+                    .WithHeaders("X-Requested-With")
+                    .WithOrigins("https://localhost:3000")
+                    .AllowAnyMethod()
+                    .AllowCredentials()));
         }
 
         public void Configure(IApplicationBuilder app)
@@ -84,13 +85,14 @@ namespace JudoLibrary.Api
             }
 
             // Middleware func for CORS mechanism
-            app.UseCors(AllCors);
+            app.UseCors(NuxtJsApp);
 
             // Support for routing
             app.UseRouting();
 
             // * Authentication part, Who are you?
             app.UseAuthentication();
+            
             app.UseIdentityServer();
 
             // * Authorization part, are you allowed?
@@ -302,23 +304,10 @@ namespace JudoLibrary.Api
             // Custom authorization for MOD role
             services.AddAuthorization(options =>
             {
-                options.AddPolicy(JudoLibraryConstants.Policies.Anon, policy =>
-                {
-                    policy.AddAuthenticationSchemes(IdentityServerConstants.LocalApi.AuthenticationScheme);
-
-                    policy.AddRequirements(new AnonymousRequirement());
-                });
-                
-                
                 // Elevating default IS4 policy
                 options.AddPolicy(JudoLibraryConstants.Policies.Mod, policy =>
                 {
-                    // Getting default IS4 policy
-                    var IS4Policy = options.GetPolicy(IdentityServerConstants.LocalApi.PolicyName);
-                    
-                    // Our policy (Mod) + default policy
-                    // Combines the specified policy into the current instance, adding to our (Mod) policy, default one
-                    policy.Combine(IS4Policy);
+                    policy.RequireAuthenticatedUser();
                     
                     // Specifying required claims for this policy, Role claim type & allowed values for that role -> you need to be a Moderator
                     policy.RequireClaim(JudoLibraryConstants.Claims.Role, JudoLibraryConstants.Roles.Mod);
@@ -330,12 +319,4 @@ namespace JudoLibrary.Api
 
     }
 
-    internal class AnonymousRequirement : IAuthorizationHandler, IAuthorizationRequirement
-    {
-        public Task HandleAsync(AuthorizationHandlerContext context)
-        {
-            context.Succeed(this);
-            return Task.CompletedTask;
-        }
-    }
 }

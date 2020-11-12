@@ -20,15 +20,13 @@ export const mutations = {
 export const actions = {
 
   // nuxtServerInit only does server side job, pulls data once
-  nuxtServerInit({dispatch}) {
-    // Pre-load all available tricks, returning Promise...
-    return dispatch("techniques/fetchTechniques");
-  },
+  async nuxtServerInit({dispatch}) {
+    // Init authentication 1st
+    await dispatch("auth/initialize");
 
-  // Client(User) initialization -> auth.js from store
-  clientInit({dispatch}) {
-    return dispatch("auth/initialize");
-  }
+    // Pre-load all available tricks, returning Promise...
+    await dispatch("techniques/fetchTechniques");
+  },
 
 }
 

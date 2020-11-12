@@ -7,10 +7,10 @@ namespace JudoLibrary.Api
     {
         public struct Policies
         {
-            public const string Anon = nameof(Anon);
-
-            // Pointing to "IdentityServerAccessToken" for User => you should be a User to access "this"
-            public const string User = IdentityServerConstants.LocalApi.PolicyName;
+            // public const string Anon = nameof(Anon);
+            //
+            // // Pointing to "IdentityServerAccessToken" for User => you should be a User to access "this"
+            // public const string User = IdentityServerConstants.LocalApi.PolicyName;
             public const string Mod = nameof(Mod);
         }
         
