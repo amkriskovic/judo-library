@@ -96,5 +96,19 @@ namespace JudoLibrary.Api.ViewModels
                     .ToList(),
                 User = UserViewModel.CreateFlat(technique.User)
             };
+        
+        public static readonly Func<Technique, object> CreateFlat = FlatProjection.Compile();
+        public static Expression<Func<Technique, object>> FlatProjection =>
+            technique => new
+            {
+                technique.Id,
+                technique.Slug,
+                technique.Name,
+                technique.Description,
+                technique.Category, // Id
+                technique.SubCategory, // Id
+                technique.Version,
+                User = UserViewModel.CreateFlat(technique.User)
+            };
     }
 }

@@ -31,8 +31,7 @@ export const actions = {
   initialize({commit}) {
     return this.$axios.$get('/api/users/me')
       .then(profile => commit('saveProfile', {profile}))
-      .catch(e => {
-        console.error('Loading profile error', e.response)
+      .catch(() => {
       })
   },
 
@@ -40,10 +39,16 @@ export const actions = {
     // Fuck off
     if (process.server) return
 
-    // * Before we log in, set the item to local storage, location.pathname => return URL pathname e.g. "/technique/osoto-gari"
-    localStorage.setItem('post-login-redirect-path', location.pathname)
+    const returnUrl = encodeURIComponent(location.href)
 
-    window.location = this.$config.auth.loginPath
+    window.location = `${this.$config.auth.loginPath}?returnUrl=${returnUrl}`
+  },
+
+  logout() {
+    // Fuck off
+    if (process.server) return
+
+    window.location = this.$config.auth.logoutPath
   },
 
 }

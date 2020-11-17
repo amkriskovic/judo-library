@@ -47,7 +47,7 @@
     <v-divider class="mt-2"></v-divider>
 
     <!-- Injecting user-header component for displaying User info -->
-    <user-header :username="technique.user.username" :image-url="technique.user.image" reverse>
+    <user-header class="pa-2" :username="technique.user.username" :image-url="technique.user.image" reverse>
 
       <template v-slot:append>
         <span>{{technique.version === 1 ? `Created by` : `Edited by`}}</span>

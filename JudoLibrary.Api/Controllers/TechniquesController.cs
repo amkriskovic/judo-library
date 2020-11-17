@@ -227,7 +227,10 @@ namespace JudoLibrary.Api.Controllers
                 // Assign Id from newly added/created technique to Target(version)
                 Target = newTechnique.Id,
 
-                Type = ModerationTypes.Technique
+                Type = ModerationTypes.Technique,
+                
+                Reason = techniqueForm.Reason,
+                UserId = UserId
             });
 
             // Save MI to DB

@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using JudoLibrary.Api.Form;
 using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
-using JudoLibrary.Models;
 using JudoLibrary.Models.Moderation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,31 +24,59 @@ namespace JudoLibrary.Api.Controllers
         
         // GET -> /api/moderation-items
         [HttpGet]
-        public IEnumerable<ModerationItem> GetModerationItems() => _ctx.ModerationItems
-            .Where(mi => !mi.Deleted)
-            .ToList();
+        public object GetAllModerationItems([FromQuery] FeedQuery feedQuery)
+        {
+            var moderationItems = _ctx.ModerationItems
+                .Include(x => x.Reviews)
+                .Where(x => !x.Deleted)
+                .OrderFeed(feedQuery)
+                .ToList();
+
+            var targets = moderationItems.GroupBy(x => x.Type)
+                .SelectMany(x =>
+                {
+                    var targetIds = x.Select(m => m.Target).ToArray();
+                    
+                    if (x.Key == ModerationTypes.Technique)
+                    {
+                        return _ctx.Techniques
+                            .Include(t => t.User)
+                            .Where(t => targetIds.Contains(t.Id))
+                            .Select(TechniqueViewModels.FlatProjection)
+                            .ToList();
+                    }
+
+                    return Enumerable.Empty<object>();
+                });
+
+            return new
+            {
+                ModerationItems = moderationItems.Select(ModerationItemViewModels.CreateFlat).ToList(),
+                Targets = targets,
+            };
+        }
         
         // GET -> /api/moderation-items/{id}
         [HttpGet("{id}")]
         public object GetModerationItem(int id) => _ctx.ModerationItems
-            .Include(mi => mi.Reviews)
-            .Where(mi => mi.Id == id)
+            .Where(mi => mi.Id.Equals(id))
             .Select(ModerationItemViewModels.Projection)
             .FirstOrDefault();
 
         // GET -> /api/moderation-items/{id}/reviews
         // Listing reviews for particular moderation item(id)
         [HttpGet("{id}/reviews")]
-        public IEnumerable<Review> GetReviewsForModerationItem(int id) =>
+        public IEnumerable<object> GetReviewsForModerationItem(int id) =>
             _ctx.Reviews
-                // Where moderation item id for review is equal to id that is passed
+                .Include(x => x.User)
                 .Where(r => r.ModerationItemId.Equals(id))
+                .Select(ReviewViewModel.WithUserProjection)
                 .ToList();
         
         // POST -> /api/moderation-items/{id}/reviews
         // Created review for particular moderation modItem
         // Passing id from url, and from body -> review 
-        [HttpPost("{id}/reviews")]
+        [HttpPut("{id}/reviews")]
         [Authorize(JudoLibraryConstants.Policies.Mod)]
         public async Task<IActionResult> CreateReviewForModerationItem(
             int id, 
@@ -70,18 +96,28 @@ namespace JudoLibrary.Api.Controllers
             if (modItem.Deleted)
                 return BadRequest("Moderation item no longer exists!");
             
-            // Created new Review for this particular MI
-            var review = new Review
-            {
-                // Assign moderation-item - {id} (That's passed in) to Review's ModerationItemId
-                ModerationItemId = id,
-                Status = reviewForm.Status,
-                Comment = reviewForm.Comment,
-                UserId = UserId
-            };
+            var review = _ctx.Reviews.FirstOrDefault(x => x.ModerationItemId == id && x.UserId == UserId);
 
-            // Add review to moderation item list of reviews
-            _ctx.Add(review);
+            if (review == null)
+            {
+                // Created new Review for this particular MI
+                review = new Review
+                {
+                    // Assign moderation-item - {id} (That's passed in) to Review's ModerationItemId
+                    ModerationItemId = id,
+                    Status = reviewForm.Status,
+                    Comment = reviewForm.Comment,
+                    UserId = UserId
+                };
+
+                // Add review to moderation item list of reviews
+                _ctx.Add(review);
+            }
+            else
+            {
+                review.Comment = reviewForm.Comment;
+                review.Status = reviewForm.Status;
+            }
 
             try
             {
@@ -95,6 +131,8 @@ namespace JudoLibrary.Api.Controllers
                     modItem.Deleted = true;
                 }
                 
+                modItem.Updated = DateTime.UtcNow;
+                
                 // Save changes to DB
                 await _ctx.SaveChangesAsync();
             }
@@ -104,7 +142,7 @@ namespace JudoLibrary.Api.Controllers
             }
 
             // Return Ok response with created review
-            return Ok(ReviewViewModel.Create(review));
+            return Ok();
         }
     }
 }

@@ -10,6 +10,7 @@ namespace JudoLibrary.Api.Form
         public string Description { get; set; }
         public string Category { get; set; } // One TechniqueForm can have One Category
         public string SubCategory { get; set; } // One TechniqueForm can have One SubCategory
+        public string Reason { get; set; }
         public IEnumerable<int> SetUpAttacks { get; set; }
         public IEnumerable<int> FollowUpAttacks { get; set; }
         public IEnumerable<int> Counters { get; set; }

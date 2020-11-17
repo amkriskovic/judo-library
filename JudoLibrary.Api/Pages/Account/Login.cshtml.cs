@@ -29,9 +29,7 @@ namespace JudoLibrary.Api.Pages.Account
         // Method for loging in -> when we submit the form => press the Log In button
         // DI at method level, injecting SignInManager for User
         // SignInManager is a service -> come from Startup -> AddIdentity
-        public async Task<IActionResult> OnPostAsync(
-            [FromServices] SignInManager<IdentityUser> signInManager,
-            [FromServices] IWebHostEnvironment env)
+        public async Task<IActionResult> OnPostAsync([FromServices] SignInManager<IdentityUser> signInManager)
         {
             // If login form is invalid, return that page again => user did not provide valid username || password
             if (!ModelState.IsValid)
@@ -43,13 +41,6 @@ namespace JudoLibrary.Api.Pages.Account
 
             if (signInResult.Succeeded)
             {
-                if (string.IsNullOrEmpty(Form.ReturnUrl))
-                {
-                    return Redirect(env.IsDevelopment() ? "https://localhost:3000" : "");
-                }
-                
-                // If signInResult succeeded we want to pop user back on from where he came from, returnUrl contains all the info
-                // that server need to redirect us back to the App -> ReturnUrl is callback
                 return Redirect(Form.ReturnUrl);
             }
 
@@ -62,7 +53,7 @@ namespace JudoLibrary.Api.Pages.Account
         // Class that represents login form -> input fields
         public class LoginForm
         {
-            public string ReturnUrl { get; set; }
+            [Required] public string ReturnUrl { get; set; }
 
             [Required] public string Username { get; set; }
 

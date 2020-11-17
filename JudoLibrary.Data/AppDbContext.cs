@@ -19,7 +19,7 @@ namespace JudoLibrary.Data
         public DbSet<TechniqueFollowupAttack> TechniqueFollowupAttacks { get; set; }
         public DbSet<Technique> Techniques { get; set; }
         public DbSet<Submission> Submissions { get; set; }
-        public DbSet<SubmissionVote> SubmissionVotes { get; set; }
+        public DbSet<SubmissionMutable> SubmissionVotes { get; set; }
         public DbSet<Video> Videos { get; set; }
         public DbSet<ModerationItem> ModerationItems { get; set; }
         public DbSet<Comment> Comments { get; set; }

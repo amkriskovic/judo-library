@@ -76,9 +76,11 @@
         </v-stepper-content>
 
         <v-stepper-content step="2">
+          <v-text-field v-if="editing" label="Reason For Change" v-model="form.reason"></v-text-field>
+
           <!-- Button - Final step (2), Saving trick -->
           <div class="d-flex justify-center">
-            <v-btn @click="save">Save</v-btn>
+            <v-btn :disabled="editing && form.reason.length <= 5" @click="save">Save</v-btn>
           </div>
         </v-stepper-content>
       </v-stepper-items>
@@ -105,6 +107,7 @@ import {mapActions, mapState} from "vuex";
         description: "",
         category: "",
         subCategory: "",
+        reason: "",
         setUpAttacks: [],
         followUpAttacks: [],
         counters: [],

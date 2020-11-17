@@ -38,6 +38,14 @@ namespace JudoLibrary.Api
                     // Created a test User
                     var testUser = new IdentityUser("test") {Id = "test_user_id", Email = "test@test.com"};
                     userManager.CreateAsync(testUser, "password").GetAwaiter().GetResult();
+                    
+                    // Seeding User
+                    context.Add(new User
+                    {
+                        Id = testUser.Id,
+                        Username = testUser.UserName,
+                        Image = "https://localhost:5001/api/files/image/user.jpg"
+                    });
 
                     // Creating(Blueprinting) fake users based on counter above
                     var fakeUsers = Enumerable.Range(0, fakeCounter)
@@ -65,13 +73,13 @@ namespace JudoLibrary.Api
                             new Claim(JudoLibraryConstants.Claims.Role, JudoLibraryConstants.Roles.Mod))
                         .GetAwaiter()
                         .GetResult();
-
-                    // Seeding User
+                    
+                    // Seeding Mod
                     context.Add(new User
                     {
-                        Id = testUser.Id,
-                        Username = testUser.UserName,
-                        Image = "https://localhost:5001/api/files/image/user.jpg"
+                        Id = mod.Id,
+                        Username = mod.UserName,
+                        Image = "https://localhost:5001/api/files/image/judge.jpg"
                     });
 
                     // Seeding Categories
@@ -209,9 +217,9 @@ namespace JudoLibrary.Api
                         Description = "This Seoi nage was very hard to pull of...",
                         VideoProcessed = true,
                         UserId = testUser.Id,
-                        Votes = new List<SubmissionVote>
+                        Votes = new List<SubmissionMutable>
                         {
-                            new SubmissionVote
+                            new SubmissionMutable
                             {
                                 UserId = testUser.Id,
                                 Value = 1,
@@ -260,7 +268,7 @@ namespace JudoLibrary.Api
                             Created = DateTime.UtcNow.AddDays(-i),
                             Votes = Enumerable
                                 .Range(0, i)
-                                .Select(ii => new SubmissionVote
+                                .Select(ii => new SubmissionMutable
                                 {
                                     UserId = fakeUsers[ii].Id,
                                     Value = 1,

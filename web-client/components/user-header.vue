@@ -1,6 +1,6 @@
 ﻿<template>
   <!-- If reverse is true, apply this class -->
-  <div class="d-flex align-center pa-2" :class="{'flex-row-reverse': reverse}">
+  <div class="d-flex align-center" :class="{'flex-row-reverse': reverse}">
     <div :class="{pointer: link}" @click="gotoUser" class="d-flex align-center">
       <!-- Avatar/Img section-->
       <v-avatar :size="size">

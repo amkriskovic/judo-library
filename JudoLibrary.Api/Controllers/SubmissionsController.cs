@@ -135,7 +135,7 @@ namespace JudoLibrary.Api.Controllers
 
             if (vote == null)
             {
-                _context.Add(new SubmissionVote
+                _context.Add(new SubmissionMutable
                 {
                     SubmissionId = id,
                     UserId = UserId,

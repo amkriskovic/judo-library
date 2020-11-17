@@ -4,7 +4,7 @@ using JudoLibrary.Models.Abstractions;
 namespace JudoLibrary.Models.Moderation
 {
     // Container for moderated items => used for separation concerns
-    public class ModerationItem : BaseModel<int>
+    public class ModerationItem : Mutable
     {
         // Current version of particular thing(item) that we are moderating
         public int Current { get; set; }
@@ -15,6 +15,8 @@ namespace JudoLibrary.Models.Moderation
         
         // Type represents => what is the type of target that we are moderating => what it is e.g. technique
         public string Type { get; set; }
+
+        public string Reason { get; set; }
 
         // Comments for moderation => notes?, moderation item can have Many Comments
         public IList<Comment> Comments { get; set; } = new List<Comment>();

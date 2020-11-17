@@ -71,7 +71,7 @@ namespace JudoLibrary.Api
             // Service for CORS mechanism, with current policy, everything is accepted
             services.AddCors(options => options
                 .AddPolicy(NuxtJsApp, build => build
-                    .WithHeaders("X-Requested-With")
+                    .AllowAnyHeader()
                     .WithOrigins("https://localhost:3000")
                     .AllowAnyMethod()
                     .AllowCredentials()));

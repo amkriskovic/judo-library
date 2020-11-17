@@ -47,8 +47,6 @@
     },
 
     loadContent() {
-      if (process.server) return;
-
       this.started = true
       this.loading = true
 
@@ -57,12 +55,16 @@
           // Finished with loading
           this.finished = content.length < this.limit
 
-          content.forEach(x => this.content.push(x))
+          this.parseContent(content)
 
           // After we did 1st round, increment the cursor, we get next step of items
           this.cursor += content.length
         })
         .finally(() => this.loading = false)
+    },
+
+    parseContent(content) {
+      content.forEach(x => this.content.push(x))
     }
   },
 
