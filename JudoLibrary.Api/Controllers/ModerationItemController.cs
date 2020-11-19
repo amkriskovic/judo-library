@@ -21,41 +21,47 @@ namespace JudoLibrary.Api.Controllers
         {
             _ctx = ctx;
         }
-        
+
         // GET -> /api/moderation-items
         [HttpGet]
         public object GetAllModerationItems([FromQuery] FeedQuery feedQuery)
         {
             var moderationItems = _ctx.ModerationItems
+                .Include(mi => mi.User)
                 .Include(x => x.Reviews)
                 .Where(x => !x.Deleted)
                 .OrderFeed(feedQuery)
                 .ToList();
 
-            var targets = moderationItems.GroupBy(x => x.Type)
-                .SelectMany(x =>
-                {
-                    var targetIds = x.Select(m => m.Target).ToArray();
-                    
-                    if (x.Key == ModerationTypes.Technique)
-                    {
-                        return _ctx.Techniques
-                            .Include(t => t.User)
-                            .Where(t => targetIds.Contains(t.Id))
-                            .Select(TechniqueViewModels.FlatProjection)
-                            .ToList();
-                    }
-
-                    return Enumerable.Empty<object>();
-                });
-
-            return new
+            var targetMapping = new Dictionary<int, object>();
+            foreach (var group in moderationItems.GroupBy(x => x.Type))
             {
-                ModerationItems = moderationItems.Select(ModerationItemViewModels.CreateFlat).ToList(),
-                Targets = targets,
-            };
+                var targetIds = group.Select(m => m.Target).ToArray();
+
+                if (group.Key == ModerationTypes.Technique)
+                {
+                    _ctx.Techniques
+                        .Where(t => targetIds.Contains(t.Id))
+                        .ToList()
+                        .ForEach(technique => targetMapping[technique.Id] = TechniqueViewModels.CreateFlat(technique));
+                }
+            }
+
+            return moderationItems.Select(x => new
+            {
+                x.Id, // Crucial to editing
+                x.Current,
+                x.Target,
+                x.Reason,
+                x.Type,
+
+                Updated = x.Updated.ToLocalTime().ToString("HH:mm dd/MM/yyyy"),
+                Reviews = x.Reviews.Select(r => r.Status).ToList(),
+                User = UserViewModel.CreateFlat(x.User),
+                TargetObject = targetMapping[x.Target],
+            });
         }
-        
+
         // GET -> /api/moderation-items/{id}
         [HttpGet("{id}")]
         public object GetModerationItem(int id) => _ctx.ModerationItems
@@ -72,14 +78,14 @@ namespace JudoLibrary.Api.Controllers
                 .Where(r => r.ModerationItemId.Equals(id))
                 .Select(ReviewViewModel.WithUserProjection)
                 .ToList();
-        
+
         // POST -> /api/moderation-items/{id}/reviews
         // Created review for particular moderation modItem
         // Passing id from url, and from body -> review 
         [HttpPut("{id}/reviews")]
         [Authorize(JudoLibraryConstants.Policies.Mod)]
         public async Task<IActionResult> CreateReviewForModerationItem(
-            int id, 
+            int id,
             [FromBody] ReviewForm reviewForm,
             [FromServices] VersionMigrationContext versionMigrationContext)
         {
@@ -87,15 +93,15 @@ namespace JudoLibrary.Api.Controllers
             var modItem = _ctx.ModerationItems
                 .Include(mi => mi.Reviews)
                 .FirstOrDefault(mi => mi.Id == id);
-                
+
             // If moderationItem doesnt exist -> we dont have anything to moderate -> 204
             if (modItem == null)
                 return NoContent();
-            
+
             // If moderation item is deleted -> 400
             if (modItem.Deleted)
                 return BadRequest("Moderation item no longer exists!");
-            
+
             var review = _ctx.Reviews.FirstOrDefault(x => x.ModerationItemId == id && x.UserId == UserId);
 
             if (review == null)
@@ -121,18 +127,35 @@ namespace JudoLibrary.Api.Controllers
 
             try
             {
-                // If moderation item Reviews count is greater or equal to 3 -> approved/rejected/pending
-                if (modItem.Reviews.Count >= 3)
+                int goal = 3, score = 9, wait = 0;
+
+                foreach (var modItemReview in modItem.Reviews)
+                {
+                    if (modItemReview.Status == ReviewStatus.Approved)
+                        score++;
+                    
+                    else if (modItemReview.Status == ReviewStatus.Rejected)
+                        score--;
+                    
+                    else if (modItemReview.Status == ReviewStatus.Waiting)
+                        wait++;
+                }
+                
+                if (score >= goal + wait)
                 {
                     // Passing ModerationItem to Migrate process
                     versionMigrationContext.Migrate(modItem);
-                    
+
                     // "Delete" after migration
                     modItem.Deleted = true;
+                } else if (score <= -goal - wait)
+                {
+                    modItem.Deleted = true;
+                    modItem.Rejected = true;
                 }
-                
+
                 modItem.Updated = DateTime.UtcNow;
-                
+
                 // Save changes to DB
                 await _ctx.SaveChangesAsync();
             }

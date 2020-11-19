@@ -84,6 +84,19 @@ namespace JudoLibrary.Api.Controllers
                 .ToList();
         }
         
+        // GET -> /api/techniques/{techniqueId}/best-submission
+        [HttpGet("{techniqueId}/best-submission")]
+        public object GetBestSubmissionForTechnique(string techniqueId)
+        {
+            return _context.Submissions
+                .Include(s => s.Video)
+                .Include(s => s.User)
+                .Where(s => s.TechniqueId.Equals(techniqueId, StringComparison.InvariantCultureIgnoreCase))
+                .OrderByDescending(s => s.Votes.Sum(v => v.Value))
+                .Select(SubmissionViewModels.PerspectiveProjection(UserId))
+                .FirstOrDefault();
+        }
+        
         // POST -> /api/techniques
         // Created technique, sending json from the body of the request, TechniqueForm is responsible for creating technique
         [HttpPost]

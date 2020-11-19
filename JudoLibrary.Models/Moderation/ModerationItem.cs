@@ -17,6 +17,8 @@ namespace JudoLibrary.Models.Moderation
         public string Type { get; set; }
 
         public string Reason { get; set; }
+        
+        public bool Rejected { get; set; }
 
         // Comments for moderation => notes?, moderation item can have Many Comments
         public IList<Comment> Comments { get; set; } = new List<Comment>();

@@ -3,7 +3,7 @@
     <!-- * Comment body component is just about how do we display that particular comment, display htmlContent of comment -->
     <div class="my-1">
       <v-sheet rounded class="d-flex align-center mb-1" color="blue-grey darken-3">
-        <user-header
+        <user-header class="pa-2"
           :username="comment.user.username"
           :image-url="comment.user.image"
           size="28"

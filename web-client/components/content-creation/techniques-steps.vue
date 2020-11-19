@@ -4,7 +4,7 @@
 
     <!-- Title -->
     <v-card-title>
-      Create Trick
+      Create Technique
       <v-spacer></v-spacer>
 
       <!-- Button - X -->

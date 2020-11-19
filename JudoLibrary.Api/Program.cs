@@ -244,7 +244,8 @@ namespace JudoLibrary.Api
                     context.Add(new ModerationItem
                     {
                         Target = 6,
-                        Type = ModerationTypes.Technique
+                        Type = ModerationTypes.Technique,
+                        UserId = testUser.Id
                     });
 
                     // Saving changes to in-memory DB

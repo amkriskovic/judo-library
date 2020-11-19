@@ -20,9 +20,11 @@ export const form = (formFactory) => ({
     form: formFactory()
   }),
 
-  created: function() {
+  created: function () {
     // Call this setup which comes from video-upload, with this form that's generated with formFactory
-    this.setup(this.form)
+    if (this.setup) {
+      this.setup(this.form)
+    }
   },
 
   computed: {

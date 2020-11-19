@@ -2,7 +2,7 @@
   <div class="video-container">
 
     <!-- Play button | playing toggles(switching) => functionality | binding class for hiding play button on play => depends on playing state -->
-    <div class="play-button" :class="{'hide': playing}" @click="playing = !playing">
+    <div class="play-button" :class="{'hide': playing}" @click.stop="playing = !playing">
       <v-icon size="78">mdi-play</v-icon>
     </div>
 

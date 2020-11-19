@@ -1,5 +1,13 @@
 <template>
   <div>
+
+    <div>
+      <h3 class="text-h5 text-center">Techniques</h3>
+      <front-page-technique-feed />
+    </div>
+
+    <v-divider class="my-5"></v-divider>
+
     <div v-for="section in sections">
       <!-- Index page data -->
       <div class="d-flex flex-column align-center">
@@ -22,8 +30,10 @@
 
 <script>
   import {mapState} from "vuex"
+  import FrontPageTechniqueFeed from "@/components/front-page/front-page-technique-feed";
 
   export default {
+    components: {FrontPageTechniqueFeed},
     // * Techniques, categories, subcategories are getting fetched from index.js
     computed: {
       // Importing lists from initial state of techniques store
@@ -34,7 +44,7 @@
         return [
           // Collection is ARRAY of techniques || categories || subcategories and we can access their model props, like id
           // /technique corresponds to folder _technique, i => item, only technique uses slug
-          {collection: this.lists.techniques, title: "Techniques", routeFactory: i => `/technique/${i.slug}`},
+          // {collection: this.lists.techniques, title: "Techniques", routeFactory: i => `/technique/${i.slug}`},
           {collection: this.lists.categories, title: "Categories", routeFactory: i => `/category/${i.id}`},
           {collection: this.lists.subcategories, title: "Subcategories", routeFactory: i => `/subcategory/${i.id}`},
         ]

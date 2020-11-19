@@ -18,7 +18,10 @@ export const mutations = {
 
   // Get's stepper based on action that we wanna perform, create technique or upload submission, passing component as payload
   // Which will be activated once we select it from menu/dropdown
-  activate(state, {component, edit = false, editPayload = null, setup = null}) {
+  activate(state, {
+    component, edit = false, editPayload = null, setup = () => {
+    }
+  }) {
     state.active = true;
     state.component = component;
 
@@ -29,10 +32,7 @@ export const mutations = {
       state.editPayload = editPayload;
     }
 
-    // If there is setup
-    if (setup) {
-      state.setup = setup
-    }
+    state.setup = setup
   },
 
   // Hide in order to prevent nullifying state (uploadPromise) when creating submission
@@ -77,20 +77,18 @@ export const actions = {
     // We are getting promise with some state, * for data we need to await it
     // Extract the data from response
     // Generate cancelToken from the source
-    const uploadPromise = this.$axios.post("/api/files", form, {
+    const uploadPromise = this.$axios.$post("/api/files", form, {
 
       // Supply an option/s -> progress -> false -> removes loading bar (spinning)
       progress: false,
       cancelToken: source.token
     })
-      .then(({data}) => {
+      .then(video => {
         // Call mutation completeUpload which will mark video -> upload complete as true
         commit("completeUpload");
 
-        console.log('startVideoUpload: ->', uploadPromise);
-
         // Return video URL which will get stored to the uploadPromise, data is actual TEMP video name
-        return data;
+        return video;
       })
       .catch(err => {
         // If err is cancel -> cancellation request
@@ -141,8 +139,7 @@ export const actions = {
     // Assign upload promise (which we resolve here -> getting data) to forms video prop
     form.video = await state.uploadPromise;
 
-    // Dispatching createSubmission action with payload form, where we have our form data
-    await dispatch("submissions/createSubmission", {form}, {root: true});
+    await this.$axios.$post("/api/submissions", form);
 
     // After creating submission, flush(reset) component to initial state
     commit("reset");

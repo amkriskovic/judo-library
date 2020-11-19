@@ -142,21 +142,23 @@ export default {
     // Produce the endpoint based on url type parameter, e.g. techniques => extract the type from modItem
     const endpoint = this.endpointResolver(type)
 
-    this.loadReviews()
+    const loadReviews = this.loadReviews()
 
     // Assign endpoint to the item in local state
     // Get dynamic API controller => response - data, based on URL parameters that we extracted
     // * Provide current from modItem which is int => current version of item we editing =>> CURRENT
-    this.$axios.$get(`/api/${endpoint}/${current}`)
+    const loadCurrent = this.$axios.$get(`/api/${endpoint}/${current}`)
       // Fire and forget
       // Then assign item(curr) that came from GET req. to local state item -> current
       .then(currItem => this.current = currItem)
 
     // * Make GET req to get the target(next) version =>> TARGET
-    this.$axios.$get(`api/${endpoint}/${target}`)
+    const loadTarget = this.$axios.$get(`api/${endpoint}/${target}`)
       // Fire and forget
       // Then assign item(targetItem) that came from GET req. to local state item
       .then(targetItem => this.target = targetItem)
+
+    await Promise.all([loadReviews, loadCurrent, loadTarget])
   },
 
   methods: {

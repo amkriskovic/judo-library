@@ -7,7 +7,7 @@
     </v-tabs>
 
     <!-- Injecting submission component -> submissions gonna be loaded based on what we are looking at -->
-    <submission :submission="c" v-for="c in content" :key="`submission-${c.id}`"/>
+    <submission class="my-3" :submission="c" v-for="c in content" :key="`submission-${c.id}`"/>
   </div>
 </template>
 

@@ -26,31 +26,6 @@ namespace JudoLibrary.Api.ViewModels
                 
                 Updated = moderationItem.Updated.ToLocalTime().ToString("HH:mm dd/MM/yyyy"),
             };
-        
-        
-        // Assign to create delegate, projection expression that we compile, so we can use it in controller
-        public static readonly Func<ModerationItem, object> CreateFlat = FlatProjection.Compile();
-        
-        // Projection ViewModel
-        // Expression holds information about function, returning a function
-        // EF will take Expression and translate it into Select statement
-        public static Expression<Func<ModerationItem, object>> FlatProjection =>
-            // Accept ModerationItem and return object, this function becomes object, we are mapping stuff
-            // to ModerationItem(moderationItem) object
-            moderationItem => new
-            {
-                moderationItem.Id, // Crucial to editing
-                moderationItem.Current,
-                moderationItem.Target,
-                moderationItem.Reason,
-                moderationItem.Type,
-                
-                Updated = moderationItem.Updated.ToLocalTime().ToString("HH:mm dd/MM/yyyy"),
-                
-                Reviews = moderationItem.Reviews
-                    .AsQueryable()
-                    .Select(r => r.Status)
-                    .ToList()
-            };
+
     }
 }
