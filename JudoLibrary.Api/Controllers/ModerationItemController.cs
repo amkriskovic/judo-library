@@ -76,7 +76,7 @@ namespace JudoLibrary.Api.Controllers
             _ctx.Reviews
                 .Include(x => x.User)
                 .Where(r => r.ModerationItemId.Equals(id))
-                .Select(ReviewViewModel.WithUserProjection)
+                .Select(ReviewViewModels.WithUserProjection)
                 .ToList();
 
         // POST -> /api/moderation-items/{id}/reviews

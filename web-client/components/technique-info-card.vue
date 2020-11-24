@@ -38,9 +38,11 @@
 
       <!-- If we are not authenticated => forbidden -->
       <template v-slot:forbidden="{login}">
-        <v-btn small outlined @click="login">
-          Log in to edit/update
-        </v-btn>
+        <div class="d-flex justify-center">
+          <v-btn small outlined @click="login">
+            Log in to edit/update
+          </v-btn>
+        </div>
       </template>
     </if-auth>
 

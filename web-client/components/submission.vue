@@ -1,7 +1,10 @@
 ﻿<template>
-  <v-card>
+  <v-card :elevation="elevation">
     <!-- Injecting user-header component, providing username from submission -->
-    <user-header class="pa-2" :username="submission.user.username" :image-url="submission.user.image">
+    <user-header class="pa-2"
+                 :username="submission.user.username"
+                 :image-url="submission.user.image"
+                 :size="slim ? '32' : '42'">
       <template v-slot:append>
         <div v-if="slim">
           <v-icon>mdi-chevron-up</v-icon>
@@ -49,7 +52,7 @@
 
           <v-spacer/>
 
-          <v-btn @click="login">Sign in to Comment</v-btn>
+          <v-btn small @click="login">Sign in to Comment</v-btn>
         </v-card-actions>
       </template>
     </if-auth>
@@ -75,10 +78,16 @@ export default {
       required: true,
     },
 
-    slim: {
+     slim: {
       type: Boolean,
       required: false,
       default: false,
+    },
+
+    elevation: {
+      type: String,
+      required: false,
+      default: '8',
     }
   },
 

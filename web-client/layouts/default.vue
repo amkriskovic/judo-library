@@ -3,12 +3,14 @@
   <v-app dark>
 
     <!-- "Header" bar -->
-    <v-app-bar app dense>
+    <v-app-bar app>
 
       <!-- Enabling navigation via nuxt-link -> home page, vuetify class -->
       <nuxt-link class="text-h5 text--primary" style="text-decoration: none;" to="/">Judo Library</nuxt-link>
 
-      <v-spacer></v-spacer>
+      <v-spacer/>
+      <nav-bar-search/>
+      <v-spacer/>
 
       <!-- Moderation button, if he is Mod -> coming from auth.js getters -->
       <v-btn class="mx-1" depressed to="/moderation">Moderation</v-btn>
@@ -80,12 +82,14 @@
 import ContentCreationDialog from "../components/content-creation/content-creation-dialog";
 import {mapActions, mapGetters, mapState} from "vuex";
 import IfAuth from "@/components/auth/if-auth";
+import NavBarSearch from "@/components/nav-bar-search";
 
 export default {
   name: "default",
 
   // Mapping components
   components: {
+    NavBarSearch,
     IfAuth,
     ContentCreationDialog
   },

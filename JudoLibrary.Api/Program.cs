@@ -81,59 +81,65 @@ namespace JudoLibrary.Api
                         Username = mod.UserName,
                         Image = "https://localhost:5001/api/files/image/judge.jpg"
                     });
-
+                    
                     // Seeding Categories
-                    context.Add(new Category
+                    var categories = new List<Category>()
                     {
-                        Id = "nage-waza", Name = "Nage Waza",
-                        Description = "Throwing Techniques"
-                    });
-                    context.Add(new Category
-                    {
-                        Id = "katame-waza", Name = "Katame Waza",
-                        Description = "Grappling Techniques"
-                    });
-                    context.Add(new Category
-                    {
-                        Id = "atemi-waza", Name = "Atemi Waza",
-                        Description = "Body Striking Techniques"
-                    });
-                    context.Add(new Category
-                    {
-                        Id = "uke-waza", Name = "Uke Waza",
-                        Description = "Blocks And Parries"
-                    });
+                        new Category
+                        {
+                            Id = "nage-waza", Name = "Nage Waza",
+                            Description = "Throwing Techniques" 
+                        },
+                        new Category
+                        {
+                            Id = "katame-waza", Name = "Katame Waza",
+                            Description = "Grappling Techniques"
+                        },
+                        new Category
+                        {
+                            Id = "atemi-waza", Name = "Atemi Waza",
+                            Description = "Body Striking Techniques"
+                        },
+                        new Category
+                        {
+                            Id = "uke-waza", Name = "Uke Waza",
+                            Description = "Blocks And Parries"
+                        } 
+                    };
+                    context.AddRange(categories);
+
 
                     // Seeding SubCategories
-                    context.Add(new SubCategory
+                    var subcategories = new List<SubCategory>()
                     {
-                        Id = "te-waza", Name = "Te Waza",
-                        Description = "Hand throwing techniques", CategoryId = "nage-waza"
-                    });
+                        new SubCategory
+                        {
+                            Id = "te-waza", Name = "Te Waza",
+                            Description = "Hand throwing techniques", CategoryId = "nage-waza"
+                        },
+                        new SubCategory
+                        {
+                            Id = "koshi-waza", Name = "Koshi Waza",
+                            Description = "Hip throwing techniques", CategoryId = "nage-waza"
+                        },
+                        new SubCategory
+                        {
+                            Id = "ashi-waza", Name = "Ashi Waza",
+                            Description = "Foot throwing techniques", CategoryId = "nage-waza"
+                        },
+                        new SubCategory
+                        {
+                            Id = "sutemi-waza", Name = "Sutemi waza",
+                            Description = "Sacrifice techniques", CategoryId = "nage-waza"
+                        },
+                        new SubCategory
+                        {
+                            Id = "osaekomi-waza", Name = "Osaekomi waza ",
+                            Description = "Pins or matholds", CategoryId = "katame-waza"
+                        } 
+                    };
+                    context.AddRange(subcategories);
 
-                    context.Add(new SubCategory
-                    {
-                        Id = "koshi-waza", Name = "Koshi Waza",
-                        Description = "Hip throwing techniques", CategoryId = "nage-waza"
-                    });
-
-                    context.Add(new SubCategory
-                    {
-                        Id = "ashi-waza", Name = "Ashi Waza",
-                        Description = "Foot throwing techniques", CategoryId = "nage-waza"
-                    });
-
-                    context.Add(new SubCategory
-                    {
-                        Id = "sutemi-waza", Name = "Sutemi waza",
-                        Description = "Sacrifice techniques", CategoryId = "nage-waza"
-                    });
-
-                    context.Add(new SubCategory
-                    {
-                        Id = "osaekomi-waza", Name = "Osaekomi waza ",
-                        Description = "Pins or matholds", CategoryId = "katame-waza"
-                    });
 
                     // Seeding Techniques
                     context.Add(new Technique
@@ -298,6 +304,58 @@ namespace JudoLibrary.Api
 
                     // Save fake Submissions to DB
                     context.SaveChanges();
+
+                    for (int i = 0; i < fakeCounter; i++)
+                    {
+                        var technique = new Technique
+                        {
+                            UserId = testUser.Id, 
+                            Version = 1, 
+                            Active = true, 
+                            Slug = $"fake-technique-{i}",
+                            Name = $"Fake Technique que {i}",
+                            Description = $"This is a fake technique # {i}", 
+                            Category = categories[i % categories.Count].Id,
+                            SubCategory = subcategories[i % subcategories.Count].Id,
+                            // SetUpAttacks = new List<TechniqueSetupAttack>
+                            // {
+                            //     new TechniqueSetupAttack {TechniqueId = 5, SetUpAttackId = 1, Active = true}
+                            // },
+                            // FollowUpAttacks = new List<TechniqueFollowupAttack>
+                            // {
+                            //     new TechniqueFollowupAttack {TechniqueId = 5, FollowUpAttackId = 6, Active = true}
+                            // },
+                            // Counters = new List<TechniqueCounter>
+                            // {
+                            //     new TechniqueCounter {TechniqueId = 5, CounterId = 2, Active = true},
+                            //     new TechniqueCounter {TechniqueId = 5, CounterId = 3, Active = true}
+                            // }
+                        };
+                        context.Add(technique);
+                        context.Add(new Submission
+                        {
+                            TechniqueId = technique.Slug,
+                            Description = $"Fake submission |||| {i}",
+                            Video = new Video
+                            {
+                                ThumbLink = "https://localhost:5001/api/files/image/three.jpg",
+                                VideoLink = "https://localhost:5001/api/files/video/three.mp4"
+                            },
+                            VideoProcessed = true,
+                            UserId = testUser.Id,
+
+                            Created = DateTime.UtcNow.AddDays(-i),
+                            Votes = Enumerable
+                                .Range(0, i)
+                                .Select(ii => new SubmissionMutable
+                                {
+                                    UserId = fakeUsers[ii].Id,
+                                    Value = 1,
+                                })
+                                .ToList(),
+                        });
+                        context.SaveChanges();
+                    }
                 }
             }
 

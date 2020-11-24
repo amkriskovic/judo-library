@@ -41,7 +41,7 @@ namespace JudoLibrary.Api.Controllers
             return _ctx.Comments
                 .Where(filter)
                 .OrderFeed(feedQuery)
-                .Select(CommentViewModel.Projection)
+                .Select(CommentViewModels.Projection)
                 .ToList();
         }
 
@@ -59,7 +59,7 @@ namespace JudoLibrary.Api.Controllers
                     .CreateCommentAsync(commentForm);
 
                 // Return ok with created comment
-                return Ok(CommentViewModel.Create(comment));
+                return Ok(CommentViewModels.Create(comment));
             }
             catch (CommentCreationContext.ParentNotFoundException e)
             {

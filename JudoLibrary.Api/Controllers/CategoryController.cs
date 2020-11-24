@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -22,7 +23,9 @@ namespace JudoLibrary.Api.Controllers
         
         // GET -> /api/categories
         [HttpGet]
-        public IEnumerable<Category> GetAllCategories() => _context.Categories.ToList();
+        public IEnumerable<object> GetAllCategories() => _context.Categories
+            .Select(CategoryViewModels.Projection)
+            .ToList();
         
         // GET -> /api/categories/{id}
         [HttpGet("{id}")]

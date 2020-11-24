@@ -31,6 +31,16 @@ namespace JudoLibrary.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Category>()
+                .HasMany(x => x.Techniques)
+                .WithOne()
+                .HasForeignKey(x => x.Category);
+            
+            modelBuilder.Entity<SubCategory>()
+                .HasMany(x => x.Techniques)
+                .WithOne()
+                .HasForeignKey(x => x.SubCategory);
+            
             // Creating composite key for TechniqueSetupAttack
             modelBuilder.Entity<TechniqueSetupAttack>()
                 .HasKey(tsa => new {tsa.TechniqueId, tsa.SetUpAttackId});

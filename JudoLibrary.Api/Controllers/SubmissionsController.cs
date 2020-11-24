@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
@@ -9,6 +10,7 @@ using JudoLibrary.Data;
 using JudoLibrary.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace JudoLibrary.Api.Controllers
 {
@@ -31,6 +33,21 @@ namespace JudoLibrary.Api.Controllers
         // GET -> /api/submissions/{id}
         [HttpGet("{id}")]
         public Submission GetSubmission(int id) => _context.Submissions.FirstOrDefault(s => s.Id.Equals(id));
+        
+        // GET -> /api/submissions/best-submission
+        [HttpGet("best-submission")]
+        public object GetBestSubmissionForTechnique(string byTechniques)
+        {
+            var techniqueIds = byTechniques.Split(';');
+                
+            return _context.Submissions
+                .Include(s => s.Video)
+                .Include(s => s.User)
+                .Where(s => techniqueIds.Contains(s.TechniqueId))
+                .OrderByDescending(s => s.Votes.Sum(v => v.Value))
+                .Select(SubmissionViewModels.PerspectiveProjection(UserId))
+                .FirstOrDefault();
+        }
 
         // POST -> /api/submissions
         // [FromServices] =>> Dependency Injection as method parameter

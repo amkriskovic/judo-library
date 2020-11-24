@@ -2,27 +2,22 @@
   <div>
 
     <div>
-      <h3 class="text-h5 text-center">Techniques</h3>
+      <h3 class="text-h3 text-center">Techniques</h3>
       <front-page-technique-feed />
     </div>
 
     <v-divider class="my-5"></v-divider>
 
-    <div v-for="section in sections">
-      <!-- Index page data -->
-      <div class="d-flex flex-column align-center">
-        <p class="text-h5">{{section.title}}</p>
+    <div>
+      <h3 class="text-h3 text-center">Categories</h3>
+      <front-page-category-feed />
+    </div>
 
-        <div>
-          <!-- Loop over collections -->
-          <v-btn class="mx-1" v-for="item in section.collection"
-                 :key="`${section.title}-${item.id}`"
-                 :to="section.routeFactory(item)">{{ item.name }}
-          </v-btn>
-        </div>
-      </div>
+    <v-divider class="my-5"></v-divider>
 
-      <v-divider class="my-5"></v-divider>
+    <div>
+      <h3 class="text-h3 text-center">Sub Categories</h3>
+      <front-page-subcategory-feed />
     </div>
 
   </div>
@@ -31,24 +26,10 @@
 <script>
   import {mapState} from "vuex"
   import FrontPageTechniqueFeed from "@/components/front-page/front-page-technique-feed";
+  import FrontPageCategoryFeed from "@/components/front-page/front-page-category-feed";
+  import FrontPageSubcategoryFeed from "@/components/front-page/front-page-subcategory-feed";
 
   export default {
-    components: {FrontPageTechniqueFeed},
-    // * Techniques, categories, subcategories are getting fetched from index.js
-    computed: {
-      // Importing lists from initial state of techniques store
-      ...mapState("techniques", ["lists"]),
-
-      // Function that returns array of objects of data from techniques store state
-      sections() {
-        return [
-          // Collection is ARRAY of techniques || categories || subcategories and we can access their model props, like id
-          // /technique corresponds to folder _technique, i => item, only technique uses slug
-          // {collection: this.lists.techniques, title: "Techniques", routeFactory: i => `/technique/${i.slug}`},
-          {collection: this.lists.categories, title: "Categories", routeFactory: i => `/category/${i.id}`},
-          {collection: this.lists.subcategories, title: "Subcategories", routeFactory: i => `/subcategory/${i.id}`},
-        ]
-      }
-    },
+    components: {FrontPageSubcategoryFeed, FrontPageCategoryFeed, FrontPageTechniqueFeed},
   }
 </script>
