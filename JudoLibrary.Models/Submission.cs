@@ -15,7 +15,7 @@ namespace JudoLibrary.Models
         public string UserId { get; set; } // Submission can have One User
         public User User { get; set; } // Navigation prop
         
-        public IList<SubmissionMutable> Votes { get; set; } = new List<SubmissionMutable>();
+        public IList<SubmissionVote> Votes { get; set; } = new List<SubmissionVote>();
         public IList<Comment> Comments { get; set; } = new List<Comment>();
 
     }

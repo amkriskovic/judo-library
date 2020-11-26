@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using JudoLibrary.Api.BackgroundServices.SubmissionVoting;
 using JudoLibrary.Api.BackgroundServices.VideoEditing;
 using JudoLibrary.Api.Form;
 using JudoLibrary.Api.ViewModels;
@@ -139,7 +140,10 @@ namespace JudoLibrary.Api.Controllers
         // PUT -> /api/submissions/{id}/vote
         [HttpPut("{id}/vote")]
         [Authorize]
-        public async Task<IActionResult> UpdateVote(int id, int value)
+        public async Task<IActionResult> UpdateVote(
+            int id, 
+            int value,
+            [FromServices] ISubmissionVoteSink voteSink)
         {
             // Doesn't fit in one of the categories of upvote or down vote
             if (value != -1 && value != 1)
@@ -147,24 +151,12 @@ namespace JudoLibrary.Api.Controllers
                 return BadRequest();
             }
 
-            var vote = _context.SubmissionVotes
-                .FirstOrDefault(sv => sv.SubmissionId == id && sv.UserId == UserId);
-
-            if (vote == null)
+            await voteSink.Submit(new VoteForm
             {
-                _context.Add(new SubmissionMutable
-                {
-                    SubmissionId = id,
-                    UserId = UserId,
-                    Value = value
-                });
-            }
-            else
-            {
-                vote.Value = value;
-            }
-
-            await _context.SaveChangesAsync();
+                SubmissionId = id,
+                UserId = UserId,
+                Value = value
+            });
 
             return Ok();
         }

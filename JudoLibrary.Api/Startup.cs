@@ -5,6 +5,7 @@ using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Models;
 using JudoLibrary.Api.BackgroundServices;
+using JudoLibrary.Api.BackgroundServices.SubmissionVoting;
 using JudoLibrary.Api.BackgroundServices.VideoEditing;
 using JudoLibrary.Data;
 using Microsoft.AspNetCore.Authorization;
@@ -49,6 +50,9 @@ namespace JudoLibrary.Api
             // Adds support for using razor pages
             services.AddRazorPages();
 
+            services.Configure<ModerationItemReviewContext.ModerationSettings>(
+                _config.GetSection(nameof(ModerationItemReviewContext.ModerationSettings)));
+
             // Adding hosted service for VideoEditingBackgroundService which implements BackgroundService <- IHostedService
             services.AddHostedService<VideoEditingBackgroundService>();
 
@@ -57,6 +61,11 @@ namespace JudoLibrary.Api
             
             // Registering VersionMigrationContext as scoped => Used for migrating versions
             services.AddScoped<VersionMigrationContext>();
+
+            // Registering ModerationItemReviewContext as Singleton
+            services.AddSingleton<ModerationItemReviewContext>();
+            services.AddSingleton<ISubmissionVoteSink, SubmissionVotingService>();
+            services.AddHostedService(provider => (SubmissionVotingService) provider.GetRequiredService<ISubmissionVoteSink>());
 
             services.AddTransient<CommentCreationContext>();
 

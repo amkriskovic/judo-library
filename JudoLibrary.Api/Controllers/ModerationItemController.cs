@@ -86,85 +86,22 @@ namespace JudoLibrary.Api.Controllers
         [Authorize(JudoLibraryConstants.Policies.Mod)]
         public async Task<IActionResult> CreateReviewForModerationItem(
             int id,
-            [FromBody] ReviewForm reviewForm,
-            [FromServices] VersionMigrationContext versionMigrationContext)
+            [FromBody] ModerationItemReviewContext.ReviewForm reviewForm,
+            [FromServices] ModerationItemReviewContext moderationItemReviewContext)
         {
-            // Get the moderation item by comparing Id's -> include Reviews with it
-            var modItem = _ctx.ModerationItems
-                .Include(mi => mi.Reviews)
-                .FirstOrDefault(mi => mi.Id == id);
-
-            // If moderationItem doesnt exist -> we dont have anything to moderate -> 204
-            if (modItem == null)
-                return NoContent();
-
-            // If moderation item is deleted -> 400
-            if (modItem.Deleted)
-                return BadRequest("Moderation item no longer exists!");
-
-            var review = _ctx.Reviews.FirstOrDefault(x => x.ModerationItemId == id && x.UserId == UserId);
-
-            if (review == null)
-            {
-                // Created new Review for this particular MI
-                review = new Review
-                {
-                    // Assign moderation-item - {id} (That's passed in) to Review's ModerationItemId
-                    ModerationItemId = id,
-                    Status = reviewForm.Status,
-                    Comment = reviewForm.Comment,
-                    UserId = UserId
-                };
-
-                // Add review to moderation item list of reviews
-                _ctx.Add(review);
-            }
-            else
-            {
-                review.Comment = reviewForm.Comment;
-                review.Status = reviewForm.Status;
-            }
-
             try
             {
-                int goal = 3, score = 9, wait = 0;
-
-                foreach (var modItemReview in modItem.Reviews)
-                {
-                    if (modItemReview.Status == ReviewStatus.Approved)
-                        score++;
-                    
-                    else if (modItemReview.Status == ReviewStatus.Rejected)
-                        score--;
-                    
-                    else if (modItemReview.Status == ReviewStatus.Waiting)
-                        wait++;
-                }
-                
-                if (score >= goal + wait)
-                {
-                    // Passing ModerationItem to Migrate process
-                    versionMigrationContext.Migrate(modItem);
-
-                    // "Delete" after migration
-                    modItem.Deleted = true;
-                } else if (score <= -goal - wait)
-                {
-                    modItem.Deleted = true;
-                    modItem.Rejected = true;
-                }
-
-                modItem.Updated = DateTime.UtcNow;
-
-                // Save changes to DB
-                await _ctx.SaveChangesAsync();
+                await moderationItemReviewContext.Review(id, UserId, reviewForm);
             }
             catch (VersionMigrationContext.InvalidVersionException e)
             {
                 return BadRequest(e.Message);
             }
+            catch (ModerationItemReviewContext.ModerationItemNotFound)
+            {
+                return NoContent();
+            }
 
-            // Return Ok response with created review
             return Ok();
         }
     }
