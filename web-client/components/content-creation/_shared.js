@@ -8,7 +8,7 @@ export const close = {
 
     // Wrapping up cancelUpload function into close func
     close() {
-      this.cancelUpload();
+      return this.cancelUpload({hard: true});
     }
   }
 }

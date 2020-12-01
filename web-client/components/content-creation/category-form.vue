@@ -13,12 +13,15 @@
     </v-card-title>
 
     <v-card-text>
-      <v-text-field label="Name" v-model="form.name"></v-text-field>
-      <v-text-field label="Description" v-model="form.description"></v-text-field>
+      <v-form ref="form" v-model="validation.valid">
+        <v-text-field :rules="validation.name" label="Name" v-model="form.name"></v-text-field>
+        <v-text-field :rules="validation.description" label="Description" v-model="form.description"></v-text-field>
+      </v-form>
+
     </v-card-text>
 
     <v-card-actions class="d-flex justify-center">
-      <v-btn @click="save">Save</v-btn>
+      <v-btn :disabled="!validation.valid" color="primary" @click="$refs.form.validate() ? save() : 0">Create</v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -35,7 +38,12 @@
       form: {
         name: "",
         description: "",
-      }
+      },
+      validation: {
+        valid: false,
+        name: [v => !!v || "Name is required."],
+        description: [v => !!v || "Description is required."]
+      },
     }),
 
     mixins: [close],

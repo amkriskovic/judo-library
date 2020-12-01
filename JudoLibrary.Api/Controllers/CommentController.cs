@@ -48,7 +48,7 @@ namespace JudoLibrary.Api.Controllers
         // POST -> /api/comments
         [HttpPost]
         public async Task<IActionResult> CreateComment(
-            [FromBody] CommentForm commentForm,
+            [FromBody] CommentCreationContext.CommentForm commentForm,
             [FromServices] CommentCreationContext commentCreationContext)
         {
             try

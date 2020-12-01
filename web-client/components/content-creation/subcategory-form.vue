@@ -13,48 +13,63 @@
     </v-card-title>
 
     <v-card-text>
-      <v-text-field label="Name" v-model="form.name"></v-text-field>
-      <v-text-field label="Description" v-model="form.description"></v-text-field>
-      <v-select label="Category" :items="categoryItems" v-model="form.categoryId"></v-select>
+      <v-form ref="form" v-model="validation.valid">
+        <v-text-field :rules="validation.name" label="Name" v-model="form.name"></v-text-field>
+        <v-text-field :rules="validation.description" label="Description" v-model="form.description"></v-text-field>
+
+        <v-select
+          :rules="validation.categoryId"
+          :items="lists.categories.map(c => ({value: c.id, text: c.name}))"
+          v-model="form.categoryId"
+          label="Category">
+        </v-select>
+      </v-form>
+
     </v-card-text>
 
     <v-card-actions class="d-flex justify-center">
-      <v-btn @click="save">Save</v-btn>
+      <v-btn :disabled="!validation.valid" color="primary" @click="$refs.form.validate() ? save() : 0">Create</v-btn>
     </v-card-actions>
   </v-card>
 </template>
 
 <script>
-  import {mapGetters} from "vuex";
-  import {close} from "./_shared";
+import {mapState} from "vuex";
+import {close} from "./_shared";
 
-  export default {
-    // Component name
-    name: "subcategory-form",
+export default {
+  // Component name
+  name: "subcategory-form",
 
-    data: () => ({
-      form: {
-        name: "",
-        description: "",
-        categoryId: ""
-      }
-    }),
-
-    mixins: [close],
-
-    computed: mapGetters("techniques", ["categoryItems"]),
-
-    methods: {
-      save() {
-        // Making post request to our API controller with payload of form
-        this.$axios.post("/api/subcategories", this.form);
-
-        // Reset component
-        this.close();
-      }
+  data: () => ({
+    form: {
+      name: "",
+      description: "",
+      categoryId: ""
     },
+    validation: {
+      valid: false,
+      name: [v => !!v || "Name is required."],
+      description: [v => !!v || "Description is required."],
+      categoryId: [v => !!v || "Category is required."]
+    },
+  }),
 
-  }
+  mixins: [close],
+
+  computed: mapState("techniques", ["lists", "dictionary"]),
+
+  methods: {
+    save() {
+      // Making post request to our API controller with payload of form
+      this.$axios.post("/api/subcategories", this.form);
+
+      // Reset component
+      this.close();
+    }
+  },
+
+}
 </script>
 
 <style scoped>

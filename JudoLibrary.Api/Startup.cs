@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using System.Threading.Channels;
 using System.Threading.Tasks;
+using FluentValidation.AspNetCore;
 using IdentityModel;
 using IdentityServer4;
 using IdentityServer4.Models;
@@ -45,7 +46,9 @@ namespace JudoLibrary.Api
             AddIdentity(services);
 
             // Adds support for using controllers
-            services.AddControllers();
+            services.AddControllers()
+                .AddFluentValidation(x => x
+                    .RegisterValidatorsFromAssembly(typeof(Startup).Assembly));
 
             // Adds support for using razor pages
             services.AddRazorPages();

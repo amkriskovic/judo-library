@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using JudoLibrary.Api.Form;
 using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
@@ -51,18 +52,20 @@ namespace JudoLibrary.Api.Controllers
         // POST -> /api/categories
         // Created category, sending json from the body of the request
         [HttpPost]
-        public async Task<Category> CreateCategory([FromBody] Category category)
+        public async Task<IActionResult> CreateCategory([FromBody] CategoryForm form)
         {
-            // Created Category -> Id, replacing white spaces with dashes, to lower ==> slug
-            category.Id = category.Name.Replace(" ", "-").ToLowerInvariant();
-            
             // Add category to DB
-            _context.Add(category);
+            _context.Add(new Category
+            {
+                Id = form.Name.Replace(" ", "-").ToLowerInvariant(),
+                Name = form.Name,
+                Description = form.Description
+            });
             
             // Saves changes async so it doesn't wait for actual saving time to DB, await prevents blocking UI
             await _context.SaveChangesAsync();
 
-            return category;
+            return Ok();
         }
 
         // PUT -> /api/categories

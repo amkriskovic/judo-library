@@ -25,53 +25,58 @@
 
         <v-divider></v-divider>
 
-        <v-stepper-step :complete="step > 3" step="3">Submission</v-stepper-step>
-
-        <v-divider></v-divider>
-
-        <v-stepper-step step="4">Review</v-stepper-step>
+        <v-stepper-step step="3">Review</v-stepper-step>
       </v-stepper-header>
 
       <!-- Form input -->
       <v-stepper-items class="fpt-0">
         <v-stepper-content step="1">
           <div>
-            <!-- Step 1, Vuetify component that accepts all types of videos, on change file upload process -->
-            <v-file-input accept="video/*" @change="handleFile"></v-file-input>
+            <v-file-input
+              v-model="file"
+              accept="video/*"
+              @change="handleFile">
+            </v-file-input>
           </div>
         </v-stepper-content>
 
         <v-stepper-content step="2">
-          <div>
-            <!-- # Dropdown for selecting technique -->
-            <!-- Step 2, Vuetify component for selecting technique from dropdown, on click goes to next step -->
-            <!-- Binds selected technique to techniqueId which lives in local form state -->
-            <v-select :items="lists.techniques.map(t => ({value: t.slug, text: t.name}))" v-model="form.techniqueId"
-                      label="Select Technique"></v-select>
+          <v-form ref="form" v-model="validation.valid">
+            <v-autocomplete
+              :items="lists.techniques.map(t => ({value: t.slug, text: t.name}))"
+              :rules="validation.techniqueId"
+              v-model="form.techniqueId"
+              label="Select Technique">
+            </v-autocomplete>
+
+            <v-text-field
+              label="Description"
+              :rules="validation.description"
+              v-model="form.description">
+            </v-text-field>
+
 
             <!-- Button -->
             <div class="d-flex justify-center">
-              <v-btn @click="step++">Next</v-btn>
+              <v-btn :disabled="!validation.valid" @click="$refs.form.validate() ? step++ : 0">Next</v-btn>
             </div>
-          </div>
+          </v-form>
         </v-stepper-content>
 
         <v-stepper-content step="3">
-          <div>
-            <!-- Step 3, Vuetify component for saving submission, stores it, on click goes to next step -->
-            <v-text-field label="Description" v-model="form.description"></v-text-field>
+          <div><strong>Filename:</strong> {{fileName}}</div>
+          <div v-if="form.techniqueId"><strong>Technique:</strong> {{ dictionary.techniques[form.techniqueId].name }}</div>
+          <div><strong>Description:</strong> {{ form.description }}</div>
 
-            <!-- Button -->
-            <div class="d-flex justify-center">
-              <v-btn @click="step++">Next</v-btn>
-            </div>
-          </div>
-        </v-stepper-content>
 
-        <v-stepper-content step="4">
           <!-- Button - Final step (4), Saving submission for particular technique -->
-          <div class="d-flex justify-center">
-            <v-btn @click="save">Save</v-btn>
+          <div class="d-flex mt-3">
+            <v-btn @click="restart">Restart</v-btn>
+            <v-btn class="mx-2" @click="step--">Edit</v-btn>
+
+            <v-spacer/>
+
+            <v-btn color="primary" @click="save">Complete</v-btn>
           </div>
         </v-stepper-content>
       </v-stepper-items>
@@ -83,6 +88,12 @@
 import {mapActions, mapMutations, mapState} from "vuex";
 import {close, form} from "@/components/content-creation/_shared";
 
+const initForm = () => ({
+  techniqueId: "",
+  video: "",
+  description: ""
+})
+
 export default {
   // Component name
   name: "submission-steps",
@@ -91,19 +102,26 @@ export default {
     close,
 
     // This is the form that we are gonna be appending in case of upload
-    form(() => ({
-      techniqueId: "",
-      video: "",
-      description: ""
-    }))
+    form(initForm),
   ],
 
   // Data is referencing initState function which holds local state of component -> this.$data
   data: () => ({
     step: 1,
+    file: null,
+    validation: {
+      valid: false,
+      techniqueId: [v => !!v || "Technique is required."],
+      description: [v => !!v || "Description is required."],
+    }
   }),
 
-  computed: mapState("techniques", ["lists"]),
+  computed: {
+    ...mapState("techniques", ["lists", "dictionary"]),
+    fileName() {
+      return this.file ? this.file.name : ""
+    }
+  },
 
   methods: {
     ...mapMutations("video-upload", ["hide"]),
@@ -133,7 +151,14 @@ export default {
 
       // Hides whatever stepper(component) was active <- dropping
       this.hide();
-    }
+    },
+
+    restart() {
+      this.form = initForm()
+      this.cancelUpload({hard: false})
+      this.step = 1
+      this.file = null
+    },
 
   }
 

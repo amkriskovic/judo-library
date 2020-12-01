@@ -1,10 +1,10 @@
 ﻿// Root store function, with initial state
-const initState = () => ({
+const initState = (active = false, component = null) => ({
   uploadPromise: null,
   uploadCancelSource: null,
   uploadCompleted: false,
-  active: false,
-  component: null,
+  active: active,
+  component: component,
   editing: false,
   editPayload: null,
   setup: null
@@ -56,8 +56,12 @@ export const mutations = {
   },
 
   // Resets state to initial state
-  reset(state) {
-    Object.assign(state, initState())
+  reset(state, {hard}) {
+    if (hard) {
+      Object.assign(state, initState())
+    } else {
+      Object.assign(state, initState(true, state.component))
+    }
   }
 
 }
@@ -66,7 +70,7 @@ export const mutations = {
 export const actions = {
 
   // Create technique, with payload <- form <- obj that is coming in
-  async startVideoUpload({commit, dispatch}, {form}) {
+  startVideoUpload({commit, dispatch}, {form}) {
 
     // * Grab the cancellation token source from axios cancel token when starting video upload
     const source = this.$axios.CancelToken.source();
@@ -102,7 +106,7 @@ export const actions = {
   },
 
   // Action for canceling upload, cancelling request / deleting video
-  async cancelUpload({state, commit}) {
+  async cancelUpload({state, commit}, {hard}) {
     // If we have upload promise
     if (state.uploadPromise) {
       // If upload was completed -> temp video has been uploaded/stored in working dir
@@ -126,7 +130,7 @@ export const actions = {
     }
 
     // Reset the state
-    commit("reset");
+    commit("reset", {hard});
   },
 
   // Create submission with accessing state of store, and with payload <- form
@@ -142,7 +146,7 @@ export const actions = {
     await this.$axios.$post("/api/submissions", form);
 
     // After creating submission, flush(reset) component to initial state
-    commit("reset");
+    commit("reset", {hard: true});
   }
 
 }

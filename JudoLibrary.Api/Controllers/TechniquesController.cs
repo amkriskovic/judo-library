@@ -88,32 +88,32 @@ namespace JudoLibrary.Api.Controllers
         // Created technique, sending json from the body of the request, TechniqueForm is responsible for creating technique
         [HttpPost]
         [Authorize]
-        public async Task<object> CreateTechnique([FromBody] TechniqueForm techniqueForm)
+        public async Task<object> CreateTechnique([FromBody] CreateTechniqueForm createTechniqueForm)
         {
             // Created Technique, mapping props from trickForm to Technique
             var technique = new Technique
             {
                 // Created TechniqueForm -> Slug | based on TechniqueForm -> Name | ' ' -> '-' ==> slug
-                Slug = techniqueForm.Name.Replace(" ", "-").ToLowerInvariant(),
-                Name = techniqueForm.Name,
+                Slug = createTechniqueForm.Name.Replace(" ", "-").ToLowerInvariant(),
+                Name = createTechniqueForm.Name,
                 Version = 1,
 
-                Description = techniqueForm.Description,
-                Category = techniqueForm.Category,
-                SubCategory = techniqueForm.SubCategory,
+                Description = createTechniqueForm.Description,
+                Category = createTechniqueForm.Category,
+                SubCategory = createTechniqueForm.SubCategory,
 
                 // Collections
-                SetUpAttacks = techniqueForm.SetUpAttacks
+                SetUpAttacks = createTechniqueForm.SetUpAttacks
                     // setUpAttackId is pulling values from TechniqueSetupAttack table -> SetUpAttackId prop, and we are
                     // Selecting that and assigning to SetUpAttacks
                     // * Assigning to SetUpAttackId value of setUpAttackId that came from [FromBody] when filling form.
                     // * SetUpAttacks hold value/s then we are selecting them and as above described, mapping them to SetUpAttackId so EF knows what is what
                     .Select(setUpAttackId => new TechniqueSetupAttack {SetUpAttackId = setUpAttackId})
                     .ToList(),
-                FollowUpAttacks = techniqueForm.FollowUpAttacks
+                FollowUpAttacks = createTechniqueForm.FollowUpAttacks
                     .Select(followUpAttackId => new TechniqueFollowupAttack {FollowUpAttackId = followUpAttackId})
                     .ToList(),
-                Counters = techniqueForm.Counters
+                Counters = createTechniqueForm.Counters
                     .Select(counterId => new TechniqueCounter {CounterId = counterId})
                     .ToList(),
 
@@ -132,7 +132,8 @@ namespace JudoLibrary.Api.Controllers
             _context.Add(new ModerationItem
             {
                 Target = technique.Id, // This is where Id is going to be generated
-                Type = ModerationTypes.Technique
+                Type = ModerationTypes.Technique,
+                UserId = UserId
             });
 
             // Save ModerationItem to DB
@@ -145,10 +146,10 @@ namespace JudoLibrary.Api.Controllers
         // PUT -> /api/techniques
         [HttpPut]
         [Authorize]
-        public async Task<IActionResult> UpdateTechnique([FromBody] TechniqueForm techniqueForm)
+        public async Task<IActionResult> UpdateTechnique([FromBody] UpdateTechniqueForm createTechniqueForm)
         {
             // Extract existing technique from DB by comparing Id(int)
-            var technique = _context.Techniques.FirstOrDefault(t => t.Id == techniqueForm.Id);
+            var technique = _context.Techniques.FirstOrDefault(t => t.Id == createTechniqueForm.Id);
 
             // If technique is null -> NoContent 204
             if (technique == null) return NoContent();
@@ -162,22 +163,22 @@ namespace JudoLibrary.Api.Controllers
                 // Bump the new Technique Version to + 1 from original Technique that we trying to edit
                 Version = technique.Version + 1,
 
-                Description = techniqueForm.Description,
-                Category = techniqueForm.Category,
-                SubCategory = techniqueForm.SubCategory,
+                Description = createTechniqueForm.Description,
+                Category = createTechniqueForm.Category,
+                SubCategory = createTechniqueForm.SubCategory,
 
                 // Collections
-                SetUpAttacks = techniqueForm.SetUpAttacks
+                SetUpAttacks = createTechniqueForm.SetUpAttacks
                     // setUpAttackId is pulling values from TechniqueSetupAttack table -> SetUpAttackId prop, and we are
                     // Selecting that and assigning to SetUpAttacks
                     // * Assigning to SetUpAttackId value of setUpAttackId that came from [FromBody] when filling form.
                     // * SetUpAttacks hold value/s then we are selecting them and as above described, mapping them to SetUpAttackId so EF knows what is what
                     .Select(setUpAttackId => new TechniqueSetupAttack {SetUpAttackId = setUpAttackId})
                     .ToList(),
-                FollowUpAttacks = techniqueForm.FollowUpAttacks
+                FollowUpAttacks = createTechniqueForm.FollowUpAttacks
                     .Select(followUpAttackId => new TechniqueFollowupAttack {FollowUpAttackId = followUpAttackId})
                     .ToList(),
-                Counters = techniqueForm.Counters
+                Counters = createTechniqueForm.Counters
                     .Select(counterId => new TechniqueCounter {CounterId = counterId})
                     .ToList(),
 
@@ -229,7 +230,7 @@ namespace JudoLibrary.Api.Controllers
 
                 Type = ModerationTypes.Technique,
                 
-                Reason = techniqueForm.Reason,
+                Reason = createTechniqueForm.Reason,
                 UserId = UserId
             });
 

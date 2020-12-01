@@ -11,6 +11,7 @@
 
     <!-- Template for Item(card) -->
     <template v-slot:item>
+
       <div v-if="subcategory">
         <div class="text-h6"> {{ subcategory.name }}</div>
 
@@ -37,10 +38,13 @@ export default {
   data: () => ({
     filter: "",
     techniques: [],
-    subcategory: null
+    subcategory: null,
+    category: null
   }),
 
-  computed: mapState("techniques", ["dictionary"]),
+  computed: {
+    ...mapState("techniques", ["dictionary"]),
+  },
 
   // Pre-fetching data asynchronously for this particular page
   async fetch() {
@@ -48,6 +52,9 @@ export default {
     const subcategoryId = this.$route.params.subcategory;
 
     this.subcategory = this.dictionary.subcategories[subcategoryId]
+
+    //todo implement category on subcategory card
+    this.category = this.dictionary.categories[subcategoryId]
 
     // Getting techniques for particular subcategory(from our subcategories API controller) (async call) | Fills page state
     this.techniques = await this.$axios.$get(`/api/subcategories/${subcategoryId}/techniques`);
