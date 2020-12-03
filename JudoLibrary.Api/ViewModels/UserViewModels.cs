@@ -7,6 +7,22 @@ namespace JudoLibrary.Api.ViewModels
 {
     public static class UserViewModel    
     {
+        public static Expression<Func<User, object>> Projection =>
+            user => new
+            {
+                user.Id,
+                user.Username,
+                user.Image,
+                Submissions = user.Submissions.AsQueryable().Select(x => new
+                {
+                    x.Id,
+                    x.TechniqueId,
+                    Score = x.Votes.Sum(v => v.Value),
+                }).ToList(),
+            };
+
+        
+        
         public static readonly Func<User, object> CreateFlatCache = FlatProjection.Compile();
         
         public static object CreateFlat(User user) => CreateFlatCache(user);
@@ -33,6 +49,12 @@ namespace JudoLibrary.Api.ViewModels
                 user.Id,
                 user.Username,
                 user.Image,
+                Submissions = user.Submissions.AsQueryable().Select(x => new
+                {
+                    x.Id,
+                    x.TechniqueId,
+                    Score = x.Votes.Sum(v => v.Value),
+                }).ToList(),
                 IsMod = isMod,
             };
     }

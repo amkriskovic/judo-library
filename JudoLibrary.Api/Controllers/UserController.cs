@@ -42,6 +42,8 @@ namespace JudoLibrary.Api.Controllers
             // Grab the User => compare User Id with userId that's coming from User Claim -> "sub"
             var user = await _ctx.Users
                 .Where(x => x.Id.Equals(userId))
+                .Include(x => x.Submissions)
+                .ThenInclude(x => x.Votes)
                 .Select(UserViewModel.ProfileProjection(IsMod))
                 .FirstOrDefaultAsync();
 
@@ -75,7 +77,9 @@ namespace JudoLibrary.Api.Controllers
         public object GetUser(string username) =>
             _ctx.Users
                 .Where(u => u.Username.Equals(username, StringComparison.InvariantCultureIgnoreCase))
-                .Select(UserViewModel.FlatProjection)
+                .Include(x => x.Submissions)
+                .ThenInclude(x => x.Votes)
+                .Select(UserViewModel.Projection)
                 .FirstOrDefault();
                 
 

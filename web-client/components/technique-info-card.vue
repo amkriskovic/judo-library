@@ -1,5 +1,5 @@
 ﻿<template>
-  <div>
+  <v-sheet class="pa-3" rounded min-width="300">
     <div class="text-h5">
       <span>{{ technique.name }}</span>
       <!-- :to= corresponds to page that we created | category == folder | category.id == page?  -->
@@ -52,10 +52,11 @@
     <user-header class="pa-2" :username="technique.user.username" :image-url="technique.user.image" reverse>
 
       <template v-slot:append>
-        <span>{{technique.version === 1 ? `Created by` : `Edited by`}}</span>
+        <span>{{ technique.version === 1 ? `Created by` : `Edited by` }}</span>
       </template>
     </user-header>
-  </div>
+  </v-sheet>
+
 </template>
 
 <script>

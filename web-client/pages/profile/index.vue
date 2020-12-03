@@ -27,6 +27,19 @@
           </v-hover>
           {{ profile.username }}
         </div>
+
+        <v-divider class="my-2"/>
+
+        <div>
+          <h6 class="text-h6 mb-2">Completed Techniques ({{completedTechniques.length}} / {{lists.techniques.length}})</h6>
+          <v-chip class="mb-1 mr-1" small
+                  v-for="{submission, technique} in completedTechniques"
+                  @click="gotoSubmission(technique.slug, submission.id)"
+                  :key="`profile-technique-chip-${submission.id}`">
+            {{ technique.name }}
+          </v-chip>
+        </div>
+
       </div>
     </template>
   </item-content-layout>
@@ -37,9 +50,12 @@ import ItemContentLayout from "@/components/item-content-layout";
 import {mapMutations, mapState} from "vuex";
 import Submission from "@/components/submission";
 import SubmissionFeed from "@/components/submission-feed";
+import profile from "@/components/profile";
 
 export default {
   components: {SubmissionFeed, Submission, ItemContentLayout},
+
+  mixins: [profile],
 
   // Local state
   data: () => ({
@@ -82,10 +98,11 @@ export default {
         })
     },
 
-    ...mapMutations("auth", ["saveProfile"])
+    ...mapMutations("auth", ["saveProfile"]),
   },
 
-  computed: mapState("auth", ["profile"])
+  computed: mapState("auth", ["profile"]),
+
 }
 </script>
 

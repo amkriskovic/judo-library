@@ -33,7 +33,12 @@ namespace JudoLibrary.Api.Controllers
 
         // GET -> /api/submissions/{id}
         [HttpGet("{id}")]
-        public Submission GetSubmission(int id) => _context.Submissions.FirstOrDefault(s => s.Id.Equals(id));
+        public object GetSubmission(int id) => _context.Submissions
+            .Where(s => s.Id.Equals(id))
+            .Include(s => s.Video)
+            .Include(s => s.User)
+            .Select(SubmissionViewModels.PerspectiveProjection(UserId))
+            .FirstOrDefault();
         
         // GET -> /api/submissions/best-submission
         [HttpGet("best-submission")]

@@ -11,9 +11,7 @@
             <v-icon size="46">mdi-arrow-right</v-icon>
           </v-col>
           <v-col cols="5" v-if="target">
-            <v-sheet class="pa-3" rounded>
-              <technique-info-card :technique="target"/>
-            </v-sheet>
+            <technique-info-card :technique="target"/>
           </v-col>
         </v-row>
 
@@ -39,8 +37,7 @@
             <div v-if="reviews.length > 0">
               <div class="d-flex mb-2" v-for="review in reviews" :key="`review-${review.id}`">
                 <div class="mr-3">
-                  <v-badge bottom overlap
-                           :color="reviewStatusColor(review.status)"
+                  <v-badge bottom overlap :color="reviewStatusColor(review.status)"
                            :icon="reviewStatusIcon(review.status)">
                     <user-header :image-url="review.user.image"/>
                   </v-badge>

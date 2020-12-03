@@ -3,22 +3,27 @@
     <!-- Input text field, mdi -> material design icons - {name of icon}, two way binding -> filter -->
     <v-text-field label="Search" placeholder="e.g. throw/reap/drop" v-model="filter" prepend-inner-icon="mdi-magnify"
                   outlined>
-
     </v-text-field>
-    <!-- Iterating over filtered Techniques -->
-    <div v-for="technique in filteredTechniques">
-      {{ technique.name }} - {{ technique.description }}
-    </div>
+
+    <v-row justify="center">
+      <v-col class="d-flex justify-center align-start"
+             lg="3"
+             v-for="technique in filteredTechniques" :key="`technique-info-card-${technique.id}`">
+        <technique-info-card :technique="technique"/>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
 <script>
   // Component for displaying techniques and filtering based on typed technique name or description
 
+  import TechniqueInfoCard from "@/components/technique-info-card";
+  import {hasOccurrences} from "@/data/functions";
   export default {
     // Component name
     name: "technique-list",
-
+    components: {TechniqueInfoCard},
     // Component local state
     data: () => ({
       filter: ""
@@ -34,17 +39,14 @@
     },
 
     computed: {
-      // Function that returns filtered techniques based on search | Mutating page state | Interacting with page data
       filteredTechniques() {
-        // If there is no filter(search) applied, just return original tricks
         if (!this.filter) return this.techniques;
 
-        // Normalize/Sanitize filter(search) input/string
-        const normalized = this.filter.trim().toLowerCase();
+        return this.techniques.filter(t => {
+          let searchIndex = (t.name + t.description).toLowerCase()
+          return hasOccurrences(searchIndex, this.filter)
+        })
 
-        // * Returning filtered techniques array -> name and description,
-        // to lower both, passing normalized string that came from search input (v-model)
-        return this.techniques.filter(t => t.name.toLowerCase().includes(normalized) || t.description.toLowerCase().includes(normalized));
       }
     }
   }

@@ -1,5 +1,5 @@
 ﻿<template>
-  <v-card :elevation="elevation">
+  <v-card :elevation="elevation" :class="{'highlight': highlight}">
     <!-- Injecting user-header component, providing username from submission -->
     <user-header class="pa-2"
                  :username="submission.user.username"
@@ -98,7 +98,11 @@ export default {
   computed: {
     submissionParentType() {
       return COMMENT_PARENT_TYPE.SUBMISSION
-    }
+    },
+
+    highlight() {
+      return (this.$route.query.submission | 0) === this.submission.id
+    },
   },
 
   methods: {
@@ -118,5 +122,7 @@ export default {
 </script>
 
 <style scoped>
-
+ .highlight {
+   box-shadow: 0 1px 8px 0 #1976d2 !important;
+ }
 </style>

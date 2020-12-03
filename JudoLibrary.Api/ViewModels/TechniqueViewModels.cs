@@ -108,7 +108,6 @@ namespace JudoLibrary.Api.ViewModels
                 technique.Category, // Id
                 technique.SubCategory, // Id
                 technique.Version,
-                User = UserViewModel.CreateFlat(technique.User)
             };
     }
 }

@@ -1,27 +1,15 @@
 ﻿<template>
 
-  <!-- Item-Content component injection -->
-  <item-content-layout>
-    <!-- Template for Content-->
-    <template v-slot:content>
-      <!-- Injecting technique list component in order to replace unnecessary HTML | Handles filtering too -->
-      <!-- :techniques is props defined in respective component, which marks details about how to bind tricks: [] -->
-      <technique-list :techniques="techniques" class="mx-2"/>
-    </template>
+  <div>
+    <div>
+      <div class="text-h4"> {{ subcategory.name }}</div>
+      <div class="text-body-1"> {{ subcategory.description }}</div>
+    </div>
 
-    <!-- Template for Item(card) -->
-    <template v-slot:item>
+    <v-divider class="my-3"></v-divider>
 
-      <div v-if="subcategory">
-        <div class="text-h6"> {{ subcategory.name }}</div>
-
-        <v-divider class="my-1"></v-divider>
-
-        <div class="text-body-2"> {{ subcategory.description }}</div>
-      </div>
-
-    </template>
-  </item-content-layout>
+    <technique-list :techniques="techniques"/>
+  </div>
 
 </template>
 
@@ -31,33 +19,21 @@ import TechniqueList from "../../components/technique-list";
 import ItemContentLayout from "../../components/item-content-layout";
 
 export default {
-  // Injected components
   components: {ItemContentLayout, TechniqueList},
 
-  // Page local state | data
-  data: () => ({
-    filter: "",
-    techniques: [],
-    subcategory: null,
-    category: null
-  }),
-
   computed: {
-    ...mapState("techniques", ["dictionary"]),
-  },
+    ...mapState("techniques", ["lists","dictionary"]),
+    techniques() {
+      // console.log(this.lists.techniques.filter(x => x.subCategory === subcategoryId).map(x => x.category), 'sadasdsad')
+      // return this.lists.techniques.filter(x => x.subCategory === subcategoryId).map(x => x.category)
 
-  // Pre-fetching data asynchronously for this particular page
-  async fetch() {
-    // Getting subcategoryId from URL param
-    const subcategoryId = this.$route.params.subcategory;
-
-    this.subcategory = this.dictionary.subcategories[subcategoryId]
-
-    //todo implement category on subcategory card
-    this.category = this.dictionary.categories[subcategoryId]
-
-    // Getting techniques for particular subcategory(from our subcategories API controller) (async call) | Fills page state
-    this.techniques = await this.$axios.$get(`/api/subcategories/${subcategoryId}/techniques`);
+      const subcategoryId = this.$route.params.subcategory;
+      return this.lists.techniques.filter(x => x.subCategory === subcategoryId)
+    },
+    subcategory() {
+      const subcategoryId = this.$route.params.subcategory;
+      return this.dictionary.subcategories[subcategoryId]
+    },
   },
 
   // Setting via head method the HTML Head tags for the current page.

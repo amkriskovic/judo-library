@@ -25,13 +25,7 @@
             <v-menu offset-y>
               <template v-slot:activator="{ on, attrs }">
                 <v-btn icon v-bind="attrs" v-on="on">
-                  <!-- Profile avatar image -->
-                  <v-avatar size="38">
-                    <!-- Make use of videos controller method for getting the profile image-->
-                    <img v-if="profile.image" :src="profile.image" alt="profile image"/>
-
-                    <v-icon v-else>mdi-account</v-icon>
-                  </v-avatar>
+                  <user-header :image-url="profile.image" :link="false" size="36"/>
                 </v-btn>
               </template>
               <v-list>
@@ -83,12 +77,14 @@ import ContentCreationDialog from "../components/content-creation/content-creati
 import {mapActions, mapGetters, mapState} from "vuex";
 import IfAuth from "@/components/auth/if-auth";
 import NavBarSearch from "@/components/nav-bar-search";
+import UserHeader from "@/components/user-header";
 
 export default {
   name: "default",
 
   // Mapping components
   components: {
+    UserHeader,
     NavBarSearch,
     IfAuth,
     ContentCreationDialog
