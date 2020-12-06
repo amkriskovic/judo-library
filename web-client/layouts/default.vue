@@ -6,19 +6,22 @@
     <v-app-bar app>
 
       <!-- Enabling navigation via nuxt-link -> home page, vuetify class -->
-      <nuxt-link class="text-h5 text--primary" style="text-decoration: none;" to="/">Judo Library</nuxt-link>
+      <nuxt-link class="text-h5 text--primary mr-2" style="text-decoration: none;" to="/">
+        <span class="d-none d-md-flex">Judo Library</span>
+        <span class="d-flex d-md-none">TL</span>
+      </nuxt-link>
 
       <v-spacer/>
       <nav-bar-search/>
       <v-spacer/>
 
-      <!-- Moderation button, if he is Mod -> coming from auth.js getters -->
-      <v-btn class="mx-1" depressed to="/moderation">Moderation</v-btn>
-
       <!-- If we are authenticated (if-auth component handles logic), display content-creation-dialog && Profile -->
       <if-auth>
-        <template v-slot:allowed>
-          <div>
+        <template v-slot:allowed="{moderator}">
+          <div class="d-flex align-center">
+            <!-- Moderation button, if he is Mod -> coming from auth.js getters -->
+            <v-btn v-if="moderator" class="d-none d-md-flex mx-1" depressed to="/moderation">Moderation</v-btn>
+
             <content-creation-dialog/>
 
             <!-- Dropdown - Menu -->
@@ -29,6 +32,15 @@
                 </v-btn>
               </template>
               <v-list>
+
+                <!-- Moderation -->
+                <v-list-item class="d-flex d-md-none" to="/moderation">
+                  <v-list-item-title>
+                    <v-icon>mdi-clipboard</v-icon>
+                    Moderation
+                  </v-list-item-title>
+                </v-list-item>
+
                 <!-- Profile -->
                 <v-list-item @click="$router.push('/profile')">
                   <v-list-item-title>

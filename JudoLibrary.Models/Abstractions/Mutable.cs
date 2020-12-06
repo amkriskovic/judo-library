@@ -3,7 +3,7 @@
 namespace JudoLibrary.Models.Abstractions
 {
     // Vote belongs to User
-    public class Mutable : BaseModel<int>
+    public class Mutable<Tkey> : BaseModel<Tkey>
     {
         public DateTime Updated { get; set; } = DateTime.UtcNow;
 

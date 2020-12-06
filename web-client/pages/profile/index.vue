@@ -30,15 +30,7 @@
 
         <v-divider class="my-2"/>
 
-        <div>
-          <h6 class="text-h6 mb-2">Completed Techniques ({{completedTechniques.length}} / {{lists.techniques.length}})</h6>
-          <v-chip class="mb-1 mr-1" small
-                  v-for="{submission, technique} in completedTechniques"
-                  @click="gotoSubmission(technique.slug, submission.id)"
-                  :key="`profile-technique-chip-${submission.id}`">
-            {{ technique.name }}
-          </v-chip>
-        </div>
+        <profile-completed-techniques :profile-submissions="profile.submissions"/>
 
       </div>
     </template>
@@ -50,12 +42,10 @@ import ItemContentLayout from "@/components/item-content-layout";
 import {mapMutations, mapState} from "vuex";
 import Submission from "@/components/submission";
 import SubmissionFeed from "@/components/submission-feed";
-import profile from "@/components/profile";
+import ProfileCompletedTechniques from "@/components/profile-completed-techniques";
 
 export default {
-  components: {SubmissionFeed, Submission, ItemContentLayout},
-
-  mixins: [profile],
+  components: {ProfileCompletedTechniques, SubmissionFeed, Submission, ItemContentLayout},
 
   // Local state
   data: () => ({

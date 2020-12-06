@@ -7,9 +7,14 @@
       <!-- Menu component - Dropdown -->
       <v-menu offset-y>
         <template v-slot:activator="{ on, attrs }">
+
           <!-- Button -->
-          <v-btn depressed v-bind="attrs" v-on="on">
+          <v-btn class="d-none d-md-flex" depressed v-bind="attrs" v-on="on">
             Create
+          </v-btn>
+
+          <v-btn class="d-flex d-md-none" icon depressed v-bind="attrs" v-on="on">
+            <v-icon>mdi-plus-box</v-icon>
           </v-btn>
         </template>
 

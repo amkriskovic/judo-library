@@ -14,6 +14,7 @@ namespace JudoLibrary.Api.ViewModels
                 category.Id,
                 category.Name,
                 category.Description,
+                Updated = category.Updated.ToLocalTime().ToString("HH:mm dd/MM/yyyy"),
                 Techniques = category.Techniques.AsQueryable().Select(x => x.Slug).ToList()
             };
     }

@@ -3,7 +3,7 @@ using JudoLibrary.Models.Abstractions;
 
 namespace JudoLibrary.Models
 {
-    public class Category : BaseModel<string>
+    public class Category : Mutable<string>
     {
         public string Name { get; set; }
         public string Description { get; set; }
