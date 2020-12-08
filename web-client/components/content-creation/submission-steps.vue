@@ -124,8 +124,8 @@ export default {
   },
 
   methods: {
-    ...mapMutations("video-upload", ["hide"]),
-    ...mapActions("video-upload", ["startVideoUpload", "createSubmission"]),
+    ...mapMutations("content-update", ["hide"]),
+    ...mapActions("content-update", ["startVideoUpload", "createSubmission"]),
 
     // Handling file for upload <- saving video | #1
     async handleFile(file) {

@@ -2,6 +2,7 @@
 const endpointResolver = (type) => {
   // If type is technique, returns techniques string which we will use for resolving our API endpoint
   if (type === 'technique') return 'techniques'
+  if (type === 'category') return 'categories'
 }
 
 // Reviews statuses, mimicking backend enum

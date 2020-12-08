@@ -1,5 +1,5 @@
 ﻿<template>
-  <!-- Dialog - Popup - based on state(value) of active prop in video-upload store state -->
+  <!-- Dialog - Popup - based on state(value) of active prop in content-update store state -->
   <v-dialog :value="active" persistent width="700">
 
     <!-- Activator will activate the component when clicked -->
@@ -55,9 +55,9 @@ import {mapState, mapMutations, mapActions, mapGetters} from "vuex";
     // List of components
     components: {TechniquesSteps, SubmissionSteps, CategoryForm, SubcategoryForm},
 
-    // Mapping state for video-upload store | computed === state
+    // Mapping state for content-update store | computed === state
     computed: {
-      ...mapState("video-upload", ["active", "component"]),
+      ...mapState("content-update", ["active", "component"]),
       ...mapGetters("auth", ["moderator"]),
 
 
@@ -74,8 +74,8 @@ import {mapState, mapMutations, mapActions, mapGetters} from "vuex";
       }
     },
 
-    // Mapping mutations & actions for video-upload | methods === functions ==> mutations/actions
-    methods: mapMutations("video-upload", ["activate"])
+    // Mapping mutations & actions for content-update | methods === functions ==> mutations/actions
+    methods: mapMutations("content-update", ["activate"])
 
   }
 </script>

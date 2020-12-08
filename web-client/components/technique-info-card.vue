@@ -3,8 +3,8 @@
     <div class="text-h5">
       <span>{{ technique.name }}</span>
       <!-- :to= corresponds to page that we created | category == folder | category.id == page?  -->
-      <v-chip small label class="mb-1 ml-2" :to="`/category/${category.id}`">{{ category.name }}</v-chip>
-      <v-chip small label class="mb-1 ml-2" :to="`/subcategory/${subcategory.id}`">{{ subcategory.name }}</v-chip>
+      <v-chip small label class="mb-1 ml-2" :to="`/category/${category.slug}`">{{ category.name }}</v-chip>
+      <v-chip small label class="mb-1 ml-2" :to="`/subcategory/${subcategory.slug}`">{{ subcategory.name }}</v-chip>
     </div>
 
     <v-divider class="my-1"></v-divider>
@@ -84,18 +84,18 @@ export default {
   },
 
   methods: {
-    ...mapMutations("video-upload", ["activate"]),
+    ...mapMutations("content-update", ["activate"]),
 
     // Method for editing Technique
     edit() {
-      // Invoke activate mutation from video-upload store
+      // Invoke activate mutation from content-update store
       // Passing TechniqueSteps as component, set edit as true, and editPayload as this technique => page data/local state
       this.activate({component: TechniqueSteps, edit: true, editPayload: this.technique})
     },
 
     // Method for uploading Technique => Submission
     upload() {
-      // Invoke activate mutation from video-upload store
+      // Invoke activate mutation from content-update store
       this.activate({
         component: SubmissionSteps,
         setup: (form) => form.techniqueId = this.technique.slug

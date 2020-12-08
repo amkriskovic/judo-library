@@ -24,21 +24,15 @@ export default {
   computed: {
     ...mapState("techniques", ["lists", "dictionary"]),
     techniques() {
-      const categoryId = this.$route.params.category;
-      return this.lists.techniques.filter(x => x.category === categoryId)
+      const categorySlug = this.$route.params.category;
+      return this.dictionary.categories[categorySlug]
+        .techniques
+        .map(x => this.dictionary.techniques[x])
     },
+
     category() {
-      const categoryId = this.$route.params.category;
-      return this.dictionary.categories[categoryId];
+      return this.dictionary.categories[this.$route.params.category]
     },
-  },
-
-  // Pre-fetching data asynchronously for this particular page
-  async fetch() {
-    // const categoryId = this.$route.params.category;
-
-    // Getting techniques for particular category(from our Category API controller) (async call)
-    // this.techniques = await this.$axios.$get(`/api/categories/${categoryId}/techniques`);
   },
 
   // Setting via head method the HTML Head tags for the current page.

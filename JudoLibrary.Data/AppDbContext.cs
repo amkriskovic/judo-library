@@ -13,6 +13,7 @@ namespace JudoLibrary.Data
 
         // Tables
         public DbSet<Category> Categories { get; set; }
+        public DbSet<TechniqueCategory> TechniqueCategories { get; set; }
         public DbSet<SubCategory> SubCategories { get; set; }
         public DbSet<TechniqueCounter> TechniqueCounters { get; set; }
         public DbSet<TechniqueSetupAttack> TechniqueSetupAttacks { get; set; }
@@ -31,10 +32,8 @@ namespace JudoLibrary.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Category>()
-                .HasMany(x => x.Techniques)
-                .WithOne()
-                .HasForeignKey(x => x.Category);
+            modelBuilder.Entity<TechniqueCategory>()
+                .HasKey(x => new {x.CategoryId, x.TechniqueId});
             
             modelBuilder.Entity<SubCategory>()
                 .HasMany(x => x.Techniques)

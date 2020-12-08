@@ -4,7 +4,7 @@ import {mapActions, mapState} from 'vuex';
 
 export const close = {
   methods: {
-    ...mapActions("video-upload", ["cancelUpload"]),
+    ...mapActions("content-update", ["cancelUpload"]),
 
     // Wrapping up cancelUpload function into close func
     close() {
@@ -21,14 +21,14 @@ export const form = (formFactory) => ({
   }),
 
   created: function () {
-    // Call this setup which comes from video-upload, with this form that's generated with formFactory
+    // Call this setup which comes from content-update, with this form that's generated with formFactory
     if (this.setup) {
       this.setup(this.form)
     }
   },
 
   computed: {
-    ...mapState("video-upload", ["setup"])
+    ...mapState("content-update", ["setup"])
   }
 })
 

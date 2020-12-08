@@ -18,10 +18,7 @@ export const mutations = {
 
   // Get's stepper based on action that we wanna perform, create technique or upload submission, passing component as payload
   // Which will be activated once we select it from menu/dropdown
-  activate(state, {
-    component, edit = false, editPayload = null, setup = () => {
-    }
-  }) {
+  activate(state, {component, edit = false, editPayload = null, setup = null}) {
     state.active = true;
     state.component = component;
 
@@ -37,7 +34,7 @@ export const mutations = {
 
   // Hide in order to prevent nullifying state (uploadPromise) when creating submission
   hide(state) {
-    // Closing <- state is gonna be inactive <- dropping video-uploads down
+    // Closing <- state is gonna be inactive <- dropping content-updates down
     state.active = false;
   },
 

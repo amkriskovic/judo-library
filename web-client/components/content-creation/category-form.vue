@@ -29,10 +29,13 @@
 <script>
 
   import {close} from "./_shared";
+  import {mapState} from "vuex";
 
   export default {
     // Component name
     name: "category-form",
+
+    mixins: [close],
 
     data: () => ({
       form: {
@@ -46,17 +49,27 @@
       },
     }),
 
-    mixins: [close],
+    created() {
+      if (this.editPayload) {
+        const {id, name, description} = this.editPayload
+        Object.assign(this.form, {id, name, description})
+      }
+    },
 
     methods: {
       save() {
-        // Making post request to our API controller with payload of form
-        this.$axios.$post("/api/categories", this.form);
+        if (this.form.id) {
+          this.$axios.put("/api/categories", this.form)
+        } else {
+          this.$axios.post("/api/categories", this.form)
+        }
 
         // Reset component
         this.close();
       }
     },
+
+    computed: mapState('content-update', ['editPayload'])
 
   }
 </script>

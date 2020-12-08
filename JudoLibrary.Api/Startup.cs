@@ -9,6 +9,7 @@ using JudoLibrary.Api.BackgroundServices;
 using JudoLibrary.Api.BackgroundServices.SubmissionVoting;
 using JudoLibrary.Api.BackgroundServices.VideoEditing;
 using JudoLibrary.Data;
+using JudoLibrary.Data.VersionMigrations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;

@@ -37,27 +37,12 @@ namespace JudoLibrary.Api.Controllers
             .Select(TechniqueViewModels.UserProjection)
             .ToList();
 
-        // GET -> /api/techniques/{id}
-        [HttpGet("{id}")]
-        public IActionResult GetTechnique(string id)
+        // GET -> /api/techniques/{value}
+        [HttpGet("{value}")]
+        public IActionResult GetTechnique(string value)
         {
-            // Make an Query -> DbSet<Techniques>
-            var query = _context.Techniques.AsQueryable();
-
-            // Try to parse id as int => means _modId is calling it => /moderation => current & target
-            if (int.TryParse(id, out var intId))
-            {
-                // Technique Id is an Int32
-                query = query.Where(t => t.Id == intId);
-            }
-            else
-            {
-                // Technique Id is an string => grab only active ones => compare the slug with id => /index/techniqueSlug
-                query = query.Where(t => t.Slug.Equals(id, StringComparison.CurrentCultureIgnoreCase) && t.Active);
-            }
-
-            // Get the technique from query
-            var technique = query
+            var technique = _context.Techniques
+                .WhereIdOrSlug(value)
                 .Include(t => t.SetUpAttacks)
                 .Include(t => t.FollowUpAttacks)
                 .Include(t => t.Counters)
@@ -99,7 +84,10 @@ namespace JudoLibrary.Api.Controllers
                 Version = 1,
 
                 Description = createTechniqueForm.Description,
-                Category = createTechniqueForm.Category,
+                TechniqueCategories = new List<TechniqueCategory>
+                {
+                    new TechniqueCategory {CategoryId = createTechniqueForm.Category}
+                },
                 SubCategory = createTechniqueForm.SubCategory,
 
                 // Collections
@@ -164,7 +152,10 @@ namespace JudoLibrary.Api.Controllers
                 Version = technique.Version + 1,
 
                 Description = createTechniqueForm.Description,
-                Category = createTechniqueForm.Category,
+                TechniqueCategories = new List<TechniqueCategory>
+                {
+                    new TechniqueCategory {CategoryId = createTechniqueForm.Category}
+                },
                 SubCategory = createTechniqueForm.SubCategory,
 
                 // Collections

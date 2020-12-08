@@ -3,7 +3,7 @@
     <v-row justify="space-around">
     <v-col lg="3" class="d-flex justify-center align-start" v-for="subcategory in content"
            :key="`subcategory-feed-${subcategory.id}`">
-      <v-card width="320" @click="() => $router.push(`/subcategory/${subcategory.id}`)" :ripple="false">
+      <v-card width="320" @click="() => $router.push(`/subcategory/${subcategory.slug}`)" :ripple="false">
         <v-card-title>{{ subcategory.name }}</v-card-title>
         <v-divider />
         <submission v-if="subcategory.submission" :submission="subcategory.submission" slim elevation="0"/>

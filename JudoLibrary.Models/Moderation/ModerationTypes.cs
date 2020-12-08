@@ -4,5 +4,6 @@
     public struct ModerationTypes
     {
         public const string Technique = "technique";
+        public const string Category = "category";
     }
 }

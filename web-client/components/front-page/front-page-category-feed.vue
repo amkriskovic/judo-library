@@ -3,7 +3,7 @@
     <v-row justify="space-around">
       <v-col lg="3" class="d-flex justify-center align-start" v-for="category in content"
              :key="`category-feed-${category.id}`">
-        <v-card width="320" @click="() => $router.push(`/category/${category.id}`)" :ripple="false">
+        <v-card width="320" @click="() => $router.push(`/category/${category.slug}`)" :ripple="false">
           <v-card-title>{{ category.name }}</v-card-title>
           <v-divider />
           <submission
@@ -48,12 +48,15 @@ export default {
       const categories = this.lists.categories.slice(this.cursor, to)
       this.cursor += this.limit
 
-      const byTechniques = (x) => x.techniques.reduce((a, b) => `${a};${b}`, "")
-
       const submissionRequests = categories.map(category => {
         if (category.techniques.length > 0) {
+
+          const byTechniques = category.techniques
+            .map(x => this.dictionary.techniques[x].slug)
+            .reduce((a, b) => `${a};${b}`, "")
+
           return this.$axios
-            .$get(`/api/submissions/best-submission?byTechniques=${byTechniques(category)}`)
+            .$get(`/api/submissions/best-submission?byTechniques=${byTechniques}`)
             .then(submission => this.content.push({
               ...category,
               submission
@@ -65,7 +68,7 @@ export default {
       return Promise.all(submissionRequests)
     }
   },
-  computed: mapState('techniques', ['lists'])
+  computed: mapState('techniques', ['lists', 'dictionary'])
 }
 </script>
 

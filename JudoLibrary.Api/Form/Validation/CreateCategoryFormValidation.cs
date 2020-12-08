@@ -2,7 +2,7 @@
 
 namespace JudoLibrary.Api.Form.Validation
 {
-    public class CategoryFormValidation : AbstractValidator<CategoryForm>
+    public class CategoryFormValidation : AbstractValidator<CreateCategoryForm>
     {
         public CategoryFormValidation()
         {

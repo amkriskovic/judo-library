@@ -150,7 +150,7 @@ import {mapActions, mapState} from "vuex";
 
     computed: {
       ...mapState("techniques", ["lists", "dictionary"]),
-      ...mapState("video-upload", ["editing", "editPayload"])
+      ...mapState("content-update", ["editing", "editPayload"])
     },
 
     // When this component get's created => grab the editingPayload and stick it on the form

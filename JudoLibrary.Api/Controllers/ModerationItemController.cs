@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using JudoLibrary.Api.Form;
 using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
+using JudoLibrary.Data.VersionMigrations;
 using JudoLibrary.Models.Moderation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +45,14 @@ namespace JudoLibrary.Api.Controllers
                         .Where(t => targetIds.Contains(t.Id))
                         .ToList()
                         .ForEach(technique => targetMapping[technique.Id] = TechniqueViewModels.CreateFlat(technique));
+                }
+                else if (group.Key == ModerationTypes.Category)
+                {
+                    _ctx.Categories
+                        .Where(t => targetIds.Contains(t.Id))
+                        .ToList()
+                        .ForEach(category => targetMapping[category.Id] = 
+                            CategoryViewModels.CreateFlat(category));
                 }
             }
 

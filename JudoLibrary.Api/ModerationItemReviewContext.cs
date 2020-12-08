@@ -3,6 +3,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using JudoLibrary.Data;
+using JudoLibrary.Data.VersionMigrations;
 using JudoLibrary.Models.Moderation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -87,7 +88,7 @@ namespace JudoLibrary.Api
 
             if (score >= goal + wait)
             {
-                migrationContext.Migrate(modItem);
+                migrationContext.Setup(modItem).Migrate();
                 modItem.Deleted = true;
             }
             else if (score <= -goal - wait)

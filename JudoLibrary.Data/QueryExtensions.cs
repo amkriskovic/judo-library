@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Linq.Expressions;
 using JudoLibrary.Models;
+using JudoLibrary.Models.Abstractions;
 
 namespace JudoLibrary.Data
 {
@@ -49,6 +50,22 @@ namespace JudoLibrary.Data
             return source
                 .Skip(feedQuery.Cursor) 
                 .Take(feedQuery.Limit); 
+        }
+
+        public static IQueryable<T> WhereIdOrSlug<T>(this IQueryable<T> source, string value) where T : VersionedModel
+        {
+            if (int.TryParse(value, out var number))
+            {
+                // Technique Id is an Int32
+                source = source.Where(t => t.Id == number);
+            }
+            else
+            {
+                // Technique Id is an string => grab only active ones => compare the slug with id => /index/techniqueSlug
+                source = source.Where(t => t.Slug.Equals(value, StringComparison.CurrentCultureIgnoreCase) && t.Active);
+            }
+
+            return source;
         }
     }
 }
