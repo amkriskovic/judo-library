@@ -7,10 +7,9 @@ namespace JudoLibrary.Models
     {
         public string Name { get; set; }
         public string Description { get; set; }
-        // public int Category { get; set; } // One Technique can have One Category
-        public string SubCategory { get; set; } // One Technique can have One SubCategory
-
         public IList<TechniqueCategory> TechniqueCategories { get; set; }
+        
+        public IList<TechniqueSubCategory> TechniqueSubCategories { get; set; } = new List<TechniqueSubCategory>(); 
         public IList<TechniqueSetupAttack> SetUpAttacks { get; set; } = new List<TechniqueSetupAttack>(); // One Technique can have Many SetUpAttacks
         public IList<TechniqueFollowupAttack> FollowUpAttacks { get; set; } = new List<TechniqueFollowupAttack>(); // One Technique can have Many FollowUpAttacks
         public IList<TechniqueCounter> Counters { get; set; } = new List<TechniqueCounter>(); // One Technique can have Many Counters 

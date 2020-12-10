@@ -21,7 +21,10 @@ namespace JudoLibrary.Api.ViewModels
                     .Where(x => x.Active)
                     .Select(x => x.CategoryId)
                     .FirstOrDefault(),
-                technique.SubCategory, // Id
+                SubCategory = technique.TechniqueSubCategories.AsQueryable()
+                    .Where(x => x.Active)
+                    .Select(x => x.SubCategoryId)
+                    .FirstOrDefault(),
                 technique.Version,
                 SetUpAttacks = technique.SetUpAttacks
                     .AsQueryable()
@@ -53,7 +56,10 @@ namespace JudoLibrary.Api.ViewModels
                     .Where(x => x.Active)
                     .Select(x => x.CategoryId)
                     .FirstOrDefault(),
-                technique.SubCategory, // Id
+                SubCategory = technique.TechniqueSubCategories.AsQueryable()
+                    .Where(x => x.Active)
+                    .Select(x => x.SubCategoryId)
+                    .FirstOrDefault(),
                 technique.Version,
                 SetUpAttacks = technique.SetUpAttacks
                     .AsQueryable()
@@ -89,7 +95,10 @@ namespace JudoLibrary.Api.ViewModels
                     .Where(x => x.Active)
                     .Select(x => x.CategoryId)
                     .FirstOrDefault(),
-                technique.SubCategory, // Id
+                SubCategory = technique.TechniqueSubCategories.AsQueryable()
+                    .Where(x => x.Active)
+                    .Select(x => x.SubCategoryId)
+                    .FirstOrDefault(),
                 technique.Version,
                 SetUpAttacks = technique.SetUpAttacks
                     .AsQueryable()
@@ -114,7 +123,6 @@ namespace JudoLibrary.Api.ViewModels
                 technique.Slug,
                 technique.Name,
                 technique.Description,
-                technique.SubCategory, // Id
                 technique.Version,
             };
     }

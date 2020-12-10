@@ -24,15 +24,14 @@ export default {
   computed: {
     ...mapState("techniques", ["lists","dictionary"]),
     techniques() {
-      // console.log(this.lists.techniques.filter(x => x.subCategory === subcategoryId).map(x => x.category), 'sadasdsad')
-      // return this.lists.techniques.filter(x => x.subCategory === subcategoryId).map(x => x.category)
-
-      const subcategoryId = this.$route.params.subcategory;
-      return this.lists.techniques.filter(x => x.subCategory === subcategoryId)
+      const subcategorySlug = this.$route.params.subcategory;
+      return this.dictionary.subcategories[subcategorySlug]
+        .techniques
+        .map(x => this.dictionary.techniques[x])
     },
+
     subcategory() {
-      const subcategoryId = this.$route.params.subcategory;
-      return this.dictionary.subcategories[subcategoryId]
+      return this.dictionary.subcategories[this.$route.params.subcategory]
     },
   },
 

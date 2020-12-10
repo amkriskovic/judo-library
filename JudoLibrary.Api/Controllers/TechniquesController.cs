@@ -88,7 +88,10 @@ namespace JudoLibrary.Api.Controllers
                 {
                     new TechniqueCategory {CategoryId = createTechniqueForm.Category}
                 },
-                SubCategory = createTechniqueForm.SubCategory,
+                TechniqueSubCategories = new List<TechniqueSubCategory>
+                {
+                    new TechniqueSubCategory {SubCategoryId = createTechniqueForm.SubCategory}
+                },
 
                 // Collections
                 SetUpAttacks = createTechniqueForm.SetUpAttacks
@@ -156,7 +159,10 @@ namespace JudoLibrary.Api.Controllers
                 {
                     new TechniqueCategory {CategoryId = createTechniqueForm.Category}
                 },
-                SubCategory = createTechniqueForm.SubCategory,
+                TechniqueSubCategories = new List<TechniqueSubCategory>
+                {
+                    new TechniqueSubCategory {SubCategoryId = createTechniqueForm.SubCategory}
+                },
 
                 // Collections
                 SetUpAttacks = createTechniqueForm.SetUpAttacks

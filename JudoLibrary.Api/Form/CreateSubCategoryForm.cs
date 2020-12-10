@@ -1,6 +1,6 @@
 ﻿namespace JudoLibrary.Api.Form
 {
-    public class SubCategoryForm
+    public class CreateSubCategoryForm
     {
         public string Name { get; set; }
         public string Description { get; set; }

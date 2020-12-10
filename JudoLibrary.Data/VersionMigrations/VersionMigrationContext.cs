@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using JudoLibrary.Models.Abstractions;
 using JudoLibrary.Models.Moderation;
 
 namespace JudoLibrary.Data.VersionMigrations
@@ -24,6 +23,7 @@ namespace JudoLibrary.Data.VersionMigrations
             {
                 ModerationTypes.Technique => new TechniqueMigrationContext(_ctx),
                 ModerationTypes.Category => new CategoryMigrationContext(_ctx),
+                ModerationTypes.SubCategory => new SubCategoryMigrationContext(_ctx),
                 _ => throw new ArgumentException(nameof(moderationItem.Type))
 
             };

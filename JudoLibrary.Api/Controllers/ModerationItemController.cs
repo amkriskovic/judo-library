@@ -34,7 +34,7 @@ namespace JudoLibrary.Api.Controllers
                 .OrderFeed(feedQuery)
                 .ToList();
 
-            var targetMapping = new Dictionary<int, object>();
+            var targetMapping = new Dictionary<string, object>();
             foreach (var group in moderationItems.GroupBy(x => x.Type))
             {
                 var targetIds = group.Select(m => m.Target).ToArray();
@@ -44,15 +44,23 @@ namespace JudoLibrary.Api.Controllers
                     _ctx.Techniques
                         .Where(t => targetIds.Contains(t.Id))
                         .ToList()
-                        .ForEach(technique => targetMapping[technique.Id] = TechniqueViewModels.CreateFlat(technique));
+                        .ForEach(technique => targetMapping[ModerationTypes.Technique + technique.Id] = TechniqueViewModels.CreateFlat(technique));
                 }
                 else if (group.Key == ModerationTypes.Category)
                 {
                     _ctx.Categories
-                        .Where(t => targetIds.Contains(t.Id))
+                        .Where(c => targetIds.Contains(c.Id))
                         .ToList()
-                        .ForEach(category => targetMapping[category.Id] = 
+                        .ForEach(category => targetMapping[ModerationTypes.Category + category.Id] = 
                             CategoryViewModels.CreateFlat(category));
+                }
+                else if (group.Key == ModerationTypes.SubCategory)
+                {
+                    _ctx.SubCategories
+                        .Where(sc => targetIds.Contains(sc.Id))
+                        .ToList()
+                        .ForEach(subcategory => targetMapping[ModerationTypes.SubCategory + subcategory.Id] = 
+                            SubCategoryViewModels.CreateFlat(subcategory));
                 }
             }
 
@@ -67,7 +75,7 @@ namespace JudoLibrary.Api.Controllers
                 Updated = x.Updated.ToLocalTime().ToString("HH:mm dd/MM/yyyy"),
                 Reviews = x.Reviews.Select(r => r.Status).ToList(),
                 User = UserViewModel.CreateFlat(x.User),
-                TargetObject = targetMapping[x.Target],
+                TargetObject = targetMapping[x.Type + x.Target],
             });
         }
 

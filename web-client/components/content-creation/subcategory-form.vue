@@ -41,6 +41,8 @@ export default {
   // Component name
   name: "subcategory-form",
 
+  mixins: [close],
+
   data: () => ({
     form: {
       name: "",
@@ -55,19 +57,31 @@ export default {
     },
   }),
 
-  mixins: [close],
-
-  computed: mapState("techniques", ["lists", "dictionary"]),
+  created() {
+    if (this.editPayload) {
+      const {id, name, description} = this.editPayload
+      Object.assign(this.form, {id, name, description})
+    }
+  },
 
   methods: {
     save() {
-      // Making post request to our API controller with payload of form
-      this.$axios.post("/api/subcategories", this.form);
+      if (this.form.id) {
+        this.$axios.put("/api/subcategories", this.form)
+      } else {
+        this.$axios.post("/api/subcategories", this.form)
+      }
 
       // Reset component
       this.close();
     }
   },
+
+  computed: {
+    ...mapState('content-update', ['editPayload']),
+    ...mapState("techniques", ["lists", "dictionary"]),
+  }
+
 
 }
 </script>

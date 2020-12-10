@@ -222,6 +222,7 @@ export default {
       if (!this.modItem) return null;
       if (this.modItem.type === 'technique') return {is: TechniqueInfoCard, payload: 'technique'};
       if (this.modItem.type === 'category') return {is: SimpleInfoCard, payload: 'payload'};
+      if (this.modItem.type === 'subcategory') return {is: SimpleInfoCard, payload: 'payload'};
       return null;
     }
   },

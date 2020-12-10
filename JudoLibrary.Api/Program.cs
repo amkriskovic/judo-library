@@ -109,17 +109,17 @@ namespace JudoLibrary.Api
                             Description = "Body Striking Techniques",
                             Active = true
                         },
-                        new Category
-                        {
-                            Id = 4,
-                            Slug = "mod", 
-                            Name = "Mod",
-                            Description = "Category under Moderation",
-                            Active = false,
-                            Version = 1,
-                        } 
                     };
                     context.AddRange(categories);
+
+                    context.Add(new Category
+                    {
+                        Id = 4,
+                        Slug = "mod", 
+                        Name = "Mod",
+                        Description = "Category under Moderation",
+                        Active = false,
+                    });
 
 
                     // Seeding SubCategories
@@ -127,28 +127,33 @@ namespace JudoLibrary.Api
                     {
                         new SubCategory
                         {
-                            Id = "te-waza", Name = "Te Waza",
-                            Description = "Hand throwing techniques", CategoryId = "nage-waza"
+                            Id = 1, Slug = "te-waza", Name = "Te Waza",
+                            Description = "Hand throwing techniques", CategoryId = "nage-waza",
+                            Active = true
                         },
                         new SubCategory
                         {
-                            Id = "koshi-waza", Name = "Koshi Waza",
-                            Description = "Hip throwing techniques", CategoryId = "nage-waza"
+                            Id = 2, Slug = "koshi-waza", Name = "Koshi Waza",
+                            Description = "Hip throwing techniques", CategoryId = "nage-waza",
+                            Active = true
                         },
                         new SubCategory
                         {
-                            Id = "ashi-waza", Name = "Ashi Waza",
-                            Description = "Foot throwing techniques", CategoryId = "nage-waza"
+                            Id = 3, Slug = "ashi-waza", Name = "Ashi Waza",
+                            Description = "Foot throwing techniques", CategoryId = "nage-waza",
+                            Active = true
                         },
                         new SubCategory
                         {
-                            Id = "sutemi-waza", Name = "Sutemi waza",
-                            Description = "Sacrifice techniques", CategoryId = "nage-waza"
+                            Id = 4, Slug = "sutemi-waza", Name = "Sutemi waza",
+                            Description = "Sacrifice techniques", CategoryId = "nage-waza",
+                            Active = true
                         },
                         new SubCategory
                         {
-                            Id = "osaekomi-waza", Name = "Osaekomi waza ",
-                            Description = "Pins or matholds", CategoryId = "katame-waza"
+                            Id = 5, Slug = "osaekomi-waza", Name = "Osaekomi waza ",
+                            Description = "Pins or matholds", CategoryId = "katame-waza",
+                            Active = true
                         } 
                     };
                     context.AddRange(subcategories);
@@ -164,7 +169,10 @@ namespace JudoLibrary.Api
                         {
                             new TechniqueCategory {CategoryId = 1, Active = true}
                         }, 
-                        SubCategory = "ashi-waza"
+                        TechniqueSubCategories = new List<TechniqueSubCategory>
+                        {
+                            new TechniqueSubCategory {SubCategoryId = 3, Active = true}
+                        }
                     });
 
                     context.Add(new Technique
@@ -176,7 +184,10 @@ namespace JudoLibrary.Api
                         {
                             new TechniqueCategory {CategoryId = 1, Active = true}
                         },
-                        SubCategory = "koshi-waza"
+                        TechniqueSubCategories = new List<TechniqueSubCategory>
+                        {
+                            new TechniqueSubCategory {SubCategoryId = 2, Active = true}
+                        }
                     });
 
                     context.Add(new Technique
@@ -188,7 +199,10 @@ namespace JudoLibrary.Api
                         {
                             new TechniqueCategory {CategoryId = 1, Active = true}
                         },
-                        SubCategory = "sutemi-waza"
+                        TechniqueSubCategories = new List<TechniqueSubCategory>
+                        {
+                            new TechniqueSubCategory {SubCategoryId = 4, Active = true}
+                        }
                     });
 
                     context.Add(new Technique
@@ -200,7 +214,10 @@ namespace JudoLibrary.Api
                         {
                             new TechniqueCategory {CategoryId = 2, Active = true}
                         },
-                        SubCategory = "osaekomi-waza"
+                        TechniqueSubCategories = new List<TechniqueSubCategory>
+                        {
+                            new TechniqueSubCategory {SubCategoryId = 5, Active = true}
+                        }
                     });
 
                     // * Main Technique *
@@ -213,7 +230,10 @@ namespace JudoLibrary.Api
                         {
                             new TechniqueCategory {CategoryId = 1, Active = true}
                         },
-                        SubCategory = "te-waza",
+                        TechniqueSubCategories = new List<TechniqueSubCategory>
+                        {
+                            new TechniqueSubCategory {SubCategoryId = 1, Active = true}
+                        },
                         SetUpAttacks = new List<TechniqueSetupAttack>
                         {
                             new TechniqueSetupAttack {TechniqueId = 5, SetUpAttackId = 1, Active = true}
@@ -238,7 +258,10 @@ namespace JudoLibrary.Api
                         {
                             new TechniqueCategory {CategoryId = 1, Active = true}
                         },
-                        SubCategory = "ashi-waza",
+                        TechniqueSubCategories = new List<TechniqueSubCategory>
+                        {
+                            new TechniqueSubCategory {SubCategoryId = 3, Active = true}
+                        },
                         SetUpAttacks = new List<TechniqueSetupAttack>
                         {
                             new TechniqueSetupAttack {TechniqueId = 6, SetUpAttackId = 3, Active = true},
@@ -368,7 +391,10 @@ namespace JudoLibrary.Api
                             {
                               new TechniqueCategory {CategoryId = categories[i % categories.Count].Id, Active = true}  
                             },
-                            SubCategory = subcategories[i % subcategories.Count].Id,
+                            TechniqueSubCategories = new List<TechniqueSubCategory>
+                            {
+                                new TechniqueSubCategory {SubCategoryId = subcategories[i % subcategories.Count].Id, Active = true}  
+                            },
                             // SetUpAttacks = new List<TechniqueSetupAttack>
                             // {
                             //     new TechniqueSetupAttack {TechniqueId = 5, SetUpAttackId = 1, Active = true}

@@ -5,5 +5,6 @@
     {
         public const string Technique = "technique";
         public const string Category = "category";
+        public const string SubCategory = "subcategory";
     }
 }
