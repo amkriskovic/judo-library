@@ -14,7 +14,8 @@
 
     <v-card-text>
       <v-form ref="form" v-model="validation.valid">
-        <v-text-field :rules="validation.name" label="Name" v-model="form.name"></v-text-field>
+        <v-text-field :rules="validation.name" label="Name" :disabled="!!editPayload"
+                      v-model="form.name"></v-text-field>
         <v-text-field :rules="validation.description" label="Description" v-model="form.description"></v-text-field>
       </v-form>
 
@@ -28,50 +29,51 @@
 
 <script>
 
-  import {close} from "./_shared";
-  import {mapState} from "vuex";
+import {close, form} from "@/components/content-creation/_shared";
+import {mapState} from "vuex";
 
-  export default {
-    // Component name
-    name: "category-form",
+export default {
+  // Component name
+  name: "category-form",
 
-    mixins: [close],
+  mixins: [close, form(() => ({
+    name: "",
+    description: "",
+  }))],
 
-    data: () => ({
-      form: {
-        name: "",
-        description: "",
-      },
-      validation: {
-        valid: false,
-        name: [v => !!v || "Name is required."],
-        description: [v => !!v || "Description is required."]
-      },
-    }),
-
-    created() {
-      if (this.editPayload) {
-        const {id, name, description} = this.editPayload
-        Object.assign(this.form, {id, name, description})
-      }
+  data: () => ({
+    validation: {
+      valid: false,
+      name: [v => !!v || "Name is required."],
+      description: [v => !!v || "Description is required."]
     },
+  }),
 
-    methods: {
-      save() {
-        if (this.form.id) {
-          this.$axios.put("/api/categories", this.form)
-        } else {
-          this.$axios.post("/api/categories", this.form)
-        }
+  created() {
+    if (this.editPayload) {
+      const {id, name, description} = this.editPayload
+      Object.assign(this.form, {id, name, description})
+    }
+  },
 
-        // Reset component
-        this.close();
+  methods: {
+    async save() {
+      if (this.form.id) {
+        await this.$axios.put("/api/categories", this.form)
+      } else {
+        await this.$axios.post("/api/categories", this.form)
       }
-    },
 
-    computed: mapState('content-update', ['editPayload'])
+      this.broadcastUpdate()
 
-  }
+      // Reset component
+      this.close();
+    }
+  },
+
+  computed: mapState('content-creation', ['editPayload'])
+
+}
 </script>
 
 <style scoped>

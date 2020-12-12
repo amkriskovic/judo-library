@@ -1,5 +1,4 @@
 ﻿<template>
-
   <!-- Item-Content component injection -->
   <item-content-layout>
     <!-- Template for Content-->
@@ -21,8 +20,8 @@
 </template>
 
 <script>
-import {mapState, mapMutations} from "vuex";
-import ItemContentLayout from "../../components/item-content-layout";
+import {mapState} from "vuex";
+import ItemContentLayout from "@/components/item-content-layout";
 import Submission from "@/components/submission";
 import TechniqueInfoCard from "@/components/technique-info-card";
 import SubmissionFeed from "@/components/submission-feed";
@@ -33,7 +32,7 @@ export default {
   // Map state for submissions and techniques, mapping getters for returning technique by id
   computed: {
     // Importing dictionary from initial state of techniques store => for particular technique we use dict => indexing
-    ...mapState("techniques", ["dictionary"]),
+    ...mapState("library", ["dictionary"]),
 
     technique() {
       // Getting techniqueId from URL param

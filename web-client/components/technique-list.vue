@@ -9,7 +9,7 @@
       <v-col class="d-flex justify-center align-start"
              lg="3"
              v-for="technique in filteredTechniques" :key="`technique-info-card-${technique.id}`">
-        <technique-info-card :technique="technique"/>
+        <technique-info-card :technique="technique" link/>
       </v-col>
     </v-row>
   </div>

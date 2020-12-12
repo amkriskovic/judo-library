@@ -62,7 +62,7 @@ namespace JudoLibrary.Data
             else
             {
                 // Technique Id is an string => grab only active ones => compare the slug with id => /index/techniqueSlug
-                source = source.Where(t => t.Slug.Equals(value, StringComparison.CurrentCultureIgnoreCase) && t.Active);
+                source = source.Where(t => t.Slug.Equals(value, StringComparison.CurrentCultureIgnoreCase) && t.State == VersionState.Live);
             }
 
             return source;

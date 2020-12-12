@@ -29,12 +29,12 @@ namespace JudoLibrary.Api.Controllers
         [HttpGet]
         public IEnumerable<object> GetAllTechniques() => _context.Techniques
             .AsNoTracking()
-            .Where(t => t.Active)
+            .Where(t => !t.Deleted && t.State == VersionState.Live)
             .Include(t => t.SetUpAttacks)
             .Include(t => t.FollowUpAttacks)
             .Include(t => t.Counters)
             .Include(t => t.User)
-            .Select(TechniqueViewModels.UserProjection)
+            .Select(TechniqueViewModels.Projection)
             .ToList();
 
         // GET -> /api/techniques/{value}
@@ -53,6 +53,20 @@ namespace JudoLibrary.Api.Controllers
             if (technique == null) return NoContent();
 
             return Ok(technique);
+        }
+        
+        // GET -> /api/techniques/{slug}/history
+        [HttpGet("{slug}/history")]
+        public IEnumerable<object> GetTechniqueHistory(string slug)
+        {
+            return _context.Techniques
+                .Where(x => x.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase) && x.State != VersionState.Staged)
+                .Include(t => t.SetUpAttacks)
+                .Include(t => t.FollowUpAttacks)
+                .Include(t => t.Counters)
+                .Include(t => t.User)
+                .Select(TechniqueViewModels.FullProjection)
+                .ToList();
         }
 
         // GET -> /api/techniques/{techniqueId}/submissions
@@ -73,7 +87,7 @@ namespace JudoLibrary.Api.Controllers
         // Created technique, sending json from the body of the request, TechniqueForm is responsible for creating technique
         [HttpPost]
         [Authorize]
-        public async Task<object> CreateTechnique([FromBody] CreateTechniqueForm createTechniqueForm)
+        public async Task<IActionResult> CreateTechnique([FromBody] CreateTechniqueForm createTechniqueForm)
         {
             // Created Technique, mapping props from trickForm to Technique
             var technique = new Technique
@@ -131,7 +145,7 @@ namespace JudoLibrary.Api.Controllers
             await _context.SaveChangesAsync();
 
             // Invoke delegate Created which is our ViewModel then return ViewModel
-            return TechniqueViewModels.Create(technique);
+            return Ok();
         }
 
         // PUT -> /api/techniques
@@ -235,7 +249,7 @@ namespace JudoLibrary.Api.Controllers
             await _context.SaveChangesAsync();
 
             // Return created technique that we pass to TechniqueViewModels
-            return Ok(TechniqueViewModels.Create(newTechnique));
+            return Ok();
         }
 
 

@@ -66,9 +66,12 @@
         <template v-slot:forbidden="{login}">
           <!-- Login / Logout section -->
           <!-- Else => not authenticated => Sign in => redirect to our client plugin =>> login -->
-          <v-btn outlined @click="login">
-            <v-icon outlined left>mdi-account-circle-outline</v-icon>
+          <v-btn class="d-none d-md-flex" outlined @click="login">
+            <v-icon left>mdi-login</v-icon>
             Log in
+          </v-btn>
+          <v-btn class="d-flex d-md-none" icon @click="login">
+            <v-icon>mdi-login</v-icon>
           </v-btn>
         </template>
       </if-auth>

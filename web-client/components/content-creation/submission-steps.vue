@@ -117,15 +117,15 @@ export default {
   }),
 
   computed: {
-    ...mapState("techniques", ["lists", "dictionary"]),
+    ...mapState("library", ["lists", "dictionary"]),
     fileName() {
       return this.file ? this.file.name : ""
     }
   },
 
   methods: {
-    ...mapMutations("content-update", ["hide"]),
-    ...mapActions("content-update", ["startVideoUpload", "createSubmission"]),
+    ...mapMutations("content-creation", ["hide"]),
+    ...mapActions("content-creation", ["startVideoUpload", "createSubmission"]),
 
     // Handling file for upload <- saving video | #1
     async handleFile(file) {
@@ -148,6 +148,7 @@ export default {
     // Saving technique | #2
     save() {
       this.createSubmission({form: this.form})
+        .then(this.broadcastUpdate)
 
       // Hides whatever stepper(component) was active <- dropping
       this.hide();

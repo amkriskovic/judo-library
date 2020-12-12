@@ -20,12 +20,7 @@
   watch: {
     // Watch order -> data
     'order': function (newValue) {
-      // Resetting
-      this.content = []
-      this.cursor = 0
-      this.finished = false
-      this.started = false
-      this.loadContent()
+      this.reloadContent()
     }
   },
 
@@ -44,6 +39,14 @@
         // Load another round of submissions
         this.loadContent()
       }
+    },
+
+    reloadContent() {
+      this.content = []
+      this.cursor = 0
+      this.finished = false
+      this.started = false
+      return this.loadContent()
     },
 
     loadContent() {

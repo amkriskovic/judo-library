@@ -7,6 +7,7 @@ using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using JudoLibrary.Models.Moderation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace JudoLibrary.Api.Controllers
@@ -24,7 +25,7 @@ namespace JudoLibrary.Api.Controllers
         // GET -> /api/subcategories
         [HttpGet]
         public IEnumerable<object> GetAllSubCategories() => _context.SubCategories
-            .Where(x => !x.Deleted && x.Active)
+            .Where(x => !x.Deleted && x.State == VersionState.Live)
             .Select(SubCategoryViewModels.Projection)
             .ToList();
         
@@ -34,6 +35,16 @@ namespace JudoLibrary.Api.Controllers
             .WhereIdOrSlug(value)
             .Select(SubCategoryViewModels.Projection)
             .FirstOrDefault();
+        
+        // GET -> /api/subcategories/{slug}/history
+        [HttpGet("{slug}/history")]
+        public IEnumerable<object> GetSubCategoryHistory(string slug)
+        {
+            return _context.SubCategories
+                .Where(x => x.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase) && x.State != VersionState.Staged)
+                .Select(SubCategoryViewModels.Projection)
+                .ToList();
+        }
         
         // GET -> /api/subcategories/{value}/techniques
         // Get all techniques for particular sub-category | Passing sub-category Id as param
@@ -47,6 +58,7 @@ namespace JudoLibrary.Api.Controllers
         // POST -> /api/subcategories
         // Created category, sending json from the body of the request
         [HttpPost]
+        [Authorize(JudoLibraryConstants.Policies.Mod)]
         public async Task<IActionResult> CreateSubCategory([FromBody] CreateSubCategoryForm form)
         {
             var subcategory = new SubCategory
@@ -77,6 +89,7 @@ namespace JudoLibrary.Api.Controllers
         // PUT -> /api/subcategories
         // Created category, sending json from the body of the request
         [HttpPut]
+        [Authorize(JudoLibraryConstants.Policies.Mod)]
         public async Task<IActionResult> UpdateSubCategory([FromBody] UpdateSubCategoryForm form)
         {
             var subcategory = _context.SubCategories.FirstOrDefault(x => x.Id == form.Id);
@@ -88,8 +101,8 @@ namespace JudoLibrary.Api.Controllers
             
             var newSubcategory = new SubCategory
             {
-                Slug = form.Name.Replace(" ", "-").ToLowerInvariant(),
-                Name = form.Name,
+                Slug = subcategory.Slug,
+                Name = subcategory.Name,
                 Description = form.Description,
                 CategoryId = form.CategoryId,
                 UserId = UserId,

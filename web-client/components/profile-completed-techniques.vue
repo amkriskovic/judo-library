@@ -30,7 +30,7 @@ export default {
     submissions() {
       return [...this.profileSubmissions].sort((a, b) => b.score - a.score)
     },
-    ...mapState('techniques', ['lists', 'dictionary']),
+    ...mapState('library', ['lists', 'dictionary']),
     completedTechniques() {
       const submissions = this.submissions
         .filter((v, i, a) => a

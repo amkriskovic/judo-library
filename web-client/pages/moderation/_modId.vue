@@ -102,10 +102,11 @@ import CommentSection from "@/components/comments/comment-section";
 import TechniqueInfoCard from "@/components/technique-info-card";
 import SimpleInfoCard from "@/components/moderation/simple-info-card";
 import {COMMENT_PARENT_TYPE} from "@/components/comments/_shared";
-import {modItemRenderer, REVIEW_STATUS} from "@/components/moderation";
+import {MODERATION_TYPES, modItemRenderer, REVIEW_STATUS, VERSION_STATE} from "@/components/moderation";
 import IfAuth from "@/components/auth/if-auth";
 import UserHeader from "@/components/user-header";
-import {mapGetters} from "vuex";
+import {mapActions, mapGetters} from "vuex";
+import {EVENTS} from "@/data/events";
 
 const initReview = () => ({
   status: -1,
@@ -172,6 +173,8 @@ export default {
         })
         .then(this.loadReviews)
         .then(this.resetReviewForm)
+        .then(() => this.$nuxt.$emit(EVENTS.CONTENT_UPDATED))
+        .then(this.loadContent)
     },
 
     loadReviews() {
@@ -181,7 +184,9 @@ export default {
 
     resetReviewForm() {
       this.review = initReview()
-    }
+    },
+
+    ...mapActions('library', ['loadContent'])
   },
 
   // Computed properties allow us to define a property that is used the same way as data,
@@ -206,7 +211,7 @@ export default {
 
     // If target(next) - current is less than or equal to zero -> it's outdated
     outdated() {
-      return this.current && this.target && this.target.version - this.current.version <= 0
+      return this.current && this.target && this.current.state === VERSION_STATE.OUTDATED
     },
 
     moderationItemParentType() {
@@ -220,9 +225,9 @@ export default {
 
     itemComponent() {
       if (!this.modItem) return null;
-      if (this.modItem.type === 'technique') return {is: TechniqueInfoCard, payload: 'technique'};
-      if (this.modItem.type === 'category') return {is: SimpleInfoCard, payload: 'payload'};
-      if (this.modItem.type === 'subcategory') return {is: SimpleInfoCard, payload: 'payload'};
+      if (this.modItem.type === MODERATION_TYPES.TECHNIQUE) return {is: TechniqueInfoCard, payload: 'technique'};
+      if (this.modItem.type === MODERATION_TYPES.CATEGORY) return {is: SimpleInfoCard, payload: 'payload'};
+      if (this.modItem.type === MODERATION_TYPES.SUBCATEGORY) return {is: SimpleInfoCard, payload: 'payload'};
       return null;
     }
   },

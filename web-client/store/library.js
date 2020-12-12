@@ -23,6 +23,7 @@ export const state = initState;
 const setEntities = (state, type, data) => {
   // Initialize dict for particular type to empty obj.
   state.dictionary[type] = {}
+  state.lists[type] = []
 
   // Loop over data
   data.forEach(t => {
@@ -32,11 +33,8 @@ const setEntities = (state, type, data) => {
     // Dynamically resolve type from dict and assign data which is coming from some data collection to particular type id
     state.dictionary[type][t.id] = t
 
-    // If we have slug on particular type
-    if (t.slug) {
-      // Assign it to dict of specific type
-      state.dictionary[type][t.slug] = t
-    }
+    // Assign it to dict of specific type
+    state.dictionary[type][t.slug] = t
   })
 }
 
@@ -71,7 +69,7 @@ export const actions = {
 
   // # Base URL is set in nuxt.config.js
   // Fetching techniques, commit <- context of store, commit func is to invoke one of the mutation func's
-  fetchTechniques({commit}) {
+  loadContent({commit}) {
     // Promise for making all 3 calls to API at the "same" time
     return Promise.all([
       // Passing array of Tasks => API cals to fetch data

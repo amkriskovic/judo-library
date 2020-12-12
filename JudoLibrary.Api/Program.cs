@@ -91,7 +91,7 @@ namespace JudoLibrary.Api
                             Slug = "nage-waza", 
                             Name = "Nage Waza",
                             Description = "Throwing Techniques" ,
-                            Active = true
+                            State = VersionState.Live
                         },
                         new Category
                         {
@@ -99,7 +99,7 @@ namespace JudoLibrary.Api
                             Slug = "katame-waza", 
                             Name = "Katame Waza",
                             Description = "Grappling Techniques",
-                            Active = true
+                            State = VersionState.Live
                         },
                         new Category
                         {
@@ -107,7 +107,7 @@ namespace JudoLibrary.Api
                             Slug = "atemi-waza", 
                             Name = "Atemi Waza",
                             Description = "Body Striking Techniques",
-                            Active = true
+                            State = VersionState.Live
                         },
                     };
                     context.AddRange(categories);
@@ -118,7 +118,7 @@ namespace JudoLibrary.Api
                         Slug = "mod", 
                         Name = "Mod",
                         Description = "Category under Moderation",
-                        Active = false,
+                        State = VersionState.Live,
                     });
 
 
@@ -129,31 +129,31 @@ namespace JudoLibrary.Api
                         {
                             Id = 1, Slug = "te-waza", Name = "Te Waza",
                             Description = "Hand throwing techniques", CategoryId = "nage-waza",
-                            Active = true
+                            State = VersionState.Live
                         },
                         new SubCategory
                         {
                             Id = 2, Slug = "koshi-waza", Name = "Koshi Waza",
                             Description = "Hip throwing techniques", CategoryId = "nage-waza",
-                            Active = true
+                            State = VersionState.Live
                         },
                         new SubCategory
                         {
                             Id = 3, Slug = "ashi-waza", Name = "Ashi Waza",
                             Description = "Foot throwing techniques", CategoryId = "nage-waza",
-                            Active = true
+                            State = VersionState.Live
                         },
                         new SubCategory
                         {
                             Id = 4, Slug = "sutemi-waza", Name = "Sutemi waza",
                             Description = "Sacrifice techniques", CategoryId = "nage-waza",
-                            Active = true
+                            State = VersionState.Live
                         },
                         new SubCategory
                         {
                             Id = 5, Slug = "osaekomi-waza", Name = "Osaekomi waza ",
                             Description = "Pins or matholds", CategoryId = "katame-waza",
-                            Active = true
+                            State = VersionState.Live
                         } 
                     };
                     context.AddRange(subcategories);
@@ -162,7 +162,7 @@ namespace JudoLibrary.Api
                     // Seeding Techniques
                     context.Add(new Technique
                     {
-                        Id = 1, UserId = testUser.Id, Version = 1, Active = true, Slug = "kouchi-gari",
+                        Id = 1, UserId = testUser.Id, Version = 1, State = VersionState.Live, Slug = "kouchi-gari",
                         Name = "Kouchi gari",
                         Description = "Small inner reap", 
                         TechniqueCategories = new List<TechniqueCategory>
@@ -177,7 +177,7 @@ namespace JudoLibrary.Api
 
                     context.Add(new Technique
                     {
-                        Id = 2, UserId = testUser.Id, Version = 1, Active = true, Slug = "ushiro-goshi",
+                        Id = 2, UserId = testUser.Id, Version = 1, State = VersionState.Live, Slug = "ushiro-goshi",
                         Name = "Ushiro goshi",
                         Description = "Rear hip throw", 
                         TechniqueCategories = new List<TechniqueCategory>
@@ -192,7 +192,7 @@ namespace JudoLibrary.Api
 
                     context.Add(new Technique
                     {
-                        Id = 3, UserId = testUser.Id, Version = 1, Active = true, Slug = "tani-otoshi",
+                        Id = 3, UserId = testUser.Id, Version = 1, State = VersionState.Live, Slug = "tani-otoshi",
                         Name = "Tani otoshi",
                         Description = "Valley drop", 
                         TechniqueCategories = new List<TechniqueCategory>
@@ -207,7 +207,7 @@ namespace JudoLibrary.Api
 
                     context.Add(new Technique
                     {
-                        Id = 4, UserId = testUser.Id, Version = 1, Active = true, Slug = "kesa-gatame",
+                        Id = 4, UserId = testUser.Id, Version = 1, State = VersionState.Live, Slug = "kesa-gatame",
                         Name = "Kesa-gatame",
                         Description = "Scarf hold", 
                         TechniqueCategories = new List<TechniqueCategory>
@@ -223,7 +223,7 @@ namespace JudoLibrary.Api
                     // * Main Technique *
                     context.Add(new Technique
                     {
-                        Id = 5, UserId = testUser.Id, Version = 1, Active = true, Slug = "seoi-nage",
+                        Id = 5, UserId = testUser.Id, Version = 1, State = VersionState.Live, Slug = "seoi-nage",
                         Name = "Seoi Nage",
                         Description = "Shoulder throw", 
                         TechniqueCategories = new List<TechniqueCategory>
@@ -240,7 +240,7 @@ namespace JudoLibrary.Api
                         },
                         FollowUpAttacks = new List<TechniqueFollowupAttack>
                         {
-                            new TechniqueFollowupAttack {TechniqueId = 5, FollowUpAttackId = 6, Active = true}
+                            new TechniqueFollowupAttack {TechniqueId = 5, FollowUpAttackId = 2, Active = true}
                         },
                         Counters = new List<TechniqueCounter>
                         {
@@ -251,7 +251,7 @@ namespace JudoLibrary.Api
 
                     context.Add(new Technique
                     {
-                        Id = 6, UserId = testUser.Id, Version = 1, Active = true, Slug = "osoto-gari",
+                        Id = 6, UserId = testUser.Id, Version = 1, State = VersionState.Live, Slug = "osoto-gari",
                         Name = "Osoto gari",
                         Description = "Major Outer Reaping",
                         TechniqueCategories = new List<TechniqueCategory>
@@ -383,7 +383,7 @@ namespace JudoLibrary.Api
                         {
                             UserId = testUser.Id, 
                             Version = 1, 
-                            Active = true, 
+                            State = VersionState.Live, 
                             Slug = $"fake-technique-{i}",
                             Name = $"Fake Technique que {i}",
                             Description = $"This is a fake technique # {i}", 
@@ -397,16 +397,16 @@ namespace JudoLibrary.Api
                             },
                             // SetUpAttacks = new List<TechniqueSetupAttack>
                             // {
-                            //     new TechniqueSetupAttack {TechniqueId = 5, SetUpAttackId = 1, Active = true}
+                            //     new TechniqueSetupAttack {TechniqueId = 5, SetUpAttackId = 1, State = VersionState.Live}
                             // },
                             // FollowUpAttacks = new List<TechniqueFollowupAttack>
                             // {
-                            //     new TechniqueFollowupAttack {TechniqueId = 5, FollowUpAttackId = 6, Active = true}
+                            //     new TechniqueFollowupAttack {TechniqueId = 5, FollowUpAttackId = 6, State = VersionState.Live}
                             // },
                             // Counters = new List<TechniqueCounter>
                             // {
-                            //     new TechniqueCounter {TechniqueId = 5, CounterId = 2, Active = true},
-                            //     new TechniqueCounter {TechniqueId = 5, CounterId = 3, Active = true}
+                            //     new TechniqueCounter {TechniqueId = 5, CounterId = 2, State = VersionState.Live},
+                            //     new TechniqueCounter {TechniqueId = 5, CounterId = 3, State = VersionState.Live}
                             // }
                         };
                         context.Add(technique);

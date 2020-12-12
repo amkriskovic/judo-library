@@ -28,50 +28,31 @@
       <v-stepper-items class="fpt-0">
         <v-stepper-content step="1">
           <v-form ref="form" v-model="validation.valid">
-            <v-text-field
-              :rules="validation.name"
-              label="Name" v-model="form.name">
-            </v-text-field>
+            <v-text-field :rules="validation.name" label="Name" :disabled="!!editPayload"
+                          v-model="form.name"></v-text-field>
 
-            <v-text-field
-              :rules="validation.description"
-              label="Description" v-model="form.description">
-            </v-text-field>
+            <v-text-field :rules="validation.description" label="Description" v-model="form.description"></v-text-field>
 
-            <v-select
-              :rules="validation.category"
-              :items="lists.categories.map(c => ({value: c.id, text: c.name}))"
-                      v-model="form.category"
-                      label="Category">
-            </v-select>
+            <v-select :rules="validation.category" :items="lists.categories.map(c => ({value: c.id, text: c.name}))"
+                      v-model="form.category" label="Category"></v-select>
 
-            <v-select
-              :rules="validation.subCategory"
-              :items="lists.subcategories.map(sc => ({value: sc.id, text: sc.name}))"
-                      v-model="form.subCategory"
-                      label="Sub Category">
-            </v-select>
+            <v-select :rules="validation.subCategory"
+                      :items="lists.subcategories.map(sc => ({value: sc.id, text: sc.name}))" v-model="form.subCategory"
+                      label="Sub Category"></v-select>
 
-            <v-autocomplete :items="lists.techniques.filter(tsa => !form.id || tsa.id !== form.id).map(tsa => ({value: tsa.id, text: tsa.name}))"
-                      v-model="form.setUpAttacks"
-                      label="Set Up Attacks"
-                      multiple small-chips
-                      chips deletable-chips>
-            </v-autocomplete>
+            <v-autocomplete
+              :items="lists.techniques.filter(tsa => !form.id || tsa.id !== form.id).map(tsa => ({value: tsa.id, text: tsa.name}))"
+              v-model="form.setUpAttacks" label="Set Up Attacks" multiple small-chips chips
+              deletable-chips></v-autocomplete>
 
-            <v-autocomplete :items="lists.techniques.filter(tfa => !form.id || tfa.id !== form.id).map(tfa => ({value: tfa.id, text: tfa.name}))"
-                      v-model="form.followUpAttacks"
-                      label="Follow Up Attacks"
-                      multiple
-                      small-chips chips deletable-chips>
-            </v-autocomplete>
+            <v-autocomplete
+              :items="lists.techniques.filter(tfa => !form.id || tfa.id !== form.id).map(tfa => ({value: tfa.id, text: tfa.name}))"
+              v-model="form.followUpAttacks" label="Follow Up Attacks" multiple small-chips chips
+              deletable-chips></v-autocomplete>
 
-            <v-autocomplete :items="lists.techniques.filter(tc => !form.id || tc.id !== form.id).map(tc => ({value: tc.id, text: tc.name}))"
-                      v-model="form.counters"
-                      label="Counters"
-                      multiple small-chips chips
-                      deletable-chips>
-            </v-autocomplete>
+            <v-autocomplete
+              :items="lists.techniques.filter(tc => !form.id || tc.id !== form.id).map(tc => ({value: tc.id, text: tc.name}))"
+              v-model="form.counters" label="Counters" multiple small-chips chips deletable-chips></v-autocomplete>
 
 
             <div class="d-flex justify-center">
@@ -82,23 +63,30 @@
 
         <v-stepper-content step="2">
 
-          <div><strong>Name:</strong> {{form.name}}</div>
-          <div><strong>Description:</strong> {{form.description}}</div>
-          <div v-if="form.category"><strong>Category:</strong> {{dictionary.categories[form.category].name}}</div>
-          <div v-if="form.subCategory"><strong>Sub-Category:</strong> {{dictionary.subcategories[form.subCategory].name}}</div>
+          <div><strong>Name:</strong> {{ form.name }}</div>
+          <div><strong>Description:</strong> {{ form.description }}</div>
+          <div v-if="form.category"><strong>Category:</strong> {{ dictionary.categories[form.category].name }}</div>
+          <div v-if="form.subCategory"><strong>Sub-Category:</strong>
+            {{ dictionary.subcategories[form.subCategory].name }}
+          </div>
 
-          <div><strong>Set Up Attacks:</strong> {{ form.setUpAttacks.map(x => dictionary.techniques[x].name).join(', ') }} </div>
-          <div><strong>Follow Up Attacks:</strong> {{ form.followUpAttacks.map(x => dictionary.techniques[x].name).join(', ') }} </div>
-          <div><strong>Counters:</strong> {{ form.counters.map(x => dictionary.techniques[x].name).join(', ') }} </div>
+          <div><strong>Set Up Attacks:</strong> {{
+              form.setUpAttacks.map(x => dictionary.techniques[x].name).join(', ')
+            }}
+          </div>
+          <div><strong>Follow Up Attacks:</strong>
+            {{ form.followUpAttacks.map(x => dictionary.techniques[x].name).join(', ') }}
+          </div>
+          <div><strong>Counters:</strong> {{ form.counters.map(x => dictionary.techniques[x].name).join(', ') }}</div>
 
-          <v-text-field v-if="editing" label="Reason For Change" v-model="form.reason"></v-text-field>
+          <v-text-field v-if="!!editPayload" label="Reason For Change" v-model="form.reason"></v-text-field>
 
           <!-- Button - Final step (2), Saving trick -->
           <div class="d-flex mt-3">
             <v-btn @click="step--">Edit</v-btn>
             <v-spacer/>
-            <v-btn color="primary" :disabled="editing && form.reason.length <= 5" @click="save">
-              {{editing ? "Update" : "Create"}}
+            <v-btn color="primary" :disabled="!!editPayload && form.reason.length <= 5" @click="save">
+              {{ !!editPayload ? "Update" : "Create" }}
             </v-btn>
           </div>
         </v-stepper-content>
@@ -111,80 +99,81 @@
 
 <script>
 import {mapActions, mapState} from "vuex";
-  import {close} from "./_shared";
+import {close, form} from "@/components/content-creation/_shared";
 
-  // Component that is responsible for creating/saving technique
-  export default {
-    // Component name
-    name: "techniques-steps",
+// Component that is responsible for creating/saving technique
+export default {
+  // Component name
+  name: "techniques-steps",
 
-    // Data is referencing initState function which holds local state of component -> this.$data
-    data: () => ({
-      step: 1,
-      form: {
-        name: "",
-        description: "",
-        category: "",
-        subCategory: "",
-        reason: "",
-        setUpAttacks: [],
-        followUpAttacks: [],
-        counters: [],
-      },
-      validation: {
-        valid: false,
-        name: [v => !!v || "Name is required."],
-        description: [v => !!v || "Description is required."],
-        category: [v => !!v || "Category is required."],
-        // v => v.length > 0
-        subCategory: [v => !!v || "Sub-Category is required."],
-      },
-      testData: [
-        {text: "Foo", value: 1},
-        {text: "Bar", value: 2},
-        {text: "Baz", value: 3},
-      ]
-    }),
+  mixins: [close, form(() => ({
+    name: "",
+    description: "",
+    category: "",
+    subCategory: "",
+    reason: "",
+    setUpAttacks: [],
+    followUpAttacks: [],
+    counters: [],
+  }))],
 
-    mixins: [close],
-
-    computed: {
-      ...mapState("techniques", ["lists", "dictionary"]),
-      ...mapState("content-update", ["editing", "editPayload"])
+  // Data is referencing initState function which holds local state of component -> this.$data
+  data: () => ({
+    step: 1,
+    validation: {
+      valid: false,
+      name: [v => !!v || "Name is required."],
+      description: [v => !!v || "Description is required."],
+      category: [v => !!v || "Category is required."],
+      // v => v.length > 0
+      subCategory: [v => !!v || "Sub-Category is required."],
     },
+    testData: [
+      {text: "Foo", value: 1},
+      {text: "Bar", value: 2},
+      {text: "Baz", value: 3},
+    ]
+  }),
 
-    // When this component get's created => grab the editingPayload and stick it on the form
-    created() {
-      // If editing is true
-      if (this.editing) {
-        // Assign editPayload to existing form | target, source
-        // Useful because it will pre-populate fields that where filled
-        Object.assign(this.form, this.editPayload)
+  computed: {
+    ...mapState("library", ["lists", "dictionary"]),
+    ...mapState("content-creation", ["editPayload"])
+  },
+
+  // When this component get's created => grab the editingPayload and stick it on the form
+  created() {
+    // If editing is true
+    if (this.editPayload) {
+      // Assign editPayload to existing form | target, source
+      // Useful because it will pre-populate fields that where filled
+      Object.assign(this.form, this.editPayload)
+    }
+  },
+
+  // Mapping modules mutation and action functions
+  methods: {
+    // Map actions for technique module
+    ...mapActions("library", ["createTechnique", "updateTechnique"]),
+
+    // Saving technique | #2
+    async save() {
+      // If we are editing
+      if (this.form.id) {
+        // Make an update -> PUT req.
+        await this.updateTechnique({form: this.form});
+      } else {
+        // Creating new obj with data from our local form(state), binding local form to form
+        // Local form is gonna get passed to store as payload
+        await this.createTechnique({form: this.form});
       }
+
+      this.broadcastUpdate()
+
+      // * this refers to VueComponent, close will set component to null and hide it, eventually -> pipeline
+      this.close();
     },
-
-    // Mapping modules mutation and action functions
-    methods: {
-      // Map actions for technique module
-      ...mapActions("techniques", ["createTechnique", "updateTechnique"]),
-
-      // Saving technique | #2
-      async save() {
-        // If we are editing
-        if (this.editing) {
-          // Make an update -> PUT req.
-          await this.updateTechnique({form: this.form});
-        } else {
-          // Creating new obj with data from our local form(state), binding local form to form
-          // Local form is gonna get passed to store as payload
-          await this.createTechnique({form: this.form});
-        }
-
-        // * this refers to VueComponent, close will set component to null and hide it, eventually -> pipeline
-        this.close();
-      },
-    },
-  }
+  },
+}
 </script>
 
 <style scoped>

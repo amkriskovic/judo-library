@@ -25,7 +25,7 @@ export const actions = {
     await dispatch("auth/initialize");
 
     // Pre-load all available tricks, returning Promise...
-    await dispatch("techniques/fetchTechniques");
+    await dispatch("library/loadContent");
   },
 
 }

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using JudoLibrary.Api.Form;
@@ -6,7 +7,9 @@ using JudoLibrary.Api.ViewModels;
 using JudoLibrary.Data;
 using JudoLibrary.Models;
 using JudoLibrary.Models.Moderation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace JudoLibrary.Api.Controllers
 {
@@ -23,7 +26,7 @@ namespace JudoLibrary.Api.Controllers
         // GET -> /api/categories
         [HttpGet]
         public IEnumerable<object> GetAllCategories() => _context.Categories
-            .Where(x => !x.Deleted && x.Active)
+            .Where(x => !x.Deleted && x.State == VersionState.Live)
             .Select(CategoryViewModels.Projection)
             .ToList();
 
@@ -34,7 +37,17 @@ namespace JudoLibrary.Api.Controllers
                 .WhereIdOrSlug(value)
                 .Select(CategoryViewModels.Projection)
                 .FirstOrDefault();
-        
+
+        // GET -> /api/categories/{slug}/history
+        [HttpGet("{slug}/history")]
+        public IEnumerable<object> GetCategoryHistory(string slug)
+        {
+            return _context.Categories
+                .Where(x => x.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase) && x.State != VersionState.Staged)
+                .Select(CategoryViewModels.Projection)
+                .ToList();
+        }
+
 
         // GET -> /api/categories/{id}/subcategories
         // Get all subcategories for particular category | Passing category Id as param
@@ -55,6 +68,7 @@ namespace JudoLibrary.Api.Controllers
         // POST -> /api/categories
         // Created category, sending json from the body of the request
         [HttpPost]
+        [Authorize(JudoLibraryConstants.Policies.Mod)]
         public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryForm form)
         {
             var category = new Category
@@ -86,19 +100,20 @@ namespace JudoLibrary.Api.Controllers
 
         // PUT -> /api/categories
         [HttpPut]
+        [Authorize(JudoLibraryConstants.Policies.Mod)]
         public async Task<IActionResult> UpdateCategory([FromBody] UpdateCategoryForm form)
         {
             var category = _context.Categories.FirstOrDefault(x => x.Id == form.Id);
-            
+
             if (category == null)
             {
                 return NoContent();
             }
-            
+
             var newCategory = new Category
             {
-                Slug = form.Name.Replace(" ", "-").ToLowerInvariant(),
-                Name = form.Name,
+                Slug = category.Slug,
+                Name = category.Name,
                 Description = form.Description,
                 Version = category.Version + 1,
                 UserId = UserId,

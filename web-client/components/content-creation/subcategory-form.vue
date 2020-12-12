@@ -14,14 +14,15 @@
 
     <v-card-text>
       <v-form ref="form" v-model="validation.valid">
-        <v-text-field :rules="validation.name" label="Name" v-model="form.name"></v-text-field>
-        <v-text-field :rules="validation.description" label="Description" v-model="form.description"></v-text-field>
+        <v-text-field :rules="validation.name" label="Name" :disabled="!!editPayload"
+                      v-model="form.name">
+        </v-text-field>
+        <v-text-field :rules="validation.description" label="Description"
+                      v-model="form.description">
+        </v-text-field>
 
-        <v-select
-          :rules="validation.categoryId"
-          :items="lists.categories.map(c => ({value: c.id, text: c.name}))"
-          v-model="form.categoryId"
-          label="Category">
+        <v-select :rules="validation.categoryId" :items="lists.categories.map(c => ({value: c.id, text: c.name}))"
+                  v-model="form.categoryId" label="Category">
         </v-select>
       </v-form>
 
@@ -34,21 +35,20 @@
 </template>
 
 <script>
+import {close, form} from "@/components/content-creation/_shared";
 import {mapState} from "vuex";
-import {close} from "./_shared";
 
 export default {
   // Component name
   name: "subcategory-form",
 
-  mixins: [close],
+  mixins: [close, form(() => ({
+    name: "",
+    description: "",
+    categoryId: ""
+  }))],
 
   data: () => ({
-    form: {
-      name: "",
-      description: "",
-      categoryId: ""
-    },
     validation: {
       valid: false,
       name: [v => !!v || "Name is required."],
@@ -65,12 +65,14 @@ export default {
   },
 
   methods: {
-    save() {
+    async save() {
       if (this.form.id) {
-        this.$axios.put("/api/subcategories", this.form)
+        await this.$axios.put("/api/subcategories", this.form)
       } else {
-        this.$axios.post("/api/subcategories", this.form)
+        await this.$axios.post("/api/subcategories", this.form)
       }
+
+      this.broadcastUpdate()
 
       // Reset component
       this.close();
@@ -78,8 +80,8 @@ export default {
   },
 
   computed: {
-    ...mapState('content-update', ['editPayload']),
-    ...mapState("techniques", ["lists", "dictionary"]),
+    ...mapState('content-creation', ['editPayload']),
+    ...mapState("library", ["lists", "dictionary"]),
   }
 
 

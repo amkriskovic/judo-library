@@ -1,7 +1,12 @@
 ﻿<template>
   <v-sheet class="pa-3" rounded min-width="300">
     <div class="text-h5">
-      <span>{{ technique.name }}</span>
+      <nuxt-link class="white--text text-decoration-none"
+                 :to="`/technique/${technique.slug}`"
+                 v-if="link">{{technique.name}}
+      </nuxt-link>
+
+      <span v-else>{{ technique.name }}</span>
       <!-- :to= corresponds to page that we created | category == folder | category.id == page?  -->
       <v-chip small label class="mb-1 ml-2" :to="`/category/${category.slug}`">{{ category.name }}</v-chip>
       <v-chip small label class="mb-1 ml-2" :to="`/subcategory/${subcategory.slug}`">{{ subcategory.name }}</v-chip>
@@ -50,7 +55,6 @@
 
     <!-- Injecting user-header component for displaying User info -->
     <user-header class="pa-2" :username="technique.user.username" :image-url="technique.user.image" reverse>
-
       <template v-slot:append>
         <span>{{ technique.version === 1 ? `Created by` : `Edited by` }}</span>
       </template>
@@ -75,6 +79,12 @@ export default {
       type: Object,
     },
 
+    link: {
+      required: false,
+      type: Boolean,
+      default: false
+    },
+
     close: {
       required: false,
       type: Function,
@@ -84,18 +94,18 @@ export default {
   },
 
   methods: {
-    ...mapMutations("content-update", ["activate"]),
+    ...mapMutations("content-creation", ["activate"]),
 
     // Method for editing Technique
     edit() {
-      // Invoke activate mutation from content-update store
+      // Invoke activate mutation from content-creation store
       // Passing TechniqueSteps as component, set edit as true, and editPayload as this technique => page data/local state
-      this.activate({component: TechniqueSteps, edit: true, editPayload: this.technique})
+      this.activate({component: TechniqueSteps, editPayload: this.technique})
     },
 
     // Method for uploading Technique => Submission
     upload() {
-      // Invoke activate mutation from content-update store
+      // Invoke activate mutation from content-creation store
       this.activate({
         component: SubmissionSteps,
         setup: (form) => form.techniqueId = this.technique.slug
@@ -106,7 +116,7 @@ export default {
   // Map state for submissions and techniques, mapping getters for returning technique by id
   computed: {
     // Importing dictionary from initial state of techniques store => for particular technique we use dict => indexing
-    ...mapState("techniques", ["dictionary"]),
+    ...mapState("library", ["dictionary"]),
 
     // Function that returns object with title, data -> for specific technique, related data in this case filters:
     // subcategory, setup attacks and followup attacks, idFactory for uniqueness and routeFactory for navigating

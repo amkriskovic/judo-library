@@ -1,9 +1,15 @@
 ﻿// Produce the endpoint based on url type parameter, e.g. techniques
 const endpointResolver = (type) => {
   // If type is technique, returns techniques string which we will use for resolving our API endpoint
-  if (type === 'technique') return 'techniques'
-  if (type === 'category') return 'categories'
-  if (type === 'subcategory') return 'subcategories'
+  if (type === MODERATION_TYPES.TECHNIQUE) return 'techniques'
+  if (type === MODERATION_TYPES.CATEGORY) return 'categories'
+  if (type === MODERATION_TYPES.SUBCATEGORY) return 'subcategories'
+}
+
+export const MODERATION_TYPES = {
+  TECHNIQUE: 'technique',
+  CATEGORY: 'category',
+  SUBCATEGORY: 'subcategory'
 }
 
 // Reviews statuses, mimicking backend enum
@@ -11,6 +17,12 @@ export const REVIEW_STATUS = {
   APPROVED: 0,
   REJECTED: 1,
   WAITING: 2
+}
+
+export const VERSION_STATE = {
+  LIVE: 0,
+  STAGED: 1,
+  OUTDATED: 2,
 }
 
 // Depending on review status returns color corresponding to that status

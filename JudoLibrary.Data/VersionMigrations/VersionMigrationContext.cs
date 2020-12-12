@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using JudoLibrary.Models;
 using JudoLibrary.Models.Moderation;
 
 namespace JudoLibrary.Data.VersionMigrations
@@ -18,7 +19,7 @@ namespace JudoLibrary.Data.VersionMigrations
 
         public VersionMigrationContext Setup(ModerationItem moderationItem)
         {
-            ModerationItem = moderationItem;
+            ModerationItem = moderationItem ?? throw new ArgumentException(nameof(moderationItem));
             EntityMigrationContext = moderationItem.Type switch
             {
                 ModerationTypes.Technique => new TechniqueMigrationContext(_ctx),
@@ -33,6 +34,9 @@ namespace JudoLibrary.Data.VersionMigrations
         // Migrating based on moderationItem that's passed as arg
         public void Migrate()
         {
+            if (ModerationItem == null) throw new NullReferenceException(nameof(ModerationItem));
+            if (EntityMigrationContext == null) throw new NullReferenceException(nameof(EntityMigrationContext));
+            
             // Getting the source based on moderationItem Type that's passed => we end up with IQue<VersionedModel> of type that's
             // passed in as argument -> moderationItem
             var source = EntityMigrationContext.GetSource();
@@ -51,17 +55,17 @@ namespace JudoLibrary.Data.VersionMigrations
             // If current version is NOT null
             if (current != null)
             {
-                // If the target version - current version is less than or equal to 0, we have a problem
-                // For example there could be same multiple versions of Technique e.g. 2, and if we approve one of them
-                // the rest should be invalid because 2 - 2 == 0 =>> problem/invalid
-                if (target.Version - current.Version <= 0)
+                
+                var newVersion = !current.Slug.Equals(target.Slug, StringComparison.InvariantCultureIgnoreCase);
+                var outdatedVersion = target.Version - current.Version <= 0;
+                if (outdatedVersion && !newVersion)
                 {
                     throw new InvalidVersionException(
                         $"Current Version is {current.Version}, Target Version is {target.Version}, for {ModerationItem.Type}");
                 }
 
                 // Deactivate current version => no longer active
-                current.Active = false;
+                current.State = VersionState.Outdated;
 
                 // Grab all current moderation items => where MI is not Deleted,
                 // and MI Type matches the moderationItem Type -> Thing that we are moderating (make sure that they are same types)
@@ -79,7 +83,7 @@ namespace JudoLibrary.Data.VersionMigrations
             }
 
             // Activate target => VersionModel
-            target.Active = true;
+            target.State = VersionState.Live;
 
             // Call MigrateTechniqueRelationships func, with provided original modItem: Current, Target
             EntityMigrationContext.MigrateTechniqueRelationships(ModerationItem.Current, ModerationItem.Target);

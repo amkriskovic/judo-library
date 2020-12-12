@@ -31,17 +31,16 @@ import SubCategoryForm from "@/components/content-creation/subcategory-form";
 export default {
   name: "moderation-subcategory-overview",
   methods: {
-    ...mapMutations('content-update', ['activate']),
+    ...mapMutations('content-creation', ['activate']),
     edit(subcategory) {
       this.activate({
         component: SubCategoryForm,
-        edit: true,
         editPayload: subcategory,
         setup: null
       })
     }
   },
-  computed: mapState('techniques', ['lists'])
+  computed: mapState('library', ['lists'])
 }
 </script>
 

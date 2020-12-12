@@ -14,15 +14,15 @@
 
 <script>
 import {mapState} from "vuex";
-import TechniqueList from "../../components/technique-list";
-import ItemContentLayout from "../../components/item-content-layout";
+import TechniqueList from "@/components/technique-list";
+import ItemContentLayout from "@/components/item-content-layout";
 
 export default {
   // Injected components
   components: {ItemContentLayout, TechniqueList},
 
   computed: {
-    ...mapState("techniques", ["lists", "dictionary"]),
+    ...mapState("library", ["lists", "dictionary"]),
     techniques() {
       const categorySlug = this.$route.params.category;
       return this.dictionary.categories[categorySlug]

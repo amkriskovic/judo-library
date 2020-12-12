@@ -1,5 +1,4 @@
 ﻿<template>
-
   <div>
     <div>
       <div class="text-h4"> {{ subcategory.name }}</div>
@@ -15,14 +14,14 @@
 
 <script>
 import {mapState} from "vuex";
-import TechniqueList from "../../components/technique-list";
-import ItemContentLayout from "../../components/item-content-layout";
+import TechniqueList from "@/components/technique-list";
+import ItemContentLayout from "@/components/item-content-layout";
 
 export default {
   components: {ItemContentLayout, TechniqueList},
 
   computed: {
-    ...mapState("techniques", ["lists","dictionary"]),
+    ...mapState("library", ["lists","dictionary"]),
     techniques() {
       const subcategorySlug = this.$route.params.subcategory;
       return this.dictionary.subcategories[subcategorySlug]
