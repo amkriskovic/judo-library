@@ -7,5 +7,6 @@ namespace JudoLibrary.Data.VersionMigrations
     {
         IQueryable<VersionedModel> GetSource();
         void MigrateTechniqueRelationships(int current, int target);
+        void VoidRelationships(int id);
     }
 }

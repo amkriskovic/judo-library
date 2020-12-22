@@ -2,6 +2,7 @@
 using System.Linq;
 using JudoLibrary.Models;
 using JudoLibrary.Models.Abstractions;
+using Microsoft.EntityFrameworkCore;
 
 namespace JudoLibrary.Data.VersionMigrations
 {
@@ -24,6 +25,7 @@ namespace JudoLibrary.Data.VersionMigrations
             if (current > 0)
             {
                 var relationships = _ctx.TechniqueSubCategories
+                    .Include(x => x.Technique)
                     .Where(x => x.SubCategoryId == current)
                     .ToList();
 
@@ -34,10 +36,19 @@ namespace JudoLibrary.Data.VersionMigrations
                     {
                         SubCategoryId = target,
                         TechniqueId = relationship.TechniqueId,
-                        Active = true,
+                        Active = relationship.Active,
                     });
+                    if (relationship.Technique.State == VersionState.Staged)
+                        _ctx.Remove(relationship);
+                    else
+                        relationship.Active = false;
                 }
             }
+        }
+
+        public void VoidRelationships(int id)
+        {
+            throw new NotImplementedException();
         }
     }
 }

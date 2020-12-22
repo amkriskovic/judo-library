@@ -137,19 +137,23 @@ namespace JudoLibrary.Api.Controllers
 
             return Ok();
         }
-
-        // DELETE -> /api/categories/{id}
+        
+        // DELETE -> /api/categories
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCategory(string id)
+        [Authorize(JudoLibraryConstants.Policies.Mod)]
+        public async Task<IActionResult> DeleteCategory(int id)
         {
-            // Grab category by Id
-            var category = _context.Categories.FirstOrDefault(c => c.Id.Equals(id));
+            if (!_context.Categories.Any(x => x.Id == id))
+            {
+                return NoContent();
+            }
 
-            if (category == null)
-                return NotFound();
-
-            // Mark field Deleted as true
-            category.Deleted = true;
+            _context.ModerationItems.Add(new ModerationItem
+            {
+                Current = id,
+                UserId = UserId,
+                Type = ModerationTypes.Category,
+            });
 
             await _context.SaveChangesAsync();
 

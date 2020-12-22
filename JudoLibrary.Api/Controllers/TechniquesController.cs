@@ -252,25 +252,5 @@ namespace JudoLibrary.Api.Controllers
             return Ok();
         }
 
-
-        // DELETE -> /api/techniques/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTechnique(string id)
-        {
-            // Grab technique from DB by comparing Slugs
-            var technique = _context.Techniques.FirstOrDefault(t => t.Slug == id);
-
-            // If technique not exists
-            if (technique == null)
-                return NotFound();
-
-            // Mark as deleted
-            technique.Deleted = true;
-
-            await _context.SaveChangesAsync();
-
-            return Ok();
-        }
-        
     }
 }

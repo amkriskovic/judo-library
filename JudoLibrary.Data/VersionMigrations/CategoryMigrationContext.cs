@@ -4,7 +4,7 @@ using JudoLibrary.Models.Abstractions;
 
 namespace JudoLibrary.Data.VersionMigrations
 {
-    class CategoryMigrationContext : IEntityMigrationContext
+    public class CategoryMigrationContext : IEntityMigrationContext
     {
         private readonly AppDbContext _ctx;
 
@@ -37,6 +37,16 @@ namespace JudoLibrary.Data.VersionMigrations
                     });
                 }
             }
+        }
+
+        public void VoidRelationships(int id)
+        {
+            var relationships = _ctx.TechniqueCategories
+                .Where(x => x.CategoryId == id)
+                .ToList();
+
+            foreach (var relationship in relationships)
+                relationship.Active = false;
         }
     }
 }

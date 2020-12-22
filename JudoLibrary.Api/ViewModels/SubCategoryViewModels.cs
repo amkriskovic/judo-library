@@ -13,8 +13,8 @@ namespace JudoLibrary.Api.ViewModels
             {
                 subCategory.Id,
                 subCategory.Name,
-                subCategory.Description,
                 subCategory.Slug,
+                subCategory.State,
                 subCategory.Version,
             };
         
@@ -24,8 +24,8 @@ namespace JudoLibrary.Api.ViewModels
             {
                 subCategory.Id,
                 subCategory.Name,
-                subCategory.Description,
                 subCategory.Slug,
+                subCategory.Description,
                 subCategory.Version,
                 subCategory.State,
                 Updated = subCategory.Updated.ToLocalTime().ToString("HH:mm dd/MM/yyyy"),

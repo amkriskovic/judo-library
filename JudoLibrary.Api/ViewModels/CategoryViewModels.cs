@@ -14,7 +14,7 @@ namespace JudoLibrary.Api.ViewModels
                 category.Id,
                 category.Name,
                 category.Slug,
-                category.Description,
+                category.State,
                 category.Version,
             };
         

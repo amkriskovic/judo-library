@@ -37,7 +37,11 @@ namespace JudoLibrary.Api.Controllers
             var targetMapping = new Dictionary<string, object>();
             foreach (var group in moderationItems.GroupBy(x => x.Type))
             {
-                var targetIds = group.Select(m => m.Target).ToArray();
+                var targetIds = group
+                    .Select(m => new[] {m.Target, m.Current})
+                    .SelectMany(x => x)
+                    .Where(x => x > 0)
+                    .ToArray();
 
                 if (group.Key == ModerationTypes.Technique)
                 {
@@ -75,7 +79,8 @@ namespace JudoLibrary.Api.Controllers
                 Updated = x.Updated.ToLocalTime().ToString("HH:mm dd/MM/yyyy"),
                 Reviews = x.Reviews.Select(r => r.Status).ToList(),
                 User = UserViewModel.CreateFlat(x.User),
-                TargetObject = targetMapping[x.Type + x.Target],
+                CurrentObject = x.Current > 0 ? targetMapping[x.Type + x.Current] : null,
+                TargetObject = x.Target > 0 ? targetMapping[x.Type + x.Target] : null,
             });
         }
 

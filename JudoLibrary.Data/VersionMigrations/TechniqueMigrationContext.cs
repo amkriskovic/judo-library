@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace JudoLibrary.Data.VersionMigrations
 {
-    class TechniqueMigrationContext : IEntityMigrationContext
+    public class TechniqueMigrationContext : IEntityMigrationContext
     {
         private readonly AppDbContext _ctx;
 
@@ -90,6 +90,11 @@ namespace JudoLibrary.Data.VersionMigrations
                 followupAttack.Active = true;
             foreach (var counter in targetTechnique.Counters)
                 counter.Active = true;
+        }
+
+        public void VoidRelationships(int id)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

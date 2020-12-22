@@ -109,6 +109,10 @@ namespace JudoLibrary.Api.Controllers
                 Version = subcategory.Version + 1
             };
             
+            newSubcategory.Version = subcategory.Slug.Equals(newSubcategory.Slug, StringComparison.InvariantCultureIgnoreCase)
+                ? subcategory.Version + 1
+                : 1;
+            
             _context.Add(newSubcategory);
             
             await _context.SaveChangesAsync();
@@ -126,19 +130,25 @@ namespace JudoLibrary.Api.Controllers
             return Ok();
         }
         
-        // DELETE -> /api/subcategories/{id}
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSubCategory(string id)
+        [HttpPut("{current}/{target}")]
+        [Authorize(JudoLibraryConstants.Policies.Mod)]
+        public async Task<IActionResult> Migrate(int current, int target)
         {
-            // Find sub-category in DB
-            var subCategory = _context.SubCategories.FirstOrDefault(sc => sc.Id.Equals(id));
-            
-            // If sub-category does not exists
-            if (subCategory == null)
-                return NotFound();
+            var subCategoryCount = _context.SubCategories.Count(x => !x.Deleted
+                                                               && x.State == VersionState.Live
+                                                               && (x.Id == current || x.Id == target));
+            if (subCategoryCount != 2)
+            {
+                return NoContent();
+            }
 
-            // Mark as deleted
-            subCategory.Deleted = true;
+            _context.ModerationItems.Add(new ModerationItem
+            {
+                Current = current,
+                Target = target,
+                UserId = UserId,
+                Type = ModerationTypes.SubCategory,
+            });
             
             await _context.SaveChangesAsync();
 

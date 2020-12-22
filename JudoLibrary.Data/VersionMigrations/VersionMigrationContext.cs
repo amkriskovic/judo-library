@@ -50,7 +50,23 @@ namespace JudoLibrary.Data.VersionMigrations
             var target = source.FirstOrDefault(vm => vm.Id == ModerationItem.Target);
 
             // If target is null -> NotFound
-            if (target == null) throw new InvalidOperationException("Target not found");
+            if (target == null)
+            {
+                if (current == null) throw new InvalidOperationException("Target not found");
+                current.Deleted = true;
+                current.State = VersionState.Outdated;
+
+                var outdatedModerationItems = _ctx.ModerationItems
+                    .Where(x => !x.Deleted && x.Type == ModerationItem.Type && x.Id != ModerationItem.Id)
+                    .ToList();
+
+                foreach (var outdatedModItem in outdatedModerationItems)
+                    outdatedModItem.Deleted = true;
+
+                EntityMigrationContext.VoidRelationships(current.Id);
+                return;
+            }
+
 
             // If current version is NOT null
             if (current != null)

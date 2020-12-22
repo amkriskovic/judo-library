@@ -57,6 +57,7 @@ namespace JudoLibrary.Api.ViewModels
                 technique.Description,
                 technique.State,
                 Category = technique.TechniqueCategories.AsQueryable()
+                    .OrderByDescending(x => x.Active)
                     .Select(x => x.CategoryId)
                     .FirstOrDefault(),
                 SubCategory = technique.TechniqueSubCategories.AsQueryable()
@@ -86,6 +87,7 @@ namespace JudoLibrary.Api.ViewModels
                 technique.Slug,
                 technique.Name,
                 technique.Description,
+                technique.State,
                 technique.Version,
             };
     }
