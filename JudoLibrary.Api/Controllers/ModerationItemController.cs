@@ -25,12 +25,16 @@ namespace JudoLibrary.Api.Controllers
 
         // GET -> /api/moderation-items
         [HttpGet]
-        public object GetAllModerationItems([FromQuery] FeedQuery feedQuery)
+        public object GetAllModerationItems([FromQuery] FeedQuery feedQuery, int user)
         {
-            var moderationItems = _ctx.ModerationItems
+            var query = _ctx.ModerationItems.Where(x => !x.Deleted);
+
+            if (user == 1)
+                query = query.Where(x => x.UserId == UserId);
+            
+            var moderationItems = query
                 .Include(mi => mi.User)
                 .Include(x => x.Reviews)
-                .Where(x => !x.Deleted)
                 .OrderFeed(feedQuery)
                 .ToList();
 

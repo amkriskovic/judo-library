@@ -79,13 +79,13 @@
           </div>
           <div><strong>Counters:</strong> {{ form.counters.map(x => dictionary.techniques[x].name).join(', ') }}</div>
 
-          <v-text-field v-if="!!editPayload" label="Reason For Change" v-model="form.reason"></v-text-field>
+          <v-text-field v-if="requireReason" label="Reason For Change" v-model="form.reason"></v-text-field>
 
           <!-- Button - Final step (2), Saving trick -->
           <div class="d-flex mt-3">
             <v-btn @click="step--">Edit</v-btn>
             <v-spacer/>
-            <v-btn color="primary" :disabled="!!editPayload && form.reason.length <= 5" @click="save">
+            <v-btn color="primary" :disabled="requireReason && form.reason.length <= 5" @click="save">
               {{ !!editPayload ? "Update" : "Create" }}
             </v-btn>
           </div>
@@ -100,6 +100,7 @@
 <script>
 import {mapActions, mapState} from "vuex";
 import {close, form} from "@/components/content-creation/_shared";
+import {VERSION_STATE} from "@/components/moderation";
 
 // Component that is responsible for creating/saving technique
 export default {
@@ -137,7 +138,13 @@ export default {
 
   computed: {
     ...mapState("library", ["lists", "dictionary"]),
-    ...mapState("content-creation", ["editPayload"])
+    ...mapState("content-creation", ["editPayload"]),
+    staged() {
+      return this.form.state === VERSION_STATE.STAGED
+    },
+    requireReason() {
+      return this.editPayload && !this.staged
+    }
   },
 
   // When this component get's created => grab the editingPayload and stick it on the form
@@ -152,19 +159,15 @@ export default {
 
   // Mapping modules mutation and action functions
   methods: {
-    // Map actions for technique module
-    ...mapActions("library", ["createTechnique", "updateTechnique"]),
-
-    // Saving technique | #2
     async save() {
-      // If we are editing
       if (this.form.id) {
-        // Make an update -> PUT req.
-        await this.updateTechnique({form: this.form});
+        if (this.staged) {
+          await this.$axios.$put("/api/techniques/staged", this.form)
+        } else {
+          await this.$axios.$put("/api/techniques", this.form)
+        }
       } else {
-        // Creating new obj with data from our local form(state), binding local form to form
-        // Local form is gonna get passed to store as payload
-        await this.createTechnique({form: this.form});
+        await this.$axios.$post("/api/techniques", this.form)
       }
 
       this.broadcastUpdate()

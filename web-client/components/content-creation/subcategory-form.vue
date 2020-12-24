@@ -14,7 +14,7 @@
 
     <v-card-text>
       <v-form ref="form" v-model="validation.valid">
-        <v-text-field :rules="validation.name" label="Name" :disabled="!!editPayload"
+        <v-text-field :rules="validation.name" label="Name" :disabled="staged"
                       v-model="form.name">
         </v-text-field>
         <v-text-field :rules="validation.description" label="Description"
@@ -29,7 +29,9 @@
     </v-card-text>
 
     <v-card-actions class="d-flex justify-center">
-      <v-btn :disabled="!validation.valid" color="primary" @click="$refs.form.validate() ? save() : 0">Create</v-btn>
+      <v-btn :disabled="!validation.valid" color="primary" @click="$refs.form.validate() ? save() : 0">
+        {{ !!editPayload ? "Update" : "Create" }}
+      </v-btn>
     </v-card-actions>
   </v-card>
 </template>
@@ -37,6 +39,7 @@
 <script>
 import {close, form} from "@/components/content-creation/_shared";
 import {mapState} from "vuex";
+import {VERSION_STATE} from "@/components/moderation";
 
 export default {
   // Component name
@@ -55,19 +58,25 @@ export default {
       description: [v => !!v || "Description is required."],
       categoryId: [v => !!v || "Category is required."]
     },
+    staged: false
   }),
 
   created() {
     if (this.editPayload) {
-      const {id, name, description} = this.editPayload
+      const {id, name, description, state} = this.editPayload
       Object.assign(this.form, {id, name, description})
+      this.staged = state && state === VERSION_STATE.STAGED
     }
   },
 
   methods: {
     async save() {
       if (this.form.id) {
-        await this.$axios.put("/api/subcategories", this.form)
+        if (this.staged) {
+          await this.$axios.put("/api/subcategories/staged", this.form)
+        } else {
+          await this.$axios.put("/api/subcategories", this.form)
+        }
       } else {
         await this.$axios.post("/api/subcategories", this.form)
       }

@@ -56,11 +56,13 @@ namespace JudoLibrary.Api.ViewModels
                 technique.Name,
                 technique.Description,
                 technique.State,
-                Category = technique.TechniqueCategories.AsQueryable()
+                Category = technique.TechniqueCategories
+                    .AsQueryable()
                     .OrderByDescending(x => x.Active)
                     .Select(x => x.CategoryId)
                     .FirstOrDefault(),
-                SubCategory = technique.TechniqueSubCategories.AsQueryable()
+                SubCategory = technique.TechniqueSubCategories
+                    .AsQueryable()
                     .Select(x => x.SubCategoryId)
                     .FirstOrDefault(),
                 technique.Version,

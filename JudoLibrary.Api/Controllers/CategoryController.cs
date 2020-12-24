@@ -159,5 +159,22 @@ namespace JudoLibrary.Api.Controllers
 
             return Ok();
         }
+        
+        [HttpPut("staged")]
+        [Authorize]
+        public async Task<IActionResult> UpdateStaged([FromBody] UpdateCategoryForm form)
+        {
+            var category = _context.Categories
+                .FirstOrDefault(x => x.Id == form.Id);
+
+            if (category == null) return NoContent();
+            if (category.UserId != UserId) return BadRequest("Can't edit this category.");
+
+            category.Description = form.Description;
+
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
     }
 }

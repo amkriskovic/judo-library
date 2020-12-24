@@ -43,6 +43,7 @@ namespace JudoLibrary.Api.Controllers
         {
             var technique = _context.Techniques
                 .WhereIdOrSlug(value)
+                .Include(t => t.TechniqueCategories)
                 .Include(t => t.SetUpAttacks)
                 .Include(t => t.FollowUpAttacks)
                 .Include(t => t.Counters)
@@ -61,6 +62,7 @@ namespace JudoLibrary.Api.Controllers
         {
             return _context.Techniques
                 .Where(x => x.Slug.Equals(slug, StringComparison.InvariantCultureIgnoreCase) && x.State != VersionState.Staged)
+                .Include(t => t.TechniqueCategories)
                 .Include(t => t.SetUpAttacks)
                 .Include(t => t.FollowUpAttacks)
                 .Include(t => t.Counters)
@@ -249,6 +251,41 @@ namespace JudoLibrary.Api.Controllers
             await _context.SaveChangesAsync();
 
             // Return created technique that we pass to TechniqueViewModels
+            return Ok();
+        }
+        
+        [HttpPut("staged")]
+        [Authorize]
+        public async Task<IActionResult> UpdateStaged([FromBody] UpdateStagedTechniqueForm form)
+        {
+            var technique = _context.Techniques
+                .Include(x => x.TechniqueCategories)
+                .Include(x => x.TechniqueSubCategories)
+                .Include(x => x.SetUpAttacks)
+                .Include(x => x.FollowUpAttacks)
+                .Include(x => x.Counters)
+                .FirstOrDefault(x => x.Id == form.Id);
+
+            if (technique == null) return NoContent();
+            if (technique.UserId != UserId) return BadRequest("Can't edit this technique.");
+
+            technique.Description = form.Description;
+            
+            technique.TechniqueCategories = new List<TechniqueCategory> {new TechniqueCategory {CategoryId = form.Category}};
+            technique.TechniqueSubCategories = new List<TechniqueSubCategory> {new TechniqueSubCategory {SubCategoryId = form.SubCategory}};
+
+            technique.SetUpAttacks = form.SetUpAttacks
+                .Select(x => new TechniqueSetupAttack {SetUpAttackId = x})
+                .ToList();
+            technique.FollowUpAttacks = form.FollowUpAttacks
+                .Select(x => new TechniqueFollowupAttack {FollowUpAttackId = x})
+                .ToList();
+            technique.Counters = form.Counters
+                .Select(x => new TechniqueCounter {CounterId = x})
+                .ToList();
+
+            await _context.SaveChangesAsync();
+
             return Ok();
         }
 

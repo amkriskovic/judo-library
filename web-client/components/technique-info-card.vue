@@ -88,7 +88,7 @@ export default {
     close: {
       required: false,
       type: Function,
-      defaults: () => {
+      default: () => {
       }
     }
   },

@@ -114,11 +114,11 @@ namespace JudoLibrary.Api
 
                     context.Add(new Category
                     {
-                        Id = 4,
-                        Slug = "mod", 
-                        Name = "Mod",
-                        Description = "Category under Moderation",
-                        State = VersionState.Live,
+                        Id = 4, 
+                        Slug = "ground-work", 
+                        Name = "Ground Work", 
+                        Description = "Category under moderation", 
+                        UserId = testUser.Id
                     });
 
 
@@ -157,6 +157,15 @@ namespace JudoLibrary.Api
                         } 
                     };
                     context.AddRange(subcategories);
+                    
+                    context.Add(new SubCategory
+                    {
+                        Id = 6,
+                        Slug = "wtf", 
+                        Name = "WTF",
+                        Description = "Sub-Category under Moderation",
+                        UserId = testUser.Id
+                    });
 
 
                     // Seeding Techniques
@@ -275,6 +284,33 @@ namespace JudoLibrary.Api
                             new TechniqueCounter {TechniqueId = 6, CounterId = 2, Active = true}
                         }
                     });
+                    
+                    context.Add(new Technique
+                    {
+                        Id = 7, UserId = testUser.Id, Version = 1, State = VersionState.Staged, Slug = "back-flip-360",
+                        Name = "Back Flip 360",
+                        Description = "This is a test back flip 360",
+                        TechniqueCategories = new List<TechniqueCategory>
+                        {
+                            new TechniqueCategory {CategoryId = 1, Active = true}
+                        },
+                        TechniqueSubCategories = new List<TechniqueSubCategory>
+                        {
+                            new TechniqueSubCategory {SubCategoryId = 3, Active = true}
+                        },
+                        SetUpAttacks = new List<TechniqueSetupAttack>
+                        {
+                            new TechniqueSetupAttack {TechniqueId = 7, SetUpAttackId = 3, Active = true},
+                        },
+                        FollowUpAttacks = new List<TechniqueFollowupAttack>
+                        {
+                            new TechniqueFollowupAttack {TechniqueId = 7, FollowUpAttackId = 1, Active = true}
+                        },
+                        Counters = new List<TechniqueCounter>
+                        {
+                            new TechniqueCounter {TechniqueId = 7, CounterId = 2, Active = true}
+                        }
+                    });
 
                     // Seeding submissions
                     context.Add(new Submission
@@ -314,7 +350,7 @@ namespace JudoLibrary.Api
                     // Seeding moderation items
                     context.Add(new ModerationItem
                     {
-                        Target = 6,
+                        Target = 7,
                         Type = ModerationTypes.Technique,
                         UserId = testUser.Id
                     });
@@ -324,6 +360,13 @@ namespace JudoLibrary.Api
                         Target = 4,
                         Type = ModerationTypes.Category,
                         UserId = testUser.Id
+                    });
+                    
+                    context.Add(new ModerationItem
+                    {
+                        Target = 6,
+                        Type = ModerationTypes.SubCategory,
+                        UserId = testUser.Id,
                     });
 
                     // Saving changes to in-memory DB

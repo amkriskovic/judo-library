@@ -81,17 +81,5 @@ export const actions = {
     ])
   },
 
-  // Create technique with accessing state of store, and with payload <- form
-  createTechnique({state, commit, dispatch}, {form}) {
-
-    // Make post request to url, sendComment payload <- from, return Promise
-    return this.$axios.$post("/api/techniques", form);
-  },
-
-  updateTechnique({state, commit, dispatch}, {form}) {
-    // Make put request to url, sendComment payload <- from, return Promise
-    return this.$axios.$put("api/techniques", form);
-  }
-
 }
 

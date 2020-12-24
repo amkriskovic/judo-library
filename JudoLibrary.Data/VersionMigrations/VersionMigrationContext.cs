@@ -37,19 +37,11 @@ namespace JudoLibrary.Data.VersionMigrations
             if (ModerationItem == null) throw new NullReferenceException(nameof(ModerationItem));
             if (EntityMigrationContext == null) throw new NullReferenceException(nameof(EntityMigrationContext));
             
-            // Getting the source based on moderationItem Type that's passed => we end up with IQue<VersionedModel> of type that's
-            // passed in as argument -> moderationItem
             var source = EntityMigrationContext.GetSource();
 
-            // Grab the current version from source => where VM Id is equal to moderationItem Current which represents Current
-            // Version of item that we are moderating
             var current = source.FirstOrDefault(vm => vm.Id == ModerationItem.Current);
-
-            // Grab the next version (target) from source => where VM Id is equal to moderationItem Target
-            // Current =>> Target
             var target = source.FirstOrDefault(vm => vm.Id == ModerationItem.Target);
 
-            // If target is null -> NotFound
             if (target == null)
             {
                 if (current == null) throw new InvalidOperationException("Target not found");

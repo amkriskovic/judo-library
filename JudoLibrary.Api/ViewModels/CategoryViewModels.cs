@@ -12,8 +12,8 @@ namespace JudoLibrary.Api.ViewModels
             category => new
             {
                 category.Id,
-                category.Name,
                 category.Slug,
+                category.Name,
                 category.State,
                 category.Version,
             };
@@ -24,8 +24,8 @@ namespace JudoLibrary.Api.ViewModels
             category => new
             {
                 category.Id,
-                category.Name,
                 category.Slug,
+                category.Name,
                 category.Description,
                 category.Version,
                 category.State,

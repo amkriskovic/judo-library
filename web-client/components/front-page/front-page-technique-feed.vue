@@ -1,7 +1,8 @@
 ﻿<template>
   <div>
     <v-row justify="space-around">
-      <v-col lg="3" class="d-flex justify-center align-start" v-for="technique in content" :key="`technique-feed-${technique.id}`">
+      <v-col lg="3" class="d-flex justify-center align-start" v-for="technique in content"
+             :key="`technique-feed-${technique.id}`">
         <v-card width="320" @click="() => $router.push(`/technique/${technique.slug}`)" :ripple="false">
           <v-card-title>{{ technique.name }}</v-card-title>
           <v-divider />

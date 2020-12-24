@@ -20,7 +20,10 @@
         <template v-slot:allowed="{moderator}">
           <div class="d-flex align-center">
             <!-- Moderation button, if he is Mod -> coming from auth.js getters -->
-            <v-btn v-if="moderator" class="d-none d-md-flex mx-1" depressed to="/moderation">Moderation</v-btn>
+            <v-btn v-if="moderator"
+                   class="d-none d-md-flex mx-1"
+                   depressed to="/moderation">Moderation
+            </v-btn>
 
             <content-creation-dialog/>
 
@@ -84,6 +87,7 @@
         <nuxt/>
       </v-container>
     </v-main>
+    <popup/>
   </v-app>
 </template>
 
@@ -93,12 +97,14 @@ import {mapActions, mapGetters, mapState} from "vuex";
 import IfAuth from "@/components/auth/if-auth";
 import NavBarSearch from "@/components/nav-bar-search";
 import UserHeader from "@/components/user-header";
+import Popup from "@/components/popup";
 
 export default {
   name: "default",
 
   // Mapping components
   components: {
+    Popup,
     UserHeader,
     NavBarSearch,
     IfAuth,

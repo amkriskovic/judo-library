@@ -10,8 +10,10 @@
           <v-col cols="2" class="d-flex justify-center" v-if="current && target">
             <v-icon size="46">mdi-arrow-right</v-icon>
           </v-col>
+
           <v-col cols="5" v-if="target">
-            <component v-if="itemComponent" :[itemComponent.payload]="target" :is="itemComponent.is"/>
+            <component v-if="itemComponent" :[itemComponent.payload]="target" :is="itemComponent.is"
+                       @edit="itemComponent.edit(target)"/>
           </v-col>
         </v-row>
 
@@ -101,12 +103,15 @@
 import CommentSection from "@/components/comments/comment-section";
 import TechniqueInfoCard from "@/components/technique-info-card";
 import SimpleInfoCard from "@/components/moderation/simple-info-card";
+import CategoryForm from "@/components/content-creation/category-form"
+import SubCategoryForm from "@/components/content-creation/subcategory-form"
 import {COMMENT_PARENT_TYPE} from "@/components/comments/_shared";
 import {MODERATION_TYPES, modItemRenderer, REVIEW_STATUS, VERSION_STATE} from "@/components/moderation";
 import IfAuth from "@/components/auth/if-auth";
 import UserHeader from "@/components/user-header";
-import {mapActions, mapGetters} from "vuex";
+import {mapActions, mapGetters, mapMutations} from "vuex";
 import {EVENTS} from "@/data/events";
+import {onContentUpdate} from "@/components/_shared";
 
 const initReview = () => ({
   status: -1,
@@ -116,7 +121,7 @@ const initReview = () => ({
 export default {
   components: {UserHeader, IfAuth, TechniqueInfoCard, CommentSection},
 
-  mixins: [modItemRenderer],
+  mixins: [modItemRenderer, onContentUpdate],
 
   // Local state
   data: () => ({
@@ -127,43 +132,32 @@ export default {
     review: initReview()
   }),
 
-  // Every time you need to get asynchronous data. fetch is called on server-side when rendering the route, and on client-side when navigating.
   async fetch() {
-    // We want extract data that we passed in from url params in /moderation/{modId.id}
-    // Needs to be called modId coz of file => _modId.vue
     const {modId} = this.$route.params
 
-    // Getting moderation item via GET req., passing modId from URL params
     this.modItem = await this.$axios.$get(`/api/moderation-items/${modId}`)
 
-    const {type, current, target} = this.modItem
-
-    // Produce the endpoint based on url type parameter, e.g. techniques => extract the type from modItem
-    const endpoint = this.endpointResolver(type)
-
-    const loadReviews = this.loadReviews()
-
-    // Assign endpoint to the item in local state
-    // Get dynamic API controller => response - data, based on URL parameters that we extracted
-    // * Provide current from modItem which is int => current version of item we editing =>> CURRENT
-    const loadCurrent = this.$axios.$get(`/api/${endpoint}/${current}`)
-      // Fire and forget
-      // Then assign item(curr) that came from GET req. to local state item -> current
-      .then(currItem => this.current = currItem)
-
-    // * Make GET req to get the target(next) version =>> TARGET
-    const loadTarget = this.$axios.$get(`api/${endpoint}/${target}`)
-      // Fire and forget
-      // Then assign item(targetItem) that came from GET req. to local state item
-      .then(targetItem => this.target = targetItem)
-
-    await Promise.all([loadReviews, loadCurrent, loadTarget])
+    await this.loadRelationships()
   },
 
   methods: {
-    // Depending on which button we press, status of that will be passed to createReview
+    onContentUpdate() {
+      return this.loadRelationships()
+    },
+
+    loadRelationships() {
+      const {type, current, target} = this.modItem
+      const endpoint = this.endpointResolver(type)
+      const loadReviews = this.loadReviews()
+      const loadCurrent = this.$axios.$get(`/api/${endpoint}/${current}`)
+        .then((item) => this.current = item)
+      const loadTarget = this.$axios.$get(`/api/${endpoint}/${target}`)
+        .then((item) => this.target = item)
+
+      return Promise.all([loadReviews, loadCurrent, loadTarget])
+    },
+
     createReview() {
-      // Extract moderation item id from URL param
       const {modId} = this.$route.params;
 
       return this.$axios.$put(`/api/moderation-items/${modId}/reviews`,
@@ -186,16 +180,13 @@ export default {
       this.review = initReview()
     },
 
-    ...mapActions('library', ['loadContent'])
+    ...mapActions('library', ['loadContent']),
+    ...mapMutations('content-creation', ['activate'])
   },
 
-  // Computed properties allow us to define a property that is used the same way as data,
-  // but can also have some custom logic that is cached based on its dependencies.
-  // You can consider computed properties another view into your data.
   computed: {
     ...mapGetters('auth', ['moderator']),
 
-    // reviewActions represents computed prop, which returns arr of object with come custom props
     reviewActions() {
       return [
         {text: "Approve", value: REVIEW_STATUS.APPROVED, commentRequired: false},
@@ -204,12 +195,10 @@ export default {
       ]
     },
 
-    // Returns number of approved reviews => length
     approveCount() {
       return this.reviews.filter(r => r.status === REVIEW_STATUS.APPROVED).length
     },
 
-    // If target(next) - current is less than or equal to zero -> it's outdated
     outdated() {
       return this.current && this.target && this.current.state === VERSION_STATE.OUTDATED
     },
@@ -225,9 +214,23 @@ export default {
 
     itemComponent() {
       if (!this.modItem) return null;
-      if (this.modItem.type === MODERATION_TYPES.TECHNIQUE) return {is: TechniqueInfoCard, payload: 'technique'};
-      if (this.modItem.type === MODERATION_TYPES.CATEGORY) return {is: SimpleInfoCard, payload: 'payload'};
-      if (this.modItem.type === MODERATION_TYPES.SUBCATEGORY) return {is: SimpleInfoCard, payload: 'payload'};
+
+      if (this.modItem.type === MODERATION_TYPES.TECHNIQUE)
+        return {is: TechniqueInfoCard, payload: 'technique'};
+
+      if (this.modItem.type === MODERATION_TYPES.CATEGORY)
+        return {
+          is: SimpleInfoCard,
+          payload: 'payload',
+          edit: (category) => this.activate({component: CategoryForm, editPayload: category})
+        };
+      if (this.modItem.type === MODERATION_TYPES.SUBCATEGORY)
+        return {
+          is: SimpleInfoCard,
+          payload: 'payload',
+          edit: (subcategory) => this.activate({component: SubCategoryForm, editPayload: subcategory})
+        };
+
       return null;
     }
   },
