@@ -287,7 +287,7 @@ namespace JudoLibrary.Api
                     
                     context.Add(new Technique
                     {
-                        Id = 7, UserId = testUser.Id, Version = 1, State = VersionState.Staged, Slug = "back-flip-360",
+                        Id = 7, UserId = testUser.Id, Version = 1, State = VersionState.Live, Slug = "back-flip-360",
                         Name = "Back Flip 360",
                         Description = "This is a test back flip 360",
                         TechniqueCategories = new List<TechniqueCategory>
